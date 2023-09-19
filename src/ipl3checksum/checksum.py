@@ -12,7 +12,7 @@ from .ipl3kinds import IPL3Kind
 
 
 def readWordFromRam(romWords: list[int], entrypointRam: int, ramAddr: int) -> int:
-    return romWords[(ramAddr - entrypointRam + 0x1000) // 4]
+    return romWords[utils.u32(ramAddr - entrypointRam + 0x1000) // 4]
 
 
 def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
@@ -27,8 +27,6 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
         containing two 32-bits words. Otherwise, `None` is returned. Possible errors:
         - `romBytes` not being big enough
     """
-
-    assert kind != IPL3Kind.IPL3_X103
 
     assert kind != IPL3Kind.IPL3_X105
 
@@ -45,6 +43,8 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
     s6 = seed
 
     a0 = romWords[8//4]
+    if kind == IPL3Kind.IPL3_X103:
+        a0 -= 0x100000
     entrypointRam = a0
 
     at = magic
@@ -124,9 +124,15 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
             LA40005F0_loop = False
 
 
-    t6 = a3 ^ t2
-    a3 = t6 ^ t3
-    t8 = s0 ^ a2
-    s0 = t8 ^ t4
+    if kind == IPL3Kind.IPL3_X103:
+        t6 = a3 ^ t2
+        a3 = utils.u32(t6 + t3)
+        t8 = s0 ^ a2
+        s0 = utils.u32(t8 + t4)
+    else:
+        t6 = a3 ^ t2
+        a3 = t6 ^ t3
+        t8 = s0 ^ a2
+        s0 = t8 ^ t4
 
     return (a3, s0)
