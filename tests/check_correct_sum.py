@@ -10,12 +10,12 @@ from pathlib import Path
 import struct
 
 ipl3mapping = {
-    "IPL3_6101":        ipl3checksum.IPL3Kind.IPL3_6101,
-    "IPL3_6102_7101":   ipl3checksum.IPL3Kind.IPL3_6102_7101,
-    "IPL3_7102":        ipl3checksum.IPL3Kind.IPL3_7102,
-    "IPL3_X103":        ipl3checksum.IPL3Kind.IPL3_X103,
-    "IPL3_X105":        ipl3checksum.IPL3Kind.IPL3_X105,
-    "IPL3_X106":        ipl3checksum.IPL3Kind.IPL3_X106,
+    "IPL3_6101":        ipl3checksum.CICKind.CIC_6101,
+    "IPL3_6102_7101":   ipl3checksum.CICKind.CIC_6102_7101,
+    "IPL3_7102":        ipl3checksum.CICKind.CIC_7102,
+    "IPL3_X103":        ipl3checksum.CICKind.CIC_X103,
+    "IPL3_X105":        ipl3checksum.CICKind.CIC_X105,
+    "IPL3_X106":        ipl3checksum.CICKind.CIC_X106,
 }
 
 print(f"Running ipl3checksum version {ipl3checksum.__version__}")

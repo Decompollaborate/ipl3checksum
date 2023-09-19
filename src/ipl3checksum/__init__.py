@@ -12,4 +12,4 @@ __author__ = "Decompollaborate"
 from . import utils as utils
 
 from .checksum import calculateChecksum as calculateChecksum
-from .ipl3kinds import IPL3Kind as IPL3Kind
+from .cickinds import CICKind as CICKind

@@ -22,9 +22,9 @@ cic = int(args.cic if args.cic is not None else 0)
 
 romBytes = romPath.read_bytes()
 
-ipl3kind = ipl3checksum.IPL3Kind.fromValue(cic)
+ipl3kind = ipl3checksum.CICKind.fromValue(cic)
 if ipl3kind is None:
-    ipl3kind = ipl3checksum.IPL3Kind.IPL3_6102_7101
+    ipl3kind = ipl3checksum.CICKind.CIC_6102_7101
 
 print(f"Using {ipl3kind.name}")
 

@@ -8,19 +8,19 @@ from __future__ import annotations
 import struct
 
 from . import utils
-from .ipl3kinds import IPL3Kind
+from .cickinds import CICKind
 
 
 def readWordFromRam(romWords: list[int], entrypointRam: int, ramAddr: int) -> int:
     return romWords[utils.u32(ramAddr - entrypointRam + 0x1000) // 4]
 
 
-def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
-    """Calculates the checksum required by an official IPL3 loader of a N64 ROM.
+def calculateChecksum(romBytes: bytes, kind: CICKind) -> tuple[int, int]|None:
+    """Calculates the checksum required by an official CIC of a N64 ROM.
 
     Args:
         romBytes (bytes): The bytes of the N64 ROM in big endian format. It must have a minimum size of 0x101000 bytes.
-        kind (IPL3Kind): The IPL3 kind variation used to calculate the checksum.
+        kind (CICKind): The CIC kind variation used to calculate the checksum.
 
     Returns:
         tuple[int, int]|None: If no error happens then the calculated checksum is returned, stored as a tuple
@@ -39,16 +39,16 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
     s6 = seed
 
     a0 = romWords[8//4]
-    if kind == IPL3Kind.IPL3_X103:
+    if kind == CICKind.CIC_X103:
         a0 -= 0x100000
-    if kind == IPL3Kind.IPL3_X106:
+    if kind == CICKind.CIC_X106:
         a0 -= 0x200000
     entrypointRam = a0
 
     at = magic
     lo = s6 * at
 
-    if kind == IPL3Kind.IPL3_X105:
+    if kind == CICKind.CIC_X105:
         s6 = 0xA0000200
 
     ra = 0x100000
@@ -115,7 +115,7 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
 
 
         # LA4000640:
-        if kind == IPL3Kind.IPL3_X105:
+        if kind == CICKind.CIC_X105:
             # ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
             t7 = romWords[(s6 - 0xA0000004 + 0x000554) // 4]
 
@@ -142,12 +142,12 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
             LA40005F0_loop = False
 
 
-    if kind == IPL3Kind.IPL3_X103:
+    if kind == CICKind.CIC_X103:
         t6 = a3 ^ t2
         a3 = utils.u32(t6 + t3)
         t8 = s0 ^ a2
         s0 = utils.u32(t8 + t4)
-    elif kind == IPL3Kind.IPL3_X106:
+    elif kind == CICKind.CIC_X106:
         t6 = utils.u32(a3 * t2)
         a3 = utils.u32(t6 + t3)
         t8 = utils.u32(s0 * a2)
