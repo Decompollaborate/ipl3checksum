@@ -36,6 +36,24 @@ class IPL3Kind(enum.Enum):
         """
         return IPL3HashMd5[self]
 
+    @staticmethod
+    def fromValue(value: int) -> IPL3Kind|None:
+        if value == 6102 or value == 7101:
+            return IPL3Kind.IPL3_6102_7101
+        if value == 6101:
+            return IPL3Kind.IPL3_6101
+        if value == 7102:
+            return IPL3Kind.IPL3_7102
+        if value == 6103 or value == 7103:
+            return IPL3Kind.IPL3_X103
+        if value == 6105 or value == 7105:
+            return IPL3Kind.IPL3_X105
+        if value == 6106 or value == 7106:
+            return IPL3Kind.IPL3_X106
+
+        return None
+
+
 IPL3Seeds: dict[IPL3Kind, int] = {
     IPL3Kind.IPL3_6101:      0x3F,
     IPL3Kind.IPL3_6102_7101: 0x3F,

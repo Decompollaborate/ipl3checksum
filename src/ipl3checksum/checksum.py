@@ -33,7 +33,7 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
     if len(romBytes) < 0x101000:
         return None
 
-    romWords = list(struct.unpack(f">{0x101000//4}I", romBytes))
+    romWords = list(struct.unpack_from(f">{0x101000//4}I", romBytes))
 
     seed = kind.getSeed()
     magic = kind.getMagic()
