@@ -11,22 +11,37 @@ import random
 import struct
 
 
+ipl3s = [
+    (ipl3checksum.IPL3Kind.IPL3_6101, ),
+    (ipl3checksum.IPL3Kind.IPL3_6102_7101, ),
+    (ipl3checksum.IPL3Kind.IPL3_7102, ),
+    # (ipl3checksum.IPL3Kind.IPL3_X103, ),
+    # (ipl3checksum.IPL3Kind.IPL3_X105, ),
+    # (ipl3checksum.IPL3Kind.IPL3_X106, ),
+]
+
 # TODO: don't hardcode 6102
 
-random.seed(0xA1F)
+for kind,  in ipl3s:
+    print(f"Generating dummy for {kind}")
 
-generatedBin = bytearray()
+    random.seed(0xA1F)
 
-for i in range(0x1000):
-    generatedBin.append(0)
+    generatedBin = bytearray()
 
-for i in range(0x100000):
-    generatedBin.append(random.randint(0, 0xFF))
+    for i in range(0x1000):
+        generatedBin.append(0)
 
-checksum = ipl3checksum.calculateChecksum(generatedBin, ipl3checksum.IPL3Kind.IPL3_6102_7101)
-assert checksum is not None
-w1, w2 = checksum
+    for i in range(0x100000):
+        generatedBin.append(random.randint(0, 0xFF))
 
-struct.pack_into(f">II", generatedBin, 0x10, w1, w2)
+    checksum = ipl3checksum.calculateChecksum(generatedBin, kind)
+    assert checksum is not None
+    w1, w2 = checksum
 
-Path(f"tests/dummytests/dummy.6102.bin").write_bytes(generatedBin)
+    struct.pack_into(f">II", generatedBin, 0x10, w1, w2)
+
+    binPath = Path(f"tests/dummytests/{kind.name}")
+    binPath.mkdir(parents=True, exist_ok=True)
+    binPath /= "dummy.bin"
+    binPath.write_bytes(generatedBin)

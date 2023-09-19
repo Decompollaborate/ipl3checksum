@@ -9,29 +9,44 @@ import ipl3checksum
 from pathlib import Path
 import struct
 
+ipl3mapping = {
+    "IPL3_6101":        ipl3checksum.IPL3Kind.IPL3_6101,
+    "IPL3_6102_7101":   ipl3checksum.IPL3Kind.IPL3_6102_7101,
+    "IPL3_7102":        ipl3checksum.IPL3Kind.IPL3_7102,
+    "IPL3_X103":        ipl3checksum.IPL3Kind.IPL3_X103,
+    "IPL3_X105":        ipl3checksum.IPL3Kind.IPL3_X105,
+    "IPL3_X106":        ipl3checksum.IPL3Kind.IPL3_X106,
+}
+
 print(f"Running ipl3checksum version {ipl3checksum.__version__}")
 
-for binPath in sorted(Path("tests/dummytests").iterdir()):
-    print(binPath)
+for ipl3folder in sorted(Path("tests/dummytests").iterdir()):
+    print(ipl3folder.name)
 
-    print("    Reading...")
-    binBytes = binPath.read_bytes()
+    kind = ipl3mapping[ipl3folder.name]
 
-    print("    Calculating checksum...")
-    # TODO: don't hardcode IPL3_6102_7101
-    checksum = ipl3checksum.calculateChecksum(binBytes, ipl3checksum.IPL3Kind.IPL3_6102_7101)
-    assert checksum is not None
+    for binPath in sorted(ipl3folder.iterdir()):
+        print(binPath)
 
-    print(f"    Calculated checksum is: 0x{checksum[0]:08X} 0x{checksum[1]:08X}")
+        print("    Reading...")
+        binBytes = binPath.read_bytes()
 
-    print("    Checking checksum...")
-    binChecksum = struct.unpack_from(f">II", binBytes, 0x10)
+        print("    Calculating checksum...")
+        checksum = ipl3checksum.calculateChecksum(binBytes, kind)
+        assert checksum is not None
 
-    print(f"    Expected checksum is: 0x{binChecksum[0]:08X} 0x{binChecksum[1]:08X}")
+        print(f"    Calculated checksum is: 0x{checksum[0]:08X} 0x{checksum[1]:08X}")
 
-    assert checksum[0] == binChecksum[0]
-    assert checksum[1] == binChecksum[1]
+        print("    Checking checksum...")
+        binChecksum = struct.unpack_from(f">II", binBytes, 0x10)
 
-    print(f"    {binPath} OK")
+        print(f"    Expected checksum is: 0x{binChecksum[0]:08X} 0x{binChecksum[1]:08X}")
+
+        assert checksum[0] == binChecksum[0]
+        assert checksum[1] == binChecksum[1]
+
+        print(f"    {binPath} OK")
+
+        print()
 
     print()
