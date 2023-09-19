@@ -28,8 +28,6 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
         - `romBytes` not being big enough
     """
 
-    assert kind != IPL3Kind.IPL3_X105
-
     assert kind != IPL3Kind.IPL3_X106
 
     if len(romBytes) < 0x101000:
@@ -49,6 +47,9 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
 
     at = magic
     lo = s6 * at
+
+    if kind == IPL3Kind.IPL3_X105:
+        s6 = 0xA0000200
 
     ra = 0x100000
 
@@ -112,13 +113,30 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
         else:
             a2 = a2 ^ a0
 
+
         # LA4000640:
-        t0 = utils.u32(t0 + 0x4)
-        t7 = v0 ^ s0
-        t1 = utils.u32(t1 + 0x4)
+        if kind == IPL3Kind.IPL3_X105:
+            # ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
+            t7 = romWords[(s6 - 0xA0000004 + 0x000554) // 4]
 
+            t0 = utils.u32(t0 + 0x4)
+            s6 = utils.u32(s6 + 0x4)
+            t7 = v0 ^ t7
 
-        t4 = utils.u32(t7 + t4)
+            t4 = utils.u32(t7 + t4)
+
+            t7 = 0xA00002FF
+
+            t1 = utils.u32(t1 + 0x4)
+
+            s6 = utils.u32(s6 & t7)
+        else:
+            t0 = utils.u32(t0 + 0x4)
+            t7 = v0 ^ s0
+            t1 = utils.u32(t1 + 0x4)
+
+            t4 = utils.u32(t7 + t4)
+
         # if (t0 != ra) goto LA40005F0;
         if t0 == ra:
             LA40005F0_loop = False
