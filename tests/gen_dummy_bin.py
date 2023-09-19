@@ -23,7 +23,7 @@ for i in range(0x1000):
 for i in range(0x100000):
     generatedBin.append(random.randint(0, 0xFF))
 
-checksum = ipl3checksum.calculateChecksum(generatedBin, ipl3checksum.IPL3Kind.IPL3_6102)
+checksum = ipl3checksum.calculateChecksum(generatedBin, ipl3checksum.IPL3Kind.IPL3_6102_7101)
 assert checksum is not None
 w1, w2 = checksum
 

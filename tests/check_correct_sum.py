@@ -18,8 +18,8 @@ for binPath in sorted(Path("tests/dummytests").iterdir()):
     binBytes = binPath.read_bytes()
 
     print("    Calculating checksum...")
-    # TODO: don't hardcode IPL3_6102
-    checksum = ipl3checksum.calculateChecksum(binBytes, ipl3checksum.IPL3Kind.IPL3_6102)
+    # TODO: don't hardcode IPL3_6102_7101
+    checksum = ipl3checksum.calculateChecksum(binBytes, ipl3checksum.IPL3Kind.IPL3_6102_7101)
     assert checksum is not None
 
     print(f"    Calculated checksum is: 0x{checksum[0]:08X} 0x{checksum[1]:08X}")

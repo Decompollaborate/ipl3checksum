@@ -28,14 +28,11 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
         - `romBytes` not being big enough
     """
 
-    assert kind != IPL3Kind.IPL3_6103
-    assert kind != IPL3Kind.IPL3_7103
+    assert kind != IPL3Kind.IPL3_X103
 
-    assert kind != IPL3Kind.IPL3_6105
-    assert kind != IPL3Kind.IPL3_7105
+    assert kind != IPL3Kind.IPL3_X105
 
-    assert kind != IPL3Kind.IPL3_6106
-    assert kind != IPL3Kind.IPL3_7106
+    assert kind != IPL3Kind.IPL3_X106
 
     if len(romBytes) < 0x101000:
         return None
