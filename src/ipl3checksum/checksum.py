@@ -28,8 +28,6 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
         - `romBytes` not being big enough
     """
 
-    assert kind != IPL3Kind.IPL3_X106
-
     if len(romBytes) < 0x101000:
         return None
 
@@ -43,6 +41,8 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
     a0 = romWords[8//4]
     if kind == IPL3Kind.IPL3_X103:
         a0 -= 0x100000
+    if kind == IPL3Kind.IPL3_X106:
+        a0 -= 0x200000
     entrypointRam = a0
 
     at = magic
@@ -146,6 +146,11 @@ def calculateChecksum(romBytes: bytes, kind: IPL3Kind) -> tuple[int, int]|None:
         t6 = a3 ^ t2
         a3 = utils.u32(t6 + t3)
         t8 = s0 ^ a2
+        s0 = utils.u32(t8 + t4)
+    elif kind == IPL3Kind.IPL3_X106:
+        t6 = utils.u32(a3 * t2)
+        a3 = utils.u32(t6 + t3)
+        t8 = utils.u32(s0 * a2)
         s0 = utils.u32(t8 + t4)
     else:
         t6 = a3 ^ t2

@@ -17,7 +17,7 @@ ipl3s = [
     (ipl3checksum.IPL3Kind.IPL3_7102, ),
     (ipl3checksum.IPL3Kind.IPL3_X103, ),
     (ipl3checksum.IPL3Kind.IPL3_X105, ),
-    # (ipl3checksum.IPL3Kind.IPL3_X106, ),
+    (ipl3checksum.IPL3Kind.IPL3_X106, ),
 ]
 
 # TODO: don't hardcode 6102
