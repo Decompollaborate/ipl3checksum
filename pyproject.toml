@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: © 2023 Decompollaborate
+# SPDX-License-Identifier: MIT
+
+[project]
+name = "ipl3checksum"
+version = "0.1.0.dev0"
+description = "N64 IPL3 tools library"
+readme = "README.md"
+requires-python = ">=3.7"
+dynamic = ["dependencies"]
+
+[project.urls]
+"Homepage" = "https://github.com/decompollaborate/ipl3checksum"
+"Bug Tracker" = "https://github.com/decompollaborate/ipl3checksum/issues"
+
+[build-system]
+requires = ["hatchling", "hatch-requirements-txt"]
+build-backend = "hatchling.build"
+
+[tool.cibuildwheel]
+skip = ["cp36-*"]

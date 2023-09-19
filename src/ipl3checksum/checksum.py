@@ -8,7 +8,7 @@ from __future__ import annotations
 import struct
 
 from . import utils
-from ipl3kinds import IPL3Kind
+from .ipl3kinds import IPL3Kind
 
 
 def readWordFromRam(romWords: list[int], entrypointRam: int, ramAddr: int) -> int:
