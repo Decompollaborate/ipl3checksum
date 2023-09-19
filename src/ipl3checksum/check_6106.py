@@ -32,7 +32,7 @@ def readWordFromRam(romWords: list[int], entrypointRam: int, ramAddr: int) -> in
     return word
 
 
-def checksumfunc(romBytes: bytes, initial_s6 = 0x78):
+def checksumfunc(romBytes: bytes, initial_s6 = 0x85):
     byteCount = len(romBytes)
     assert byteCount > 0x101000, f"0x{byteCount:X}"
     wordCount = byteCount // 4
@@ -40,7 +40,7 @@ def checksumfunc(romBytes: bytes, initial_s6 = 0x78):
 
     s6 = initial_s6
 
-    a0 = romWords[8//4] - 0x100000
+    a0 = romWords[8//4] - 0x200000
     entrypointRam = a0
 
     at = 0x6C078965
@@ -120,9 +120,9 @@ def checksumfunc(romBytes: bytes, initial_s6 = 0x78):
             LA40005F0_loop = False
 
 
-    t6 = a3 ^ t2
+    t6 = u32(a3 * t2)
     a3 = u32(t6 + t3)
-    t8 = s0 ^ a2
+    t8 = u32(s0 * a2)
     s0 = u32(t8 + t4)
 
     return (a3, s0)
