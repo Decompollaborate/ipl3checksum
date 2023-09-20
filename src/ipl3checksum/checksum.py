@@ -62,7 +62,6 @@ def calculateChecksum(romBytes: bytes, kind: CICKind) -> tuple[int, int]|None:
     t5 = 0x20
 
     v0 = utils.u32(lo)
-
     v0 += 1
 
     a3 = v0
