@@ -13,11 +13,9 @@ import struct
 
 print(f"Running ipl3checksum version {ipl3checksum.__version__}")
 
-def checkChecksum(romPath: Path) -> bool:
+def checkChecksum(romPath: Path, romBytes: bytes) -> bool:
+    print()
     print(romPath)
-
-    print("    Reading...")
-    romBytes = romPath.read_bytes()
 
     binChecksum = struct.unpack_from(f">II", romBytes, 0x10)
 
@@ -50,6 +48,9 @@ def recursePaths(folder: Path) -> int:
     errors = 0
 
     for subpath in sorted(folder.iterdir()):
+        if subpath.name.startswith("."):
+            continue
+
         if subpath.is_dir():
             recursePaths(subpath)
             continue
@@ -58,7 +59,14 @@ def recursePaths(folder: Path) -> int:
             # iQue has a wrong checksum for some reason
             continue
 
-        ok = checkChecksum(subpath)
+        romBytes = subpath.read_bytes()
+        romMagic = struct.unpack_from(f">I", romBytes, 0x0)
+
+        if romMagic != 0x80371240:
+            # Not an N64 rom
+            continue
+
+        ok = checkChecksum(subpath, romBytes)
         if not ok:
             errors += 1
 
