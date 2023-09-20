@@ -11,5 +11,10 @@ __author__ = "Decompollaborate"
 
 from . import utils as utils
 
-from .checksum import calculateChecksum as calculateChecksum
 from .cickinds import CICKind as CICKind
+
+from .checksum import calculateChecksum as calculateChecksum
+from .checksum import calculateChecksumAutodetect as calculateChecksumAutodetect
+
+from .detect import detectCIC as detectCIC
+from .detect import detectCICRaw as detectCICRaw

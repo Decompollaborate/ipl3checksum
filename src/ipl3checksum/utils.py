@@ -10,5 +10,5 @@ import hashlib
 def u32(value: int) -> int:
     return value & 0xFFFFFFFF
 
-def getStrHash(bytes: bytes) -> str:
+def getHashMd5(bytes: bytes) -> str:
     return str(hashlib.md5(bytes).hexdigest())
