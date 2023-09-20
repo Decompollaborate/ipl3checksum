@@ -51,8 +51,10 @@ def recursePaths(folder: Path) -> int:
         if subpath.name.startswith("."):
             continue
 
+        print(subpath)
+
         if subpath.is_dir():
-            recursePaths(subpath)
+            errors += recursePaths(subpath)
             continue
 
         if subpath.parts[-2] == "drmario64" and subpath.name == "baserom.cn.z64":
@@ -70,8 +72,6 @@ def recursePaths(folder: Path) -> int:
         if not ok:
             errors += 1
 
-    print(f"Total errors: {errors}")
-
     return errors
 
 
@@ -80,4 +80,5 @@ parser.add_argument("path")
 
 args = parser.parse_args()
 
-exit(recursePaths(Path(args.path)))
+errors = recursePaths(Path(args.path))
+exit(errors)
