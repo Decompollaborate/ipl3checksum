@@ -11,7 +11,7 @@ import random
 import struct
 
 
-ipl3s = [
+cics = [
     (ipl3checksum.CICKind.CIC_6101, ),
     (ipl3checksum.CICKind.CIC_6102_7101, ),
     (ipl3checksum.CICKind.CIC_7102, ),
@@ -20,9 +20,7 @@ ipl3s = [
     (ipl3checksum.CICKind.CIC_X106, ),
 ]
 
-# TODO: don't hardcode 6102
-
-for kind,  in ipl3s:
+for kind, in cics:
     print(f"Generating dummy for {kind}")
 
     random.seed(0xA1F)

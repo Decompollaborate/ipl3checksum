@@ -24,16 +24,16 @@ cic = int(args.cic if args.cic is not None else 0)
 romBytes = romPath.read_bytes()
 
 if args.autodetect:
-    ipl3kind = ipl3checksum.detectCIC(romBytes)
+    cickind = ipl3checksum.detectCIC(romBytes)
 else:
-    ipl3kind = ipl3checksum.CICKind.fromValue(cic)
+    cickind = ipl3checksum.CICKind.fromValue(cic)
 
-if ipl3kind is None:
-    ipl3kind = ipl3checksum.CICKind.CIC_6102_7101
+if cickind is None:
+    cickind = ipl3checksum.CICKind.CIC_6102_7101
 
-print(f"Using {ipl3kind.name}")
+print(f"Using {cickind.name}")
 
-checksum = ipl3checksum.calculateChecksum(romBytes, ipl3kind)
+checksum = ipl3checksum.calculateChecksum(romBytes, cickind)
 assert checksum is not None
 
 print(f"{checksum[0]:08X}")
