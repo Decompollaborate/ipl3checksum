@@ -17,6 +17,9 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
+    - name: Install local ipl3checksum
+      run: pip install .
+
     - name: Get extra dependencies
       uses: actions/checkout@v4
       with:
