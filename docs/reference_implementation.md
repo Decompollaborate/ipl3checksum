@@ -1,5 +1,7 @@
 # Reference implementation
 
+![Static Badge](https://img.shields.io/badge/license-CC0-green)
+
 This whole file is licensed under CC0-1.0. See [docs/LICENSE](docs/LICENSE).
 
 This file contains a reference implementation of the IPL3 checksum algorithm, adapted to work with every known retail CIC/IPL3 variant.

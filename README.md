@@ -1,5 +1,11 @@
 # ipl3checksum
 
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/ipl3checksum)](https://pypi.org/project/ipl3checksum/)
+[![GitHub License](https://img.shields.io/github/license/Decompollaborate/ipl3checksum)](https://github.com/Decompollaborate/ipl3checksum/releases/latest)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/Decompollaborate/ipl3checksum)](https://github.com/Decompollaborate/ipl3checksum/releases/latest)
+[![PyPI](https://img.shields.io/pypi/v/ipl3checksum)](https://pypi.org/project/ipl3checksum/)
+[![GitHub contributors](https://img.shields.io/github/contributors/Decompollaborate/ipl3checksum?logo=purple)](https://github.com/Decompollaborate/ipl3checksum/graphs/contributors)
+
 A Python library to calculate the IPL3 checksum for N64 ROMs.
 
 ## How to use it?
