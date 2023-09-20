@@ -63,11 +63,12 @@ def recursePaths(folder: Path) -> int:
             continue
 
         romBytes = subpath.read_bytes()
-        romMagic = struct.unpack_from(f">I", romBytes, 0x0)
+        romMagic = struct.unpack_from(f">I", romBytes, 0x0)[0]
 
         print(f"  Rom magic: {romMagic:08X}")
         if romMagic != 0x80371240:
             # Not an N64 rom
+            print(f"Skipping {subpath}")
             continue
 
         ok = checkChecksum(subpath, romBytes)
