@@ -1,4 +1,4 @@
-name: Build
+name: Test other repo
 
 # Build on every branch push, tag push, and pull request change:
 on: [push, pull_request_target]
@@ -16,9 +16,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: ${{ github.event.pull_request.head.sha }}
-
-    - name: Install Python dependencies
-      run: pip3 install -r requirements.txt
 
     - name: Get extra dependencies
       uses: actions/checkout@v4
