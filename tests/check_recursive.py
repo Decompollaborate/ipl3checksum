@@ -27,6 +27,8 @@ def checkChecksum(romPath: Path, romBytes: bytes) -> bool:
         print(f"    Not able to detect CIC for {romPath}")
         return False
 
+    print(f"    Detected CIC is: {cicKind}")
+
     print("    Calculating checksum...")
     calculatedChecksum = ipl3checksum.calculateChecksum(romBytes, cicKind)
     if calculatedChecksum is None:
