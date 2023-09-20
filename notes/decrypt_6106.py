@@ -2,7 +2,9 @@
 
 # SPDX-License-Identifier: CC0-1.0
 
-D_A40004F0 = [
+from __future__ import annotations
+
+D_A40004F0: list[int] = [
     # Fill with 0x2BC bytes at rom offset 0x0004F0 from cic 6106
 ]
 
