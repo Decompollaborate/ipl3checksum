@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: © 2023 Decompollaborate
-# SPDX-License-Identifier: MIT
-
-# works for 6102, 6101, 7101
+# SPDX-License-Identifier: CC0-1.0
 
 from __future__ import annotations
 
@@ -34,7 +31,7 @@ def readWordFromRam(romWords: list[int], entrypointRam: int, ramAddr: int) -> in
     return word
 
 
-def checksumfunc(romBytes: bytes, initial_s6 = 0x3F):
+def checksumfunc(romBytes: bytes, initial_s6 = 0x85):
     byteCount = len(romBytes)
     assert byteCount > 0x101000, f"0x{byteCount:X}"
     wordCount = byteCount // 4
@@ -42,10 +39,10 @@ def checksumfunc(romBytes: bytes, initial_s6 = 0x3F):
 
     s6 = initial_s6
 
-    a0 = romWords[8//4]
+    a0 = romWords[8//4] - 0x200000
     entrypointRam = a0
 
-    at = 0x5D588B65
+    at = 0x6C078965
     lo = s6 * at
 
     ra = 0x100000
@@ -122,10 +119,10 @@ def checksumfunc(romBytes: bytes, initial_s6 = 0x3F):
             LA40005F0_loop = False
 
 
-    t6 = a3 ^ t2
-    a3 = t6 ^ t3
-    t8 = s0 ^ a2
-    s0 = t8 ^ t4
+    t6 = u32(a3 * t2)
+    a3 = u32(t6 + t3)
+    t8 = u32(s0 * a2)
+    s0 = u32(t8 + t4)
 
     return (a3, s0)
 

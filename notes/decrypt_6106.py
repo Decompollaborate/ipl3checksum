@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+
+# SPDX-License-Identifier: CC0-1.0
+
 D_A40004F0 = [
     # Fill with 0x2BC bytes at rom offset 0x0004F0 from cic 6106
 ]

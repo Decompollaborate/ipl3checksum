@@ -1,12 +1,3 @@
-# Reference implementation
-
-This whole file is licensed under CC0-1.0. See [docs/LICENSE](docs/LICENSE).
-
-This file contains a reference implementation of the IPL3 checksum algorithm, adapted to work with every known retail CIC/IPL3 variant.
-
-This implementation is a very crude direct translation from the original assembly and it could be greatly simplified in a reimplementation.
-
-```c
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include <stdint.h>
@@ -15,9 +6,6 @@ uint32_t readWord(const uint8_t *rom , uint32_t offset) {
     return (rom[offset] << 24) | (rom[offset+1] << 16) | (rom[offset+2] << 8) | (rom[offset+3]);
 }
 
-/**
- * This value is passed by the PIF ROM to IPL3 via the $s6 register.
- */
 uint32_t getSeed(uint32_t cic) {
     switch (cic) {
         case 6101:
@@ -41,9 +29,6 @@ uint32_t getSeed(uint32_t cic) {
     }
 }
 
-/**
- * This value is hardcoded into the IPL3.
- */
 uint32_t getMagic(uint32_t cic) {
     switch (cic) {
         case 6101:
@@ -88,7 +73,6 @@ void calculateChecksum(const uint8_t *rom, uint32_t cic, uint32_t *dst1, uint32_
             break;
     }
 
-    /* Tweak: The entrypoint is kept to be able to adjust some rom reads */
     entrypointRam = a0;
 
     at = magic;
@@ -120,7 +104,6 @@ void calculateChecksum(const uint8_t *rom, uint32_t cic, uint32_t *dst1, uint32_
     t4 = v0;
 
     do {
-        /* lw $v0, 0x0($t1) */
         v0 = readWord(rom, t1 - entrypointRam + 0x1000);
         v1 = a3 + v0;
 
@@ -157,7 +140,6 @@ void calculateChecksum(const uint8_t *rom, uint32_t cic, uint32_t *dst1, uint32_
             case 6105:
             case 7105:
                 /* ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004 */
-                /* lw $t7, 0x0($s6) */
                 t7 = readWord(rom, s6 - 0xA0000004 + 0x000554);
 
                 t0 = t0 + 0x4;
@@ -210,4 +192,50 @@ void calculateChecksum(const uint8_t *rom, uint32_t cic, uint32_t *dst1, uint32_
     *dst1 = a3;
     *dst2 = s0;
 }
-```
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char **argv) {
+    uint8_t rom[0x101000];
+    FILE *file;
+    uint32_t w0;
+    uint32_t w1;
+    size_t readlen;
+    uint32_t cic;
+
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s <rom_path> <cic_type>\n", argv[0]);
+        return 1;
+    }
+
+    file = fopen(argv[1], "rb");
+    if (file == NULL) {
+        fprintf(stderr, "Not able to open rom file '%s'\n", argv[1]);
+        return 1;
+    }
+
+    readlen = fread(rom, sizeof(uint8_t), 0x101000, file);
+    if (readlen != 0x101000) {
+        fprintf(stderr, "Not able to read rom file\n");
+        return 1;
+    }
+
+    {
+        char *str_end;
+
+        cic = strtol(argv[2], &str_end, 10);
+        if (argv[2] == str_end) {
+            fprintf(stderr, "Not able to parse cic argument (%s)\n", argv[2]);
+            return 1;
+        }
+    }
+
+    calculateChecksum(rom, cic, &w0, &w1);
+
+    printf("0x%08X\n0x%08X\n", w0, w1);
+
+    fclose(file);
+
+    return 0;
+}

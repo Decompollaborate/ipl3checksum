@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: © 2023 Decompollaborate
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: CC0-1.0
 
 from __future__ import annotations
 
@@ -32,7 +31,7 @@ def readWordFromRam(romWords: list[int], entrypointRam: int, ramAddr: int) -> in
     return word
 
 
-def checksumfunc(romBytes: bytes, initial_s6 = 0x78):
+def checksumfunc(romBytes: bytes, initial_s6 = 0x91):
     byteCount = len(romBytes)
     assert byteCount > 0x101000, f"0x{byteCount:X}"
     wordCount = byteCount // 4
@@ -40,11 +39,13 @@ def checksumfunc(romBytes: bytes, initial_s6 = 0x78):
 
     s6 = initial_s6
 
-    a0 = romWords[8//4] - 0x100000
+    a0 = romWords[8//4]
     entrypointRam = a0
 
-    at = 0x6C078965
+    at = 0x5D588B65
     lo = s6 * at
+
+    s6 = 0xA0000200
 
     ra = 0x100000
 
@@ -52,8 +53,6 @@ def checksumfunc(romBytes: bytes, initial_s6 = 0x78):
     t0 = 0
 
     t1 = a0
-
-    t5 = 0x20
 
     v0 = u32(lo)
 
@@ -65,6 +64,8 @@ def checksumfunc(romBytes: bytes, initial_s6 = 0x78):
     s0 = v0
     a2 = v0
     t4 = v0
+
+    t5 = 0x20
 
     # poor man's do while
     LA40005F0_loop = True
@@ -109,21 +110,43 @@ def checksumfunc(romBytes: bytes, initial_s6 = 0x78):
             a2 = a2 ^ a0
 
         # LA4000640:
+        # t0 = u32(t0 + 0x4)
+        # t7 = v0 ^ s0
+
+        # t7 = *s6
+        # ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
+        t7 = romWords[(s6 - 0xA0000004 + 0x000554) // 4]
+        # lw          $t7, 0x0($s6)
+
         t0 = u32(t0 + 0x4)
-        t7 = v0 ^ s0
+        # addiu       $t0, $t0, 0x4
+
+        s6 = u32(s6 + 0x4)
+        # addiu       $s6, $s6, 0x4
+
+        t7 = v0 ^ t7
+        # xor         $t7, $v0, $t7
+
+        t4 = u32(t7 + t4)
+        # addu        $t4, $t7, $t4
+
+        t7 = 0xA00002FF
+        # lui         $t7, (0xA00002FF >> 16)
+        # ori         $t7, $t7, (0xA00002FF & 0xFFFF)
+
         t1 = u32(t1 + 0x4)
 
 
-        t4 = u32(t7 + t4)
+        # t4 = u32(t7 + t4)
+        s6 = u32(s6 & t7)
         # if (t0 != ra) goto LA40005F0;
         if t0 == ra:
             LA40005F0_loop = False
 
-
     t6 = a3 ^ t2
-    a3 = u32(t6 + t3)
+    a3 = t6 ^ t3
     t8 = s0 ^ a2
-    s0 = u32(t8 + t4)
+    s0 = t8 ^ t4
 
     return (a3, s0)
 
