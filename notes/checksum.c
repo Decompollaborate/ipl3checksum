@@ -73,6 +73,7 @@ void calculateChecksum(const uint8_t *rom, uint32_t cic, uint32_t *dst1, uint32_
             break;
     }
 
+    /* Tweak: The entrypoint is kept to be able to adjust some rom reads */
     entrypointRam = a0;
 
     at = magic;
@@ -104,6 +105,7 @@ void calculateChecksum(const uint8_t *rom, uint32_t cic, uint32_t *dst1, uint32_
     t4 = v0;
 
     do {
+        /* lw $v0, 0x0($t1) */
         v0 = readWord(rom, t1 - entrypointRam + 0x1000);
         v1 = a3 + v0;
 
@@ -140,6 +142,7 @@ void calculateChecksum(const uint8_t *rom, uint32_t cic, uint32_t *dst1, uint32_
             case 6105:
             case 7105:
                 /* ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004 */
+                /* lw $t7, 0x0($s6) */
                 t7 = readWord(rom, s6 - 0xA0000004 + 0x000554);
 
                 t0 = t0 + 0x4;

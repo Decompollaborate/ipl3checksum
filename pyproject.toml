@@ -4,7 +4,7 @@
 [project]
 name = "ipl3checksum"
 version = "0.1.0.dev0"
-description = "N64 IPL3 tools library"
+description = "Library to calculate the IPL3 checksum for N64 ROMs"
 readme = "README.md"
 requires-python = ">=3.7"
 dynamic = ["dependencies"]
