@@ -28,6 +28,6 @@ version of the library.
 
 - Initial relase
 
-[unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/1.1.0...HEAD
-[1.0.1]: https://github.com/olivierlacan/keep-a-changelog/compare/1.0.0...1.1.1
+[unreleased]: https://github.com/Decompollaborate/ipl3checksum/compare/1.0.1...develop
+[1.0.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/Decompollaborate/ipl3checksum/releases/tag/1.0.0
