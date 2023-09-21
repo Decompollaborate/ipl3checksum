@@ -9,9 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Allow invoking `ipl3checksum` as a CLI program
-  - Currently it only allows the `-V`/`--version` to print the version of the library
+- Allow invoking `ipl3checksum` as a CLI program.
+  - Currently it only allows the `-V`/`--version` to print the version of the library.
 - A `CHANGELOG.md`
+- Cleanup the `README.md`
+  - Reorder sections.
+  - Add more notes about installing and the develop version.
+  - Reference the changelog.
+  - List features.
+- Add a `py.typed` file.
 
 ## [1.0.0] - 2023-09-21
 

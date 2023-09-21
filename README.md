@@ -10,20 +10,7 @@ A Python library to calculate the IPL3 checksum for N64 ROMs.
 
 ## How to use it?
 
-First you need to install the library, one way of doing it is via `pip`.
-
-```bash
-python3 -m pip install -U ipl3checksum
-```
-
-If you use a `requirements.txt` file in your repository, then you can add
-library with this line:
-
-```txt
-ipl3checksum>=1.0.0,<2.0.0
-``````
-
-Now you can invoke the library from your script.
+To calculate the checksum of a ROM:
 
 ```py
 romBytes = # A big endian bytes-like object
@@ -42,6 +29,62 @@ This library also contains a CIC detector:
 cickind = ipl3checksum.detectCIC(romBytes)
 print(cickind) # Either a `ipl3checksum.CICKind` or None if was not able to detect the CIC
 ```
+
+## Features
+
+- Supports all 6 retail CIC variants.
+- Can calculate the checksum of a ROM using the algorithm of any of the
+supported CIC variants.
+- Can detect any of the supported CIC variants.
+
+### Restrictions/requirements
+
+- The library assumes the passed ROM contains a ROM header at offset range
+`[0x0, 0x40]` and a correct IPL3 is at `[0x40, 0x1000]`
+- Since the checksum algorithm is calculated on the first MiB after IPL3 (from
+`0x1000` to `0x101000`), then the library expects the passed ROM to be at least
+`0x101000` bytes long, otherwise the library will reject the ROM.
+  - If it is not the case, then pad your ROM with zeroes to that size.
+
+## Installing
+
+First you need to install the library, one way of doing it is via `pip`.
+
+```bash
+python3 -m pip install -U ipl3checksum
+```
+
+If you use a `requirements.txt` file in your repository, then you can add
+this library with the following line:
+
+```txt
+ipl3checksum>=1.0.0,<2.0.0
+``````
+
+Now you can invoke the library from your script.
+
+### Development version
+
+The unstable development version is located at the [develop](https://github.com/Decompollaborate/ipl3checksum/tree/develop)
+branch. PRs should be made into that branch instead of the main one.
+
+The recommended way to install a locally cloned repo is by passing the `-e`
+(editable) flag to `pip`.
+
+```bash
+python3 -m pip install -e .
+```
+
+In case you want to mess with the latest development version without wanting to
+clone the repository, then you could use the following commands:
+
+```bash
+python3 -m pip uninstall ipl3checksum
+python3 -m pip install git+https://github.com/Decompollaborate/ipl3checksum.git@develop
+```
+
+NOTE: Installing the development version is not recommended unless you know what
+you are doing. Proceed at your own risk.
 
 ## Versioning and changelog
 
@@ -77,14 +120,14 @@ prefer (acknowledgment is always appreciated, but not required).
 I'm not really the guy that can answer all your hunger for knowledge, but here
 are a few links that may be helpful:
 
-* CIC-NUS: <https://n64brew.dev/wiki/CIC-NUS>
-* Initial Program Load 3 (IPL3) <https://n64brew.dev/wiki/Initial_Program_Load#IPL3>
-* List of retail games, containing which CIC they use: <https://docs.google.com/spreadsheets/d/1WgZ7DZSzWwYIxwg03yoN9NK_0okuSx9dVL2u5MWPQ60/edit#gid=1247952340>
-* Research about the CIC 6105: <https://github.com/Dragorn421/n64checksum>
-* Disassembly of all the retail IPL3 binaries: <https://github.com/decompals/N64-IPL/blob/main/src/ipl3.s>
+- CIC-NUS: <https://n64brew.dev/wiki/CIC-NUS>
+- Initial Program Load 3 (IPL3) <https://n64brew.dev/wiki/Initial_Program_Load#IPL3>
+- List of retail games, containing which CIC they use: <https://docs.google.com/spreadsheets/d/1WgZ7DZSzWwYIxwg03yoN9NK_0okuSx9dVL2u5MWPQ60/edit#gid=1247952340>
+- Research about the CIC 6105: <https://github.com/Dragorn421/n64checksum>
+- Disassembly of all the retail IPL3 binaries: <https://github.com/decompals/N64-IPL/blob/main/src/ipl3.s>
 
 ## References
 
-* "IPL3 checksum algorithm" section of the "PIF-NUS" article on n64brew.dev: <https://n64brew.dev/wiki/PIF-NUS#IPL3_checksum_algorithm>
-  * Used for getting the "8-bit IPL3" seed value.
-* List of retail games, containing which CIC they use: <https://docs.google.com/spreadsheets/d/1WgZ7DZSzWwYIxwg03yoN9NK_0okuSx9dVL2u5MWPQ60/edit#gid=1247952340>
+- "IPL3 checksum algorithm" section of the "PIF-NUS" article on n64brew.dev: <https://n64brew.dev/wiki/PIF-NUS#IPL3_checksum_algorithm>
+  - Used for getting the "8-bit IPL3" seed value.
+- List of retail games, containing which CIC they use: <https://docs.google.com/spreadsheets/d/1WgZ7DZSzWwYIxwg03yoN9NK_0okuSx9dVL2u5MWPQ60/edit#gid=1247952340>
