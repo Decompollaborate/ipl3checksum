@@ -16,6 +16,13 @@ First you need to install the library, one way of doing it is via `pip`.
 python3 -m pip install -U ipl3checksum
 ```
 
+If you use a `requirements.txt` file in your repository, then you can add
+library with this line:
+
+```txt
+ipl3checksum>=1.0.0,<2.0.0
+``````
+
 Now you can invoke the library from your script.
 
 ```py
@@ -35,6 +42,17 @@ This library also contains a CIC detector:
 cickind = ipl3checksum.detectCIC(romBytes)
 print(cickind) # Either a `ipl3checksum.CICKind` or None if was not able to detect the CIC
 ```
+
+## Versioning and changelog
+
+This library follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+We try to always keep backwards compatibility, so no breaking changes should
+happen until a major release (i.e. jumping from 1.X.X to 2.0.0).
+
+To see what changed on each release check either the [CHANGELOG.md](CHANGELOG.md)
+file or check the [releases page on Github](https://github.com/Decompollaborate/ipl3checksum/releases).
+You can also use [this link](https://github.com/Decompollaborate/ipl3checksum/releases/latest)
+to check the latest release.
 
 ## Where does this come from?
 
