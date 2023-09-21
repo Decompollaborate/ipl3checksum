@@ -3,7 +3,7 @@
 
 [project]
 name = "ipl3checksum"
-version = "1.0.0"
+version = "1.0.1.dev0"
 description = "Library to calculate the IPL3 checksum for N64 ROMs"
 readme = "README.md"
 requires-python = ">=3.7"
@@ -17,5 +17,11 @@ dynamic = ["dependencies"]
 requires = ["hatchling", "hatch-requirements-txt"]
 build-backend = "hatchling.build"
 
+[project.scripts]
+ipl3checksum = "ipl3checksum.frontends.climain:ipl3checksumMain"
+
 [tool.cibuildwheel]
 skip = ["cp36-*"]
+
+[tool.setuptools.package-data]
+spimdisasm = ["py.typed"]
