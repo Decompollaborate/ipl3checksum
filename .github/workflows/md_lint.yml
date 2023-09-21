@@ -6,7 +6,7 @@ on: [push, pull_request]
 jobs:
   checks:
     runs-on: ubuntu-latest
-    name: mypy
+    name: Lint md files
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
