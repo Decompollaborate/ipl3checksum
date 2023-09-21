@@ -162,8 +162,6 @@ cython_debug/
 #.idea/
 
 
-# 
-.vscode/
 
 asm/
 *.z64

@@ -4,9 +4,11 @@
 
 This whole file is licensed under CC0-1.0. See [docs/LICENSE](./LICENSE).
 
-This file contains a reference implementation of the IPL3 checksum algorithm, adapted to work with every known retail CIC/IPL3 variant.
+This file contains a reference implementation of the IPL3 checksum algorithm,
+adapted to work with every known retail CIC/IPL3 variant.
 
-This implementation is a very crude direct translation from the original assembly and it could be greatly simplified in a reimplementation.
+This implementation is a very crude direct translation from the original
+assembly and it could be greatly simplified in a reimplementation.
 
 ```c
 /* SPDX-License-Identifier: CC0-1.0 */
@@ -158,7 +160,8 @@ void calculateChecksum(const uint8_t *rom, uint32_t cic, uint32_t *dst1, uint32_
         switch (cic) {
             case 6105:
             case 7105:
-                /* ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004 */
+                /* ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) */
+                /* to vram 0xA0000004 */
                 /* lw $t7, 0x0($s6) */
                 t7 = readWord(rom, s6 - 0xA0000004 + 0x000554);
 
