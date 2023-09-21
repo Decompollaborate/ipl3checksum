@@ -5,7 +5,7 @@ on: [push, pull_request_target]
 
 jobs:
   build_repo:
-    name: Build repo
+    name: Test other repo
     runs-on: ubuntu-latest
 
     strategy:
