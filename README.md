@@ -38,21 +38,26 @@ print(cickind) # Either a `ipl3checksum.CICKind` or None if was not able to dete
 
 ## Where does this come from?
 
-This algorithm comes directly from the IPL3, which each variant is part of the first 0x1000 bytes of the rom of every retail N64 ROM.
+This algorithm comes directly from the IPL3, which each variant is part of the
+first 0x1000 bytes of the rom of every retail N64 ROM.
 
-There are various implementations floating around on the internet, but for this specific one was reverse-engineered by myself.
-I made this because I couldn't find a library to calculate this checksum, so I decided to reverse-engineer it myself instead of
-taking somebody else's work. It also was an interesting learning experience.
+There are various implementations floating around on the internet, but for this
+specific one was reverse-engineered by myself. I made this because I couldn't
+find a library to calculate this checksum, so I decided to reverse-engineer it
+myself instead of taking somebody else's work. It also was an interesting
+learning experience.
 
 ## Note about licensing
 
-Most of the repository is licensed under the [MIT license](LICENSE), but I also made a
-[reference implementation](docs/reference_implementation.md) that is part of the public domain (licensed under CC0-1.0), feel free to
-use it however you prefer (acknowledgment is always appreciated, but not required).
+Most of the repository is licensed under the [MIT license](LICENSE), but I also
+made a [reference implementation](docs/reference_implementation.md) that is part
+of the public domain (licensed under CC0-1.0), feel free to use it however you
+prefer (acknowledgment is always appreciated, but not required).
 
 ## I want to learn more! What is an IPL3? What is CIC?
 
-I'm not really the guy that can answer all your hunger for knowledge, but here are a few links that may be helpful:
+I'm not really the guy that can answer all your hunger for knowledge, but here
+are a few links that may be helpful:
 
 * CIC-NUS: <https://n64brew.dev/wiki/CIC-NUS>
 * Initial Program Load 3 (IPL3) <https://n64brew.dev/wiki/Initial_Program_Load#IPL3>
