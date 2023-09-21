@@ -3,7 +3,7 @@
 
 [project]
 name = "ipl3checksum"
-version = "1.0.1.dev0"
+version = "1.0.1"
 description = "Library to calculate the IPL3 checksum for N64 ROMs"
 readme = "README.md"
 requires-python = ">=3.7"

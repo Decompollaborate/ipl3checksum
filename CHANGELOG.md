@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2023-09-21
+
 ### Added
 
 - Allow invoking `ipl3checksum` as a CLI program.
@@ -19,11 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - List features.
 - Add a `py.typed` file.
 
-## [1.0.0] - 2023-09-21
+## [1.0.0] - 2023-09-20
 
 ### Added
 
 - Initial relase
 
-[unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/1.0.0...HEAD
+[unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/1.1.0...HEAD
+[1.0.1]: https://github.com/olivierlacan/keep-a-changelog/compare/1.0.0...1.1.1
 [1.0.0]: https://github.com/Decompollaborate/ipl3checksum/releases/tag/1.0.0
