@@ -24,4 +24,4 @@ ipl3checksum = "ipl3checksum.frontends.climain:ipl3checksumMain"
 skip = ["cp36-*"]
 
 [tool.setuptools.package-data]
-spimdisasm = ["py.typed"]
+ipl3checksum = ["py.typed"]
