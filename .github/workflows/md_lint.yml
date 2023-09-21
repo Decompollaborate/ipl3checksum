@@ -12,6 +12,6 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Lint markdown files
-    - uses: articulate/actions-markdownlint@v1.1.0
+      uses: articulate/actions-markdownlint@v1.1.0
       with:
-        config: markdownlint-config.json
+        config: .markdownlint.jsonc
