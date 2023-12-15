@@ -32,7 +32,7 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
         return None;
     }
 
-    let romWords = utils::read_u32_vec(romBytes, 0, 0x101000);
+    let romWords = utils::read_u32_vec(romBytes, 0, 0x101000/4);
 
     let seed = kind.get_seed();
     let magic = kind.get_magic();
@@ -41,28 +41,28 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
 
     let mut a0 = romWords[8/4];
     if *kind == CICKind::CIC_X103 {
-        a0 -= 0x100000;
+        a0 = a0.wrapping_sub(0x100000);
     }
     if *kind == CICKind::CIC_X106 {
-        a0 -= 0x200000;
+        a0 = a0.wrapping_sub(0x200000);
     }
     let entrypointRam = a0;
 
     let mut at = magic;
-    let mut lo = s6 * at;
+    let lo = s6.wrapping_mul(at);
 
     if *kind == CICKind::CIC_X105 {
         s6 = 0xA0000200;
     }
 
-    let mut ra = 0x100000;
+    let ra = 0x100000;
 
-    let mut v1 = 0;
-    let mut t0 = 0;
+    let mut v1: u32 = 0;
+    let mut t0: u32 = 0;
 
-    let mut t1 = a0;
+    let mut t1: u32 = a0;
 
-    let mut t5 = 0x20;
+    let t5: u32 = 0x20;
 
     //let mut v0 = utils.u32(lo);
     let mut v0 = lo;
@@ -82,7 +82,7 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
         v0 = readWordFromRam(&romWords, entrypointRam, t1);
 
         //v1 = utils.u32(a3 + v0);
-        v1 = a3 + v0;
+        v1 = a3.wrapping_add(v0);
 
         //at = utils.u32(v1) < utils.u32(a3);
         at = if v1 < a3 { 1 } else { 0 };
@@ -92,19 +92,19 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
 
         if at != 0 {
             //t2 = utils.u32(t2 + 0x1)
-            t2 = t2 + 0x1;
+            t2 = t2.wrapping_add(0x1);
         }
 
         // LA4000608
         v1 = v0 & 0x1F;
         //t7 = utils.u32(t5 - v1)
-        let t7 = t5 - v1;
+        let t7: u32 = t5.wrapping_sub(v1);
 
 
         //let t8 = utils.u32(v0 >> t7)
         //let t6 = utils.u32(v0 << v1)
-        let t8 = v0 >> t7;
-        let t6 = v0 << v1;
+        let t8 = v0.wrapping_shr(t7);
+        let t6 = v0.wrapping_shl(v1);
 
         a0 = t6 | t8;
         // at = utils.u32(a2) < utils.u32(v0);
@@ -114,7 +114,7 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
         t3 = t3 ^ v0;
 
         //s0 = utils.u32(s0 + a0)
-        s0 = s0 + a0;
+        s0 = s0.wrapping_add(a0);
         // if (at == 0) goto LA400063C;
         if at != 0 {
             let t9 = a3 ^ v0;
@@ -135,32 +135,32 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
 
             //t0 = utils.u32(t0 + 0x4);
             //s6 = utils.u32(s6 + 0x4);
-            t0 = t0 + 0x4;
-            s6 = s6 + 0x4;
+            t0 = t0.wrapping_add(0x4);
+            s6 = s6.wrapping_add(0x4);
 
             t7 = v0 ^ t7;
 
             // t4 = utils.u32(t7 + t4);
-            t4 = t7 + t4;
+            t4 = t7.wrapping_add(t4);
 
             t7 = 0xA00002FF;
 
             // t1 = utils.u32(t1 + 0x4);
-            t1 = t1 + 0x4;
+            t1 = t1.wrapping_add(0x4);
 
             // s6 = utils.u32(s6 & t7);
             s6 = s6 & t7;
         } else {
             // t0 = utils.u32(t0 + 0x4);
-            t0 = t0 + 0x4;
+            t0 = t0.wrapping_add(0x4);
 
             let t7 = v0 ^ s0;
 
             // t1 = utils.u32(t1 + 0x4);
-            t1 = t1 + 0x4;
+            t1 = t1.wrapping_add(0x4);
 
             // t4 = utils.u32(t7 + t4);
-            t4 = t7 + t4;
+            t4 = t7.wrapping_add(t4);
         }
 
 
@@ -173,11 +173,11 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
     if *kind == CICKind::CIC_X103 {
         let t6 = a3 ^ t2;
         // a3 = utils.u32(t6 + t3);
-        a3 = t6 + t3;
+        a3 = t6.wrapping_add(t3);
 
         let t8 = s0 ^ a2;
         // s0 = utils.u32(t8 + t4);
-        s0 = t8 + t4;
+        s0 = t8.wrapping_add(t4);
     } else if *kind == CICKind::CIC_X106 {
         /*
         let t6 = utils.u32(a3 * t2);
@@ -185,10 +185,10 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
         let t8 = utils.u32(s0 * a2);
         s0 = utils.u32(t8 + t4);
         */
-        let t6 = a3 * t2;
-        a3 = t6 + t3;
-        let t8 = s0 * a2;
-        s0 = t8 + t4;
+        let t6 = a3.wrapping_mul(t2);
+        a3 = t6.wrapping_add(t3);
+        let t8 = s0.wrapping_mul(a2);
+        s0 = t8.wrapping_add(t4);
     } else {
         let t6 = a3 ^ t2;
         a3 = t6 ^ t3;
@@ -197,4 +197,67 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
     }
 
     return Some((a3, s0))
+}
+
+#[cfg(test)]
+mod tests {
+    //use rstest::rstest;
+    //use std::path::PathBuf;
+
+    use std::fs;
+
+    use crate::{cickinds::CICKind, utils};
+
+    #[test]
+    fn test_dummy_files() -> Result<(), ()> {
+        println!("asdf");
+
+        for path_result in fs::read_dir("tests/dummytests").unwrap() {
+            let ipl3_folder = path_result.unwrap();
+            let folder_name = ipl3_folder.file_name();
+
+            println!("{:?}", folder_name);
+
+            let kind = match folder_name.to_str().unwrap() {
+                "CIC_6101" => CICKind::CIC_6101,
+                "CIC_6102_7101" => CICKind::CIC_6102_7101,
+                "CIC_7102" => CICKind::CIC_7102,
+                "CIC_X103" => CICKind::CIC_X103,
+                "CIC_X105" => CICKind::CIC_X105,
+                "CIC_X106" => CICKind::CIC_X106,
+                _ => panic!("Unknown cic kind"),
+            };
+            println!("CIC Kind: {:?}", kind);
+
+            for bin_path_result in fs::read_dir(ipl3_folder.path() ).unwrap() {
+                let bin_path = bin_path_result.unwrap();
+
+                println!("{:?}", bin_path);
+
+                println!("    Reading...");
+
+                let bin_bytes = fs::read(&bin_path.path()).unwrap();
+
+                println!("    Calculating checksum...");
+                let checksum = super::calculateChecksum(&bin_bytes, &kind).unwrap();
+
+                println!("    Calculated checksum is: 0x{:08X} 0x{:08X}", checksum.0, checksum.1);
+
+                println!("    Checking checksum...");
+                let bin_checksum = utils::read_u32_vec(&bin_bytes, 0x10, 2);
+
+                println!("    Expected checksum is: 0x{:08X} 0x{:08X}", bin_checksum[0], bin_checksum[1]);
+
+                assert_eq!(checksum.0, bin_checksum[0]);
+                assert_eq!(checksum.1, bin_checksum[1]);
+
+                println!("    {:?} OK", bin_path);
+
+                println!();
+            }
+
+            println!();
+        }
+        Ok(())
+    }
 }

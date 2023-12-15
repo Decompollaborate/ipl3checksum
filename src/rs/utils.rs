@@ -7,7 +7,7 @@ pub(crate) fn read_u32(bytes: &[u8], offset: usize) -> u32 {
     }
 
     if offset + 4 > bytes.len() {
-        panic!("Out of bounds");
+        panic!("Out of bounds. Offset {:X}, len {:X}", offset, bytes.len());
     }
 
     /*
@@ -23,8 +23,8 @@ pub(crate) fn read_u32(bytes: &[u8], offset: usize) -> u32 {
 pub(crate) fn read_u32_vec(bytes: &[u8], offset: usize, len: usize) -> Vec<u32> {
     let mut ret = vec![0;len];
 
-    for i in 0..(len*4) {
-        ret[i] = read_u32(bytes, offset + i);
+    for i in 0..len {
+        ret[i] = read_u32(bytes, offset + i*4);
     }
 
     ret
