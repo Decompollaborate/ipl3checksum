@@ -212,11 +212,7 @@ pub fn calculate_checksum_autodetect(rom_bytes: &[u8]) -> Option<(u32, u32)> {
 
 #[cfg(test)]
 mod tests {
-    //use rstest::rstest;
-    //use std::path::PathBuf;
-
     use std::fs;
-
     use crate::{cickinds::CICKind, utils};
 
     #[test]
