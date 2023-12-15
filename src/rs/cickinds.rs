@@ -17,7 +17,6 @@ pub enum CICKind {
     CIC_X106, // Both 6106 and 7106
 }
 
-#[cfg_attr(feature = "python_bindings", pymethods)]
 impl CICKind {
     pub fn get_seed(&self) -> u32 {
         match self {
@@ -52,19 +51,6 @@ impl CICKind {
         }
     }
 
-    #[cfg(feature = "python_bindings")]
-    #[staticmethod]
-    pub fn from_value(value: usize) -> Option<CICKind> {
-        CICKind::from_value_impl(value)
-    }
-
-    #[cfg(not(feature = "python_bindings"))]
-    pub fn from_value(value: usize) -> Option<CICKind> {
-        CICKind::from_value_impl(value)
-    }
-}
-
-impl CICKind {
     pub fn from_hash_md5(hash_str: &str) -> Option<CICKind> {
         match hash_str {
             "900b4a5b68edb71f4c7ed52acd814fc5" => Some(CICKind::CIC_6101),
@@ -77,7 +63,7 @@ impl CICKind {
         }
     }
 
-    fn from_value_impl(value: usize) -> Option<CICKind> {
+    pub fn from_value(value: usize) -> Option<CICKind> {
         match value {
             6101 => Some(CICKind::CIC_6101),
             6102 | 7101 => Some(CICKind::CIC_6102_7101),
@@ -87,5 +73,41 @@ impl CICKind {
             6106 | 7106 => Some(CICKind::CIC_X106),
             _ =>  None
         }
+    }
+}
+
+#[cfg(feature = "python_bindings")]
+mod python_bindings {
+    use pyo3::prelude::*;
+
+    #[pymethods]
+    impl super::CICKind {
+        #[allow(non_snake_case)]
+        pub fn getSeed(&self) -> u32 {
+            self.get_seed()
+        }
+
+        #[allow(non_snake_case)]
+        pub fn getMagic(&self) -> u32 {
+            self.get_magic()
+        }
+
+        #[allow(non_snake_case)]
+        pub fn getHashMd5(&self) -> &str {
+            self.get_hash_md5()
+        }
+
+        #[staticmethod]
+        #[allow(non_snake_case)]
+        pub fn fromHashMd5(hash_str: &str) -> Option<super::CICKind> {
+            super::CICKind::from_hash_md5(hash_str)
+        }
+
+        #[staticmethod]
+        #[allow(non_snake_case)]
+        pub fn fromValue(value: usize) -> Option<super::CICKind> {
+            super::CICKind::from_value(value)
+        }
+
     }
 }
