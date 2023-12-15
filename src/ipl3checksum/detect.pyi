@@ -5,9 +5,7 @@
 
 from __future__ import annotations
 
-from . import utils
-from .cickinds import CICKind, CICHashMd5
-
+from .cickinds import CICKind
 
 def detectCICRaw(rawBytes: bytes) -> CICKind|None:
     """Tries to detect an IPL3 binary.
@@ -21,17 +19,6 @@ def detectCICRaw(rawBytes: bytes) -> CICKind|None:
         CICKind|None: The detected CIC kind, or `None` if was not able to detect the CIC kind.
     """
 
-    if len(rawBytes) < 0xFC0:
-        return None
-
-    bytesHash = utils.getHashMd5(rawBytes[:0xFC0])
-
-    for kind, expectedHash in CICHashMd5.items():
-        if bytesHash == expectedHash:
-            return kind
-
-    return None
-
 
 def detectCIC(romBytes: bytes) -> CICKind|None:
     """Tries to detect an IPL3 in a ROM.
@@ -44,5 +31,3 @@ def detectCIC(romBytes: bytes) -> CICKind|None:
     Returns:
         CICKind|None: The detected CIC kind, or `None` if was not able to detect the CIC kind.
     """
-
-    return detectCICRaw(romBytes[0x40:0x1000])
