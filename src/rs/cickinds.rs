@@ -71,7 +71,7 @@ impl CICKind {
             6103 | 7103 => Some(CICKind::CIC_X103),
             6105 | 7105 => Some(CICKind::CIC_X105),
             6106 | 7106 => Some(CICKind::CIC_X106),
-            _ =>  None
+            _ => None,
         }
     }
 }

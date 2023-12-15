@@ -2,7 +2,7 @@
 /* SPDX-License-Identifier: MIT */
 
 use crate::cickinds::CICKind;
-use crate::{utils, detect};
+use crate::{detect, utils};
 
 fn read_word_from_ram(rom_words: &[u32], entrypoint_ram: u32, ram_addr: u32) -> u32 {
     rom_words[((ram_addr - entrypoint_ram + 0x1000) / 4) as usize]
@@ -26,14 +26,14 @@ pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)
         return None;
     }
 
-    let rom_words = utils::read_u32_vec(rom_bytes, 0, 0x101000/4);
+    let rom_words = utils::read_u32_vec(rom_bytes, 0, 0x101000 / 4);
 
     let seed = kind.get_seed();
     let magic = kind.get_magic();
 
     let mut s6 = seed;
 
-    let mut a0 = rom_words[8/4];
+    let mut a0 = rom_words[8 / 4];
     if *kind == CICKind::CIC_X103 {
         a0 = a0.wrapping_sub(0x100000);
     }
@@ -94,7 +94,6 @@ pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)
         //t7 = utils.u32(t5 - v1)
         let t7: u32 = t5.wrapping_sub(v1);
 
-
         //let t8 = utils.u32(v0 >> t7)
         //let t6 = utils.u32(v0 << v1)
         let t8 = v0.wrapping_shr(t7);
@@ -116,11 +115,10 @@ pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)
             a2 = t9 ^ a2;
             // goto LA4000640;
 
-        // LA400063C:
+            // LA400063C:
         } else {
             a2 = a2 ^ a0;
         }
-
 
         // LA4000640:
         if *kind == CICKind::CIC_X105 {
@@ -157,7 +155,6 @@ pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)
             t4 = t7.wrapping_add(t4);
         }
 
-
         // if (t0 != ra) goto LA40005F0;
         if t0 == ra {
             loop_variable = false;
@@ -190,7 +187,7 @@ pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)
         s0 = t8 ^ t4;
     }
 
-    return Some((a3, s0))
+    Some((a3, s0))
 }
 
 pub fn calculate_checksum_autodetect(rom_bytes: &[u8]) -> Option<(u32, u32)> {
@@ -243,7 +240,7 @@ mod tests {
             };
             println!("CIC Kind: {:?}", kind);
 
-            for bin_path_result in fs::read_dir(ipl3_folder.path() ).unwrap() {
+            for bin_path_result in fs::read_dir(ipl3_folder.path()).unwrap() {
                 let bin_path = bin_path_result.unwrap();
 
                 println!("{:?}", bin_path);
@@ -255,12 +252,18 @@ mod tests {
                 println!("    Calculating checksum...");
                 let checksum = super::calculate_checksum(&bin_bytes, &kind).unwrap();
 
-                println!("    Calculated checksum is: 0x{:08X} 0x{:08X}", checksum.0, checksum.1);
+                println!(
+                    "    Calculated checksum is: 0x{:08X} 0x{:08X}",
+                    checksum.0, checksum.1
+                );
 
                 println!("    Checking checksum...");
                 let bin_checksum = utils::read_u32_vec(&bin_bytes, 0x10, 2);
 
-                println!("    Expected checksum is: 0x{:08X} 0x{:08X}", bin_checksum[0], bin_checksum[1]);
+                println!(
+                    "    Expected checksum is: 0x{:08X} 0x{:08X}",
+                    bin_checksum[0], bin_checksum[1]
+                );
 
                 assert_eq!(checksum.0, bin_checksum[0]);
                 assert_eq!(checksum.1, bin_checksum[1]);

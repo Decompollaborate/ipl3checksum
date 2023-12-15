@@ -23,10 +23,10 @@ pub(crate) fn read_u32(bytes: &[u8], offset: usize) -> u32 {
 }
 
 pub(crate) fn read_u32_vec(bytes: &[u8], offset: usize, len: usize) -> Vec<u32> {
-    let mut ret = vec![0;len];
+    let mut ret = vec![0; len];
 
     for i in 0..len {
-        ret[i] = read_u32(bytes, offset + i*4);
+        ret[i] = read_u32(bytes, offset + i * 4);
     }
 
     ret
