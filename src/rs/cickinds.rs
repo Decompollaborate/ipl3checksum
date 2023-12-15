@@ -77,34 +77,30 @@ impl CICKind {
 }
 
 #[cfg(feature = "python_bindings")]
+#[allow(non_snake_case)]
 mod python_bindings {
     use pyo3::prelude::*;
 
     #[pymethods]
     impl super::CICKind {
-        #[allow(non_snake_case)]
         pub fn getSeed(&self) -> u32 {
             self.get_seed()
         }
 
-        #[allow(non_snake_case)]
         pub fn getMagic(&self) -> u32 {
             self.get_magic()
         }
 
-        #[allow(non_snake_case)]
         pub fn getHashMd5(&self) -> &str {
             self.get_hash_md5()
         }
 
         #[staticmethod]
-        #[allow(non_snake_case)]
         pub fn fromHashMd5(hash_str: &str) -> Option<super::CICKind> {
             super::CICKind::from_hash_md5(hash_str)
         }
 
         #[staticmethod]
-        #[allow(non_snake_case)]
         pub fn fromValue(value: usize) -> Option<super::CICKind> {
             super::CICKind::from_value(value)
         }

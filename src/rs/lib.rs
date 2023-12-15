@@ -14,6 +14,10 @@ use pyo3::prelude::*;
 #[pymodule]
 fn ipl3checksum(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<cickinds::CICKind>()?;
+    m.add_function(wrap_pyfunction!(checksum::python_bindings::calculateChecksum, m)?)?;
+    m.add_function(wrap_pyfunction!(checksum::python_bindings::calculateChecksumAutodetect, m)?)?;
+    m.add_function(wrap_pyfunction!(detect::python_bindings::detectCICRaw, m)?)?;
+    m.add_function(wrap_pyfunction!(detect::python_bindings::detectCIC, m)?)?;
     Ok(())
 }
 

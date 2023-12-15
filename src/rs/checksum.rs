@@ -1,52 +1,46 @@
 /* SPDX-FileCopyrightText: © 2023 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
 
-#[cfg(feature = "python_bindings")]
-use pyo3::prelude::*;
-
 use crate::cickinds::CICKind;
-use crate::utils;
+use crate::{utils, detect};
 
-
-fn readWordFromRam(romWords: &[u32], entrypointRam: u32, ramAddr: u32) -> u32 {
-    //return romWords[utils.u32(ramAddr - entrypointRam + 0x1000) / 4]
-    romWords[((ramAddr - entrypointRam + 0x1000) / 4) as usize]
+fn read_word_from_ram(rom_words: &[u32], entrypoint_ram: u32, ram_addr: u32) -> u32 {
+    rom_words[((ram_addr - entrypoint_ram + 0x1000) / 4) as usize]
 }
 
-
-pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> {
+pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> {
     /*
     Calculates the checksum required by an official CIC of a N64 ROM.
 
     Args:
-        romBytes (bytes): The bytes of the N64 ROM in big endian format. It must have a minimum size of 0x101000 bytes.
+        rom_bytes (bytes): The bytes of the N64 ROM in big endian format. It must have a minimum size of 0x101000 bytes.
         kind (CICKind): The CIC kind variation used to calculate the checksum.
 
     Returns:
         tuple[int, int]|None: If no error happens then the calculated checksum is returned, stored as a tuple
         containing two 32-bits words. Otherwise, `None` is returned. Possible errors:
-        - `romBytes` not being big enough
+        - `rom_bytes` not being big enough
     */
 
-    if romBytes.len() < 0x101000 {
+    if rom_bytes.len() < 0x101000 {
         return None;
     }
 
-    let romWords = utils::read_u32_vec(romBytes, 0, 0x101000/4);
+    let rom_words = utils::read_u32_vec(rom_bytes, 0, 0x101000/4);
 
     let seed = kind.get_seed();
     let magic = kind.get_magic();
 
     let mut s6 = seed;
 
-    let mut a0 = romWords[8/4];
+    let mut a0 = rom_words[8/4];
     if *kind == CICKind::CIC_X103 {
         a0 = a0.wrapping_sub(0x100000);
     }
     if *kind == CICKind::CIC_X106 {
         a0 = a0.wrapping_sub(0x200000);
     }
-    let entrypointRam = a0;
+    let entrypoint_ram = a0;
 
     let mut at = magic;
     let lo = s6.wrapping_mul(at);
@@ -57,7 +51,6 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
 
     let ra = 0x100000;
 
-    let mut v1: u32 = 0;
     let mut t0: u32 = 0;
 
     let mut t1: u32 = a0;
@@ -76,13 +69,14 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
     let mut t4 = v0;
 
     // poor man's do while
-    let mut LA40005F0_loop = true;
-    while LA40005F0_loop {
+    // LA40005F0_loop
+    let mut loop_variable = true;
+    while loop_variable {
         // v0 = *t1
-        v0 = readWordFromRam(&romWords, entrypointRam, t1);
+        v0 = read_word_from_ram(&rom_words, entrypoint_ram, t1);
 
         //v1 = utils.u32(a3 + v0);
-        v1 = a3.wrapping_add(v0);
+        let mut v1 = a3.wrapping_add(v0);
 
         //at = utils.u32(v1) < utils.u32(a3);
         at = if v1 < a3 { 1 } else { 0 };
@@ -131,7 +125,7 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
         // LA4000640:
         if *kind == CICKind::CIC_X105 {
             // ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
-            let mut t7 = romWords[((s6 - 0xA0000004 + 0x000554) / 4) as usize];
+            let mut t7 = rom_words[((s6 - 0xA0000004 + 0x000554) / 4) as usize];
 
             //t0 = utils.u32(t0 + 0x4);
             //s6 = utils.u32(s6 + 0x4);
@@ -166,7 +160,7 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
 
         // if (t0 != ra) goto LA40005F0;
         if t0 == ra {
-            LA40005F0_loop = false;
+            loop_variable = false;
         }
     }
 
@@ -197,6 +191,26 @@ pub fn calculateChecksum(romBytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> 
     }
 
     return Some((a3, s0))
+}
+
+pub fn calculate_checksum_autodetect(rom_bytes: &[u8]) -> Option<(u32, u32)> {
+    /*Calculates the checksum required by an official CIC of a N64 ROM.
+
+    This function will try to autodetect the CIC kind automatically. If it fails to detect it then it will return `None`.
+
+    Args:
+        rom_bytes (bytes): The bytes of the N64 ROM in big endian format. It must have a minimum size of 0x101000 bytes.
+
+    Returns:
+        tuple[int, int]|None: If no error happens then the calculated checksum is returned, stored as a tuple
+        containing two 32-bits words. Otherwise, `None` is returned. Possible errors:
+        - `rom_bytes` not being big enough
+        - Not able to detect the CIC kind
+    */
+
+    let kind = detect::detect_cic(rom_bytes)?;
+
+    calculate_checksum(rom_bytes, &kind)
 }
 
 #[cfg(test)]
@@ -239,7 +253,7 @@ mod tests {
                 let bin_bytes = fs::read(&bin_path.path()).unwrap();
 
                 println!("    Calculating checksum...");
-                let checksum = super::calculateChecksum(&bin_bytes, &kind).unwrap();
+                let checksum = super::calculate_checksum(&bin_bytes, &kind).unwrap();
 
                 println!("    Calculated checksum is: 0x{:08X} 0x{:08X}", checksum.0, checksum.1);
 
@@ -259,5 +273,21 @@ mod tests {
             println!();
         }
         Ok(())
+    }
+}
+
+#[cfg(feature = "python_bindings")]
+#[allow(non_snake_case)]
+pub(crate) mod python_bindings {
+    use pyo3::prelude::*;
+
+    #[pyfunction]
+    pub(crate) fn calculateChecksum(rom_bytes: &[u8], kind: &super::CICKind) -> Option<(u32, u32)> {
+        super::calculate_checksum(rom_bytes, kind)
+    }
+
+    #[pyfunction]
+    pub(crate) fn calculateChecksumAutodetect(rom_bytes: &[u8]) -> Option<(u32, u32)> {
+        super::calculate_checksum_autodetect(rom_bytes)
     }
 }
