@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add Rust support
+- New static method `CICKind.fromHashMd5`.
+  - Returns a CIC kind based on the passed md5 hash.
+
+### Changed
+
+- Library was reimplemented in Rust, allowing faster runtime calculation.
+  - The Python API is still the same
+
+### Fixed
+
 - Fix links in `CHANGELOG.md`
 
 ## [1.0.1] - 2023-09-21

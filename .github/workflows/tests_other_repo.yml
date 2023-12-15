@@ -4,8 +4,8 @@ name: Test other repo
 on: [push, pull_request]
 
 jobs:
-  build_repo:
-    name: Test other repo
+  test_other_repo_py:
+    name: Test other repo (Python)
     runs-on: ubuntu-latest
 
     strategy:
@@ -14,6 +14,10 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        python3 -m pip install -U maturin
 
     - name: Install local ipl3checksum
       run: python3 -m pip install .
