@@ -1,8 +1,6 @@
 /* SPDX-FileCopyrightText: © 2023 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
 
-use md5;
-
 pub(crate) fn read_u32(bytes: &[u8], offset: usize) -> u32 {
     if offset % 4 != 0 {
         panic!("Unaligned read");
@@ -23,10 +21,10 @@ pub(crate) fn read_u32(bytes: &[u8], offset: usize) -> u32 {
 }
 
 pub(crate) fn read_u32_vec(bytes: &[u8], offset: usize, len: usize) -> Vec<u32> {
-    let mut ret = vec![0; len];
+    let mut ret = Vec::with_capacity(len);
 
     for i in 0..len {
-        ret[i] = read_u32(bytes, offset + i * 4);
+        ret.push(read_u32(bytes, offset + i * 4));
     }
 
     ret

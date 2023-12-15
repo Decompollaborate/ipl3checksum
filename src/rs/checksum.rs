@@ -104,7 +104,7 @@ pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)
         at = if a2 < v0 { 1 } else { 0 };
         a3 = a1;
 
-        t3 = t3 ^ v0;
+        t3 ^= v0;
 
         //s0 = utils.u32(s0 + a0)
         s0 = s0.wrapping_add(a0);
@@ -112,12 +112,12 @@ pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)
         if at != 0 {
             let t9 = a3 ^ v0;
 
-            a2 = t9 ^ a2;
+            a2 ^= t9;
             // goto LA4000640;
 
             // LA400063C:
         } else {
-            a2 = a2 ^ a0;
+            a2 ^= a0;
         }
 
         // LA4000640:
@@ -130,7 +130,7 @@ pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)
             t0 = t0.wrapping_add(0x4);
             s6 = s6.wrapping_add(0x4);
 
-            t7 = v0 ^ t7;
+            t7 ^= v0;
 
             // t4 = utils.u32(t7 + t4);
             t4 = t7.wrapping_add(t4);
@@ -141,7 +141,7 @@ pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)
             t1 = t1.wrapping_add(0x4);
 
             // s6 = utils.u32(s6 & t7);
-            s6 = s6 & t7;
+            s6 &= t7;
         } else {
             // t0 = utils.u32(t0 + 0x4);
             t0 = t0.wrapping_add(0x4);
