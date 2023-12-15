@@ -17,6 +17,10 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
+    - name: Install Dependencies
+      run: |
+        pip3 install -U maturin
+
     - name: Install local ipl3checksum
       run: pip install .
 

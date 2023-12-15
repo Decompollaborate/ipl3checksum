@@ -18,7 +18,7 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        pip3 install mypy -U
+        pip3 install -U mypy
 
     - name: mypy
       run: mypy --show-column-numbers --hide-error-context .
