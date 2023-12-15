@@ -233,8 +233,8 @@ pub fn calculate_checksum_autodetect(rom_bytes: &[u8]) -> Option<(u32, u32)> {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
     use crate::{cickinds::CICKind, utils};
+    use std::fs;
 
     #[test]
     fn test_dummy_files() -> Result<(), ()> {
