@@ -1,6 +1,8 @@
 /* SPDX-FileCopyrightText: © 2023 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
 
+use md5;
+
 pub(crate) fn read_u32(bytes: &[u8], offset: usize) -> u32 {
     if offset % 4 != 0 {
         panic!("Unaligned read");
@@ -28,4 +30,8 @@ pub(crate) fn read_u32_vec(bytes: &[u8], offset: usize, len: usize) -> Vec<u32> 
     }
 
     ret
+}
+
+pub(crate) fn get_hash_md5(bytes: &[u8]) -> String {
+    format!("{:x}", md5::compute(bytes))
 }

@@ -65,6 +65,18 @@ impl CICKind {
 }
 
 impl CICKind {
+    pub fn from_hash_md5(hash_str: &str) -> Option<CICKind> {
+        match hash_str {
+            "900b4a5b68edb71f4c7ed52acd814fc5" => Some(CICKind::CIC_6101),
+            "e24dd796b2fa16511521139d28c8356b" => Some(CICKind::CIC_6102_7101),
+            "955894c2e40a698bf98a67b78a4e28fa" => Some(CICKind::CIC_7102),
+            "319038097346e12c26c3c21b56f86f23" => Some(CICKind::CIC_X103),
+            "ff22a296e55d34ab0a077dc2ba5f5796" => Some(CICKind::CIC_X105),
+            "6460387749ac0bd925aa5430bc7864fe" => Some(CICKind::CIC_X106),
+            _ => None,
+        }
+    }
+
     fn from_value_impl(value: usize) -> Option<CICKind> {
         match value {
             6101 => Some(CICKind::CIC_6101),

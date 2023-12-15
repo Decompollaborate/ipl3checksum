@@ -3,6 +3,7 @@
 
 pub mod cickinds;
 pub mod checksum;
+pub mod detect;
 
 mod utils;
 
