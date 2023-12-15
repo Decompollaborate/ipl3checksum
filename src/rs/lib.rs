@@ -2,6 +2,9 @@
 /* SPDX-License-Identifier: MIT */
 
 pub mod cickinds;
+pub mod checksum;
+
+mod utils;
 
 #[cfg(feature = "python_bindings")]
 use pyo3::prelude::*;
