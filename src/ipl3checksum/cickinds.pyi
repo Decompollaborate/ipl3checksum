@@ -39,3 +39,6 @@ class CICKind():
     def fromValue(value: int) -> CICKind|None:
         ...
 
+    @property
+    def name(self) -> str:
+        ...

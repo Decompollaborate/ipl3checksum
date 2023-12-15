@@ -105,5 +105,16 @@ mod python_bindings {
             super::CICKind::from_value(value)
         }
 
+        #[getter]
+        pub fn name(&self) -> &str {
+            match self {
+                super::CICKind::CIC_6101 => "CIC_6101",
+                super::CICKind::CIC_6102_7101 => "CIC_6102_7101",
+                super::CICKind::CIC_7102 => "CIC_7102",
+                super::CICKind::CIC_X103 => "CIC_X103",
+                super::CICKind::CIC_X105 => "CIC_X105",
+                super::CICKind::CIC_X106 => "CIC_X106",
+            }
+        }
     }
 }
