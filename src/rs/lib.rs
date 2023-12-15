@@ -1,11 +1,15 @@
 /* SPDX-FileCopyrightText: © 2023 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
 
-pub mod checksum;
-pub mod cickinds;
-pub mod detect;
+mod checksum;
+mod cickinds;
+mod detect;
 
 mod utils;
+
+pub use checksum::*;
+pub use cickinds::*;
+pub use detect::*;
 
 #[cfg(feature = "python_bindings")]
 use pyo3::prelude::*;

@@ -7,6 +7,7 @@ use pyo3::prelude::*;
 #[cfg_attr(feature = "python_bindings", pyclass(module = "ipl3checksum"))]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 #[allow(non_camel_case_types)]
+/// Enum that represents a CIC kind
 pub enum CICKind {
     CIC_6101,
     CIC_6102_7101,

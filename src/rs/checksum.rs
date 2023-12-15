@@ -8,20 +8,30 @@ fn read_word_from_ram(rom_words: &[u32], entrypoint_ram: u32, ram_addr: u32) -> 
     rom_words[((ram_addr - entrypoint_ram + 0x1000) / 4) as usize]
 }
 
+/// Calculates the checksum required by an official CIC of a N64 ROM.
+///
+/// ## Arguments
+///
+/// * `rom_bytes` - The bytes of the N64 ROM in big endian format. It must have a minimum size of 0x101000 bytes.
+/// * `kind` - The CIC kind variation used to calculate the checksum.
+///
+/// ## Return
+///
+/// * If no error happens then the calculated checksum is returned, stored as a tuple
+///   containing two 32-bits words. Otherwise, `None` is returned.
+///   Possible errors:
+///     - `rom_bytes` not being big enough
+///
+/// ## Examples
+///
+/// ```
+/// use ipl3checksum;
+/// let bytes = vec![0; 0x101000];
+/// let kind = ipl3checksum::CICKind::CIC_6102_7101;
+/// let checksum = ipl3checksum::calculate_checksum(&bytes, &kind).unwrap();
+/// println!("{:08X} {:08X}", checksum.0, checksum.1);
+/// ```
 pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> {
-    /*
-    Calculates the checksum required by an official CIC of a N64 ROM.
-
-    Args:
-        rom_bytes (bytes): The bytes of the N64 ROM in big endian format. It must have a minimum size of 0x101000 bytes.
-        kind (CICKind): The CIC kind variation used to calculate the checksum.
-
-    Returns:
-        tuple[int, int]|None: If no error happens then the calculated checksum is returned, stored as a tuple
-        containing two 32-bits words. Otherwise, `None` is returned. Possible errors:
-        - `rom_bytes` not being big enough
-    */
-
     if rom_bytes.len() < 0x101000 {
         return None;
     }
@@ -190,21 +200,32 @@ pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)
     Some((a3, s0))
 }
 
+/// Calculates the checksum required by an official CIC of a N64 ROM.
+///
+/// This function will try to autodetect the CIC kind automatically. If it fails to detect it then it will return `None`.
+///
+/// ## Arguments
+///
+/// * `rom_bytes` - The bytes of the N64 ROM in big endian format. It must have a minimum size of 0x101000 bytes.
+///
+/// ## Return
+///
+/// * If no error happens then the calculated checksum is returned, stored as a tuple
+///   containing two 32-bits words. Otherwise, `None` is returned.
+///   Possible errors:
+///     - `rom_bytes` not being big enough
+///     - Not able to detect the CIC kind
+///
+/// ## Examples
+///
+/// ```
+/// use ipl3checksum;
+/// let bytes = vec![0; 0x101000];
+/// let checksum = ipl3checksum::calculate_checksum_autodetect(&bytes);
+/// /* This will return `None` because there's no ipl3 binary on an array of zeroes */
+/// assert!(checksum.is_none());
+/// ```
 pub fn calculate_checksum_autodetect(rom_bytes: &[u8]) -> Option<(u32, u32)> {
-    /*Calculates the checksum required by an official CIC of a N64 ROM.
-
-    This function will try to autodetect the CIC kind automatically. If it fails to detect it then it will return `None`.
-
-    Args:
-        rom_bytes (bytes): The bytes of the N64 ROM in big endian format. It must have a minimum size of 0x101000 bytes.
-
-    Returns:
-        tuple[int, int]|None: If no error happens then the calculated checksum is returned, stored as a tuple
-        containing two 32-bits words. Otherwise, `None` is returned. Possible errors:
-        - `rom_bytes` not being big enough
-        - Not able to detect the CIC kind
-    */
-
     let kind = detect::detect_cic(rom_bytes)?;
 
     calculate_checksum(rom_bytes, &kind)
