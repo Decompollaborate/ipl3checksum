@@ -1,7 +1,7 @@
 name: Test other repo
 
 # Build on every branch push, tag push, and pull request change:
-on: [push, pull_request_target]
+on: [push, pull_request]
 
 jobs:
   test_other_repo_py:
@@ -14,8 +14,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
 
     - name: Install Dependencies
       run: |
