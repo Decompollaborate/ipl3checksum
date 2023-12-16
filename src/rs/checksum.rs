@@ -31,9 +31,15 @@ fn read_word_from_ram(rom_words: &[u32], entrypoint_ram: u32, ram_addr: u32) -> 
 /// let checksum = ipl3checksum::calculate_checksum(&bytes, &kind).unwrap();
 /// println!("{:08X} {:08X}", checksum.0, checksum.1);
 /// ```
-pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Result<(u32, u32), Ipl3ChecksumError> {
+pub fn calculate_checksum(
+    rom_bytes: &[u8],
+    kind: &CICKind,
+) -> Result<(u32, u32), Ipl3ChecksumError> {
     if rom_bytes.len() < 0x101000 {
-        return Err(Ipl3ChecksumError::BufferNotBigEnough{buffer_len: rom_bytes.len(), expected_len: 0x101000});
+        return Err(Ipl3ChecksumError::BufferNotBigEnough {
+            buffer_len: rom_bytes.len(),
+            expected_len: 0x101000,
+        });
     }
 
     let rom_words = utils::read_u32_vec(rom_bytes, 0, 0x101000 / 4)?;
@@ -300,22 +306,33 @@ pub(crate) mod python_bindings {
     use pyo3::prelude::*;
 
     #[pyfunction]
-    pub(crate) fn calculateChecksum(rom_bytes: &[u8], kind: &super::CICKind) -> Result<Option<(u32, u32)>, super::Ipl3ChecksumError> {
+    pub(crate) fn calculateChecksum(
+        rom_bytes: &[u8],
+        kind: &super::CICKind,
+    ) -> Result<Option<(u32, u32)>, super::Ipl3ChecksumError> {
         match super::calculate_checksum(rom_bytes, kind) {
             Ok(checksum) => Ok(Some(checksum)),
             Err(e) => match e {
-                super::Ipl3ChecksumError::BufferNotBigEnough { buffer_len, expected_len } => Ok(None),
+                super::Ipl3ChecksumError::BufferNotBigEnough {
+                    buffer_len: _,
+                    expected_len: _,
+                } => Ok(None),
                 _ => Err(e), // To trigger an exception on Python's side
             },
         }
     }
 
     #[pyfunction]
-    pub(crate) fn calculateChecksumAutodetect(rom_bytes: &[u8]) -> Result<Option<(u32, u32)>, super::Ipl3ChecksumError> {
+    pub(crate) fn calculateChecksumAutodetect(
+        rom_bytes: &[u8],
+    ) -> Result<Option<(u32, u32)>, super::Ipl3ChecksumError> {
         match super::calculate_checksum_autodetect(rom_bytes) {
             Ok(checksum) => Ok(Some(checksum)),
             Err(e) => match e {
-                super::Ipl3ChecksumError::BufferNotBigEnough { buffer_len, expected_len } => Ok(None),
+                super::Ipl3ChecksumError::BufferNotBigEnough {
+                    buffer_len: _,
+                    expected_len: _,
+                } => Ok(None),
                 _ => Err(e), // To trigger an exception on Python's side
             },
         }
