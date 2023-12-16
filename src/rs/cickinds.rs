@@ -21,9 +21,7 @@ pub enum CICKind {
 impl CICKind {
     pub fn get_seed(&self) -> u32 {
         match self {
-            Self::CIC_6101 => 0x3F,
-            Self::CIC_6102_7101 => 0x3F,
-            Self::CIC_7102 => 0x3F,
+            Self::CIC_6101 | Self::CIC_6102_7101 | Self::CIC_7102 => 0x3F,
             Self::CIC_X103 => 0x78,
             Self::CIC_X105 => 0x91,
             Self::CIC_X106 => 0x85,
@@ -32,12 +30,8 @@ impl CICKind {
 
     pub fn get_magic(&self) -> u32 {
         match self {
-            Self::CIC_6101 => 0x5D588B65,
-            Self::CIC_6102_7101 => 0x5D588B65,
-            Self::CIC_7102 => 0x5D588B65,
-            Self::CIC_X103 => 0x6C078965,
-            Self::CIC_X105 => 0x5D588B65,
-            Self::CIC_X106 => 0x6C078965,
+            Self::CIC_6101 | Self::CIC_6102_7101 | Self::CIC_7102 | Self::CIC_X105 => 0x5D588B65,
+            Self::CIC_X103 | Self::CIC_X106 => 0x6C078965,
         }
     }
 
