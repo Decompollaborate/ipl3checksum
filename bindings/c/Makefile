@@ -32,7 +32,7 @@ endif
 $(shell cargo build --lib --features c_bindings $(CARGO_FLAGS))
 
 
-%.elf: %.c $(LIB)
+%.elf: %.c $(LIB) tests/utils.c
 	$(CC) $(CSTD) $(CFLAGS) $(IINC) $(WARNINGS) -o $@ tests/utils.c $< -L ../../target/$(BUILD_MODE) -Wl,-Bstatic -l ipl3checksum -Wl,-Bdynamic
 
 # Print target for debugging

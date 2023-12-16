@@ -19,7 +19,7 @@ void print_usage(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     int ret = 0;
 
-    if (argc < 1) {
+    if (argc < 2) {
         print_usage(argc, argv);
         return -1;
     }

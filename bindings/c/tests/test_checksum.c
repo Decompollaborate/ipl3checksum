@@ -19,7 +19,7 @@ void print_usage(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     int ret = 0;
 
-    if (argc < 2) {
+    if (argc < 3) {
         print_usage(argc, argv);
         return -1;
     }
@@ -32,9 +32,23 @@ int main(int argc, char *argv[]) {
     assert(bin_size > 0);
     assert(bin != NULL);
 
-    fprintf(stderr, "CIC kind: '%s'\n", cic_kind_name);
-    // TODO: Don't hardcode
-    Ipl3Checksum_CICKind kind = Ipl3Checksum_CICKind_CIC_6102_7101;
+    fprintf(stderr, "Passed CIC kind: '%s'\n", cic_kind_name);
+    Ipl3Checksum_CICKind kind;
+    {
+        Ipl3Checksum_Error err = ipl3checksum_cickind_from_name(&kind, cic_kind_name);
+
+        if (err.tag == Ipl3Checksum_Error_Okay) {
+            fprintf(stderr, "Parsed kind: '%i'\n", kind);
+        } else {
+            fprintf(stderr, "Passed CIC kind was not valid: %s\n", get_ipl3checksum_error_str(err));
+            goto cleanup;
+        }
+    }
+
+    uint32_t expected_checksum0 = read_be_word(bin, 0x10);
+    uint32_t expected_checksum1 = read_be_word(bin, 0x14);
+
+    fprintf(stderr, "Expected checksum: %08X %08X\n", expected_checksum0, expected_checksum1);
 
     {
         uint32_t checksum0;
@@ -44,11 +58,17 @@ int main(int argc, char *argv[]) {
 
         if (err.tag == Ipl3Checksum_Error_Okay) {
             fprintf(stderr, "Computed checksum: %08X %08X\n", checksum0, checksum1);
+            if ((checksum0 == expected_checksum0) && (checksum1 == expected_checksum1)) {
+                fprintf(stderr, "Checksum matches\n");
+            } else {
+                fprintf(stderr, "Checksum doesn't match\n");
+            }
         } else {
             fprintf(stderr, "Error trying to compute the checksum: %s\n", get_ipl3checksum_error_str(err));
         }
     }
 
+cleanup:
     free(bin);
 
     return ret;

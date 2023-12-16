@@ -38,6 +38,8 @@ pub enum Ipl3ChecksumError {
     },
     #[error("Unable to detect CIC variant")]
     UnableToDetectCIC,
+    #[error("Failed to convert a FFI string")]
+    StringConversion,
 }
 
 #[cfg(feature = "python_bindings")]

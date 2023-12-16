@@ -40,6 +40,9 @@ uint8_t *read_binary_file(const char *path, size_t *size) {
     return data;
 }
 
+uint32_t read_be_word(const uint8_t *src, size_t offset) {
+    return (src[offset] << 24) | (src[offset+1] << 16) | (src[offset+2] << 8) | (src[offset+3] << 0);
+}
 
 const char *const ipl3checksum_error_str[] = {
     [Ipl3Checksum_Error_Okay] = "Okay",
@@ -50,6 +53,7 @@ const char *const ipl3checksum_error_str[] = {
     [Ipl3Checksum_Error_BufferNotBigEnough] = "BufferNotBigEnough",
     [Ipl3Checksum_Error_BufferSizeIsWrong] = "BufferSizeIsWrong",
     [Ipl3Checksum_Error_UnableToDetectCIC] = "UnableToDetectCIC",
+    [Ipl3Checksum_Error_StringConversion] = "StringConversion",
 };
 
 const char *get_ipl3checksum_error_str(Ipl3Checksum_Error error) {

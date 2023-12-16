@@ -19,6 +19,7 @@ typedef enum Ipl3Checksum_Error_Tag {
     Ipl3Checksum_Error_BufferNotBigEnough,
     Ipl3Checksum_Error_BufferSizeIsWrong,
     Ipl3Checksum_Error_UnableToDetectCIC,
+    Ipl3Checksum_Error_StringConversion,
 } Ipl3Checksum_Error_Tag;
 
 typedef struct Ipl3Checksum_Error {

@@ -57,3 +57,13 @@ pub(crate) fn u8_vec_from_pointer_array(
 
     Ok(bytes)
 }
+
+#[cfg(feature = "c_bindings")]
+pub(crate) fn static_str_from_c_string(c_str: *const core::ffi::c_char) -> Result<&'static str, Ipl3ChecksumError> {
+    let converted = unsafe { std::ffi::CStr::from_ptr(c_str) };
+
+    match converted.to_str() {
+        Err(_) => Err(Ipl3ChecksumError::StringConversion),
+        Ok(s) => Ok(s),
+    }
+}
