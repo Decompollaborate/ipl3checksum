@@ -338,3 +338,61 @@ pub(crate) mod python_bindings {
         }
     }
 }
+
+#[cfg(feature = "c_bindings")]
+mod c_bindings {
+    #[no_mangle]
+    pub extern "C" fn ipl3checksum_calculate_checksum(
+        dst_checksum0: *mut u32,
+        dst_checksum1: *mut u32,
+        rom_bytes_len: usize,
+        rom_bytes: *const u8,
+        kind: super::CICKind,
+    ) -> super::Ipl3ChecksumError {
+        if dst_checksum0.is_null() || dst_checksum1.is_null() || rom_bytes.is_null() {
+            return super::Ipl3ChecksumError::NullPointer;
+        }
+
+        let bytes = match super::utils::u8_vec_from_pointer_array(rom_bytes_len, rom_bytes) {
+            Err(e) => return e,
+            Ok(d) => d,
+        };
+
+        let checksum = match super::calculate_checksum(&bytes, &kind) {
+            Ok(chk) => chk,
+            Err(e) => return e,
+        };
+
+        unsafe {*dst_checksum0 = checksum.0};
+        unsafe {*dst_checksum1 = checksum.1};
+
+        super::Ipl3ChecksumError::Okay
+    }
+
+    #[no_mangle]
+    pub extern "C" fn ipl3checksum_calculate_checksum_autodetect(
+        dst_checksum0: *mut u32,
+        dst_checksum1: *mut u32,
+        rom_bytes_len: usize,
+        rom_bytes: *const u8,
+    ) -> super::Ipl3ChecksumError {
+        if dst_checksum0.is_null() || dst_checksum1.is_null() || rom_bytes.is_null() {
+            return super::Ipl3ChecksumError::NullPointer;
+        }
+
+        let bytes = match super::utils::u8_vec_from_pointer_array(rom_bytes_len, rom_bytes) {
+            Err(e) => return e,
+            Ok(d) => d,
+        };
+
+        let checksum = match super::calculate_checksum_autodetect(&bytes) {
+            Ok(chk) => chk,
+            Err(e) => return e,
+        };
+
+        unsafe {*dst_checksum0 = checksum.0};
+        unsafe {*dst_checksum1 = checksum.1};
+
+        super::Ipl3ChecksumError::Okay
+    }
+}

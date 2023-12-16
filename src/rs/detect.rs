@@ -26,7 +26,7 @@ pub fn detect_cic_raw(raw_bytes: &[u8]) -> Result<CICKind, Ipl3ChecksumError> {
 
     match CICKind::from_hash_md5(&bytes_hash) {
         Some(cic) => Ok(cic),
-        None => Err(Ipl3ChecksumError::UnableToDetectCIC { hash: bytes_hash }),
+        None => Err(Ipl3ChecksumError::UnableToDetectCIC),
     }
 }
 
@@ -61,7 +61,7 @@ pub(crate) mod python_bindings {
                     buffer_len: _,
                     expected_len: _,
                 } => Ok(None),
-                super::Ipl3ChecksumError::UnableToDetectCIC { hash: _ } => Ok(None),
+                super::Ipl3ChecksumError::UnableToDetectCIC => Ok(None),
                 _ => Err(e), // To trigger an exception on Python's side
             },
         }
@@ -78,7 +78,7 @@ pub(crate) mod python_bindings {
                     buffer_len: _,
                     expected_len: _,
                 } => Ok(None),
-                super::Ipl3ChecksumError::UnableToDetectCIC { hash: _ } => Ok(None),
+                super::Ipl3ChecksumError::UnableToDetectCIC => Ok(None),
                 _ => Err(e), // To trigger an exception on Python's side
             },
         }

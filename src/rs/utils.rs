@@ -39,3 +39,21 @@ pub(crate) fn read_u32_vec(
 pub(crate) fn get_hash_md5(bytes: &[u8]) -> String {
     format!("{:x}", md5::compute(bytes))
 }
+
+#[cfg(feature = "c_bindings")]
+pub(crate) fn u8_vec_from_pointer_array(
+    src_len: usize,
+    src: *const u8,
+) -> Result<Vec<u8>, Ipl3ChecksumError> {
+    if src.is_null() {
+        return Err(Ipl3ChecksumError::NullPointer);
+    }
+
+    let mut bytes = Vec::with_capacity(src_len);
+
+    for i in 0..src_len {
+        bytes.push(unsafe { *src.add(i) });
+    }
+
+    Ok(bytes)
+}

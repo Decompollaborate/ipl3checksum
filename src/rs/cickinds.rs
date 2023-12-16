@@ -4,7 +4,11 @@
 #[cfg(feature = "python_bindings")]
 use pyo3::prelude::*;
 
+/* This needs to be in sync with the C equivalent at `bindings/c/include/ipl3checksum/cickinds.h` */
 #[cfg_attr(feature = "python_bindings", pyclass(module = "ipl3checksum"))]
+// repr is kinda complex and I may have got it wrong.
+// I tried to follow the stuff at https://rust-lang.github.io/unsafe-code-guidelines/layout/enums.html
+#[cfg_attr(feature = "c_bindings", repr(C))]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 #[allow(non_camel_case_types)]
 /// Enum that represents a CIC kind

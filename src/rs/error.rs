@@ -6,8 +6,10 @@ use pyo3::exceptions::PyRuntimeError;
 #[cfg(feature = "python_bindings")]
 use pyo3::prelude::*;
 
-/* This needs to be in sync with the C equivalent at `crunch64_error.h` */
-#[cfg_attr(feature = "c_bindings", repr(u32))]
+/* This needs to be in sync with the C equivalent at `bindings/c/include/ipl3checksum/error.h` */
+// repr is kinda complex and I may have got it wrong.
+// I tried to follow the stuff at https://rust-lang.github.io/unsafe-code-guidelines/layout/enums.html
+#[cfg_attr(feature = "c_bindings", repr(C))]
 #[derive(Clone, Debug, PartialEq, Eq, Hash, thiserror::Error)]
 pub enum Ipl3ChecksumError {
     #[error("Not an error")]
@@ -34,8 +36,8 @@ pub enum Ipl3ChecksumError {
         buffer_len: usize,
         expected_len: usize,
     },
-    #[error("Unable to detect the CIC variant because the computed hash did not match any of the known variants. Computed hash: {hash}")]
-    UnableToDetectCIC { hash: String },
+    #[error("Unable to detect the CIC variant because the computed hash did not match any of the known variants")]
+    UnableToDetectCIC,
 }
 
 #[cfg(feature = "python_bindings")]
