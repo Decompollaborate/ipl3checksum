@@ -11,40 +11,25 @@
 void print_usage(int argc, char *argv[]) {
     (void)argc;
 
-    fprintf(stderr, "Usage: %s bin_file cic_kind\n", argv[0]);
+    fprintf(stderr, "Usage: %s bin_file\n", argv[0]);
     fprintf(stderr, "\n");
-    fprintf(stderr, "This programs computes the ipl3 checksum of a big endian binary file with a given cic kind\n");
+    fprintf(stderr, "This programs computes the ipl3 checksum of a big endian binary file by guessing its cic kind\n");
 }
 
 int main(int argc, char *argv[]) {
     int ret = 0;
 
-    if (argc < 3) {
+    if (argc < 2) {
         print_usage(argc, argv);
         return -1;
     }
 
     const char *bin_path = argv[1];
-    const char *cic_kind_name = argv[2];
 
     size_t bin_size = 0;
     uint8_t *bin = read_binary_file(bin_path, &bin_size);
     assert(bin_size > 0);
     assert(bin != NULL);
-
-    fprintf(stderr, "Passed CIC kind: '%s'\n", cic_kind_name);
-    Ipl3Checksum_CICKind kind;
-    {
-        Ipl3Checksum_Error err = ipl3checksum_cickind_from_name(&kind, cic_kind_name);
-
-        if (err.tag == Ipl3Checksum_Error_Okay) {
-            fprintf(stderr, "Parsed kind: '%i'\n", kind);
-        } else {
-            fprintf(stderr, "Passed CIC kind was not valid: %s\n", get_ipl3checksum_error_str(err));
-            ret++;
-            goto cleanup;
-        }
-    }
 
     uint32_t expected_checksum0 = read_be_word(bin, 0x10);
     uint32_t expected_checksum1 = read_be_word(bin, 0x14);
@@ -55,7 +40,7 @@ int main(int argc, char *argv[]) {
         uint32_t checksum0;
         uint32_t checksum1;
 
-        Ipl3Checksum_Error err = ipl3checksum_calculate_checksum(&checksum0, &checksum1, bin_size, bin, kind);
+        Ipl3Checksum_Error err = ipl3checksum_calculate_checksum_autodetect(&checksum0, &checksum1, bin_size, bin);
 
         if (err.tag == Ipl3Checksum_Error_Okay) {
             fprintf(stderr, "Computed checksum: %08X %08X\n", checksum0, checksum1);
@@ -71,7 +56,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-cleanup:
     free(bin);
 
     return ret;

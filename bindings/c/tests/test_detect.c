@@ -41,6 +41,7 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Detected CIC kind: %i\n", kind);
         } else {
             fprintf(stderr, "Error trying to detect the cic: %s\n", get_ipl3checksum_error_str(err));
+            ret++;
         }
     }
 
