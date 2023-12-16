@@ -363,8 +363,8 @@ mod c_bindings {
             Err(e) => return e,
         };
 
-        unsafe {*dst_checksum0 = checksum.0};
-        unsafe {*dst_checksum1 = checksum.1};
+        unsafe { *dst_checksum0 = checksum.0 };
+        unsafe { *dst_checksum1 = checksum.1 };
 
         super::Ipl3ChecksumError::Okay
     }
@@ -390,8 +390,8 @@ mod c_bindings {
             Err(e) => return e,
         };
 
-        unsafe {*dst_checksum0 = checksum.0};
-        unsafe {*dst_checksum1 = checksum.1};
+        unsafe { *dst_checksum0 = checksum.0 };
+        unsafe { *dst_checksum1 = checksum.1 };
 
         super::Ipl3ChecksumError::Okay
     }
