@@ -1,33 +1,31 @@
 /* SPDX-FileCopyrightText: © 2023 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
 
-pub(crate) fn read_u32(bytes: &[u8], offset: usize) -> u32 {
+use crate::error::Ipl3ChecksumError;
+
+pub(crate) fn read_u32(bytes: &[u8], offset: usize) -> Result<u32, Ipl3ChecksumError> {
     if offset % 4 != 0 {
-        panic!("Unaligned read");
+        return Err(Ipl3ChecksumError::UnalignedRead{ offset });
     }
 
     if offset + 4 > bytes.len() {
-        panic!("Out of bounds. Offset {:X}, len {:X}", offset, bytes.len());
+        return Err(Ipl3ChecksumError::OutOfBounds{offset, requested_bytes: 4, buffer_len: bytes.len()});
     }
 
-    /*
     match bytes[offset..offset + 4].try_into() {
-        Ok(bytes) => u32::from_be_bytes(bytes),
-        Err(_error) => todo!(),
+        Ok(bytes) => Ok(u32::from_be_bytes(bytes)),
+        Err(_error) => Err(Ipl3ChecksumError::ByteConversion{offset}),
     }
-    */
-
-    u32::from_be_bytes(bytes[offset..offset + 4].try_into().unwrap())
 }
 
-pub(crate) fn read_u32_vec(bytes: &[u8], offset: usize, len: usize) -> Vec<u32> {
+pub(crate) fn read_u32_vec(bytes: &[u8], offset: usize, len: usize) -> Result<Vec<u32>, Ipl3ChecksumError> {
     let mut ret = Vec::with_capacity(len);
 
     for i in 0..len {
-        ret.push(read_u32(bytes, offset + i * 4));
+        ret.push(read_u32(bytes, offset + i * 4).unwrap());
     }
 
-    ret
+    Ok(ret)
 }
 
 pub(crate) fn get_hash_md5(bytes: &[u8]) -> String {

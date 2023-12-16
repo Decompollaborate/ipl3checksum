@@ -10,7 +10,7 @@ from .cickinds import CICKind
 def detectCICRaw(rawBytes: bytes) -> CICKind|None:
     """Tries to detect an IPL3 binary.
 
-    The argument to this function must be exactly the IPL3 binary, stripping the rest of the ROM.
+    The argument to this function must be exactly the IPL3 binary.
 
     Args:
         rawBytes (bytes): IPL3 binary in big endian format.

@@ -4,12 +4,13 @@
 mod checksum;
 mod cickinds;
 mod detect;
-
+mod error;
 mod utils;
 
 pub use checksum::*;
 pub use cickinds::*;
 pub use detect::*;
+pub use error::*;
 
 #[cfg(feature = "python_bindings")]
 use pyo3::prelude::*;

@@ -2,7 +2,7 @@
 /* SPDX-License-Identifier: MIT */
 
 use crate::cickinds::CICKind;
-use crate::{detect, utils};
+use crate::{detect, error::Ipl3ChecksumError, utils};
 
 fn read_word_from_ram(rom_words: &[u32], entrypoint_ram: u32, ram_addr: u32) -> u32 {
     rom_words[((ram_addr - entrypoint_ram + 0x1000) / 4) as usize]
@@ -31,12 +31,12 @@ fn read_word_from_ram(rom_words: &[u32], entrypoint_ram: u32, ram_addr: u32) -> 
 /// let checksum = ipl3checksum::calculate_checksum(&bytes, &kind).unwrap();
 /// println!("{:08X} {:08X}", checksum.0, checksum.1);
 /// ```
-pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)> {
+pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Result<(u32, u32), Ipl3ChecksumError> {
     if rom_bytes.len() < 0x101000 {
-        return None;
+        return Err(Ipl3ChecksumError::BufferNotBigEnough{buffer_len: rom_bytes.len(), expected_len: 0x101000});
     }
 
-    let rom_words = utils::read_u32_vec(rom_bytes, 0, 0x101000 / 4);
+    let rom_words = utils::read_u32_vec(rom_bytes, 0, 0x101000 / 4)?;
 
     let seed = kind.get_seed();
     let magic = kind.get_magic();
@@ -197,7 +197,7 @@ pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)
         s0 = t8 ^ t4;
     }
 
-    Some((a3, s0))
+    Ok((a3, s0))
 }
 
 /// Calculates the checksum required by an official CIC of a N64 ROM.
@@ -223,9 +223,9 @@ pub fn calculate_checksum(rom_bytes: &[u8], kind: &CICKind) -> Option<(u32, u32)
 /// let bytes = vec![0; 0x101000];
 /// let checksum = ipl3checksum::calculate_checksum_autodetect(&bytes);
 /// /* This will return `None` because there's no ipl3 binary on an array of zeroes */
-/// assert!(checksum.is_none());
+/// assert!(checksum.is_err());
 /// ```
-pub fn calculate_checksum_autodetect(rom_bytes: &[u8]) -> Option<(u32, u32)> {
+pub fn calculate_checksum_autodetect(rom_bytes: &[u8]) -> Result<(u32, u32), Ipl3ChecksumError> {
     let kind = detect::detect_cic(rom_bytes)?;
 
     calculate_checksum(rom_bytes, &kind)
@@ -237,9 +237,7 @@ mod tests {
     use std::fs;
 
     #[test]
-    fn test_dummy_files() -> Result<(), ()> {
-        println!("asdf");
-
+    fn test_dummy_files() -> Result<(), super::Ipl3ChecksumError> {
         for path_result in fs::read_dir("tests/dummytests").unwrap() {
             let ipl3_folder = path_result.unwrap();
             let folder_name = ipl3_folder.file_name();
@@ -275,7 +273,7 @@ mod tests {
                 );
 
                 println!("    Checking checksum...");
-                let bin_checksum = utils::read_u32_vec(&bin_bytes, 0x10, 2);
+                let bin_checksum = utils::read_u32_vec(&bin_bytes, 0x10, 2)?;
 
                 println!(
                     "    Expected checksum is: 0x{:08X} 0x{:08X}",
@@ -302,12 +300,24 @@ pub(crate) mod python_bindings {
     use pyo3::prelude::*;
 
     #[pyfunction]
-    pub(crate) fn calculateChecksum(rom_bytes: &[u8], kind: &super::CICKind) -> Option<(u32, u32)> {
-        super::calculate_checksum(rom_bytes, kind)
+    pub(crate) fn calculateChecksum(rom_bytes: &[u8], kind: &super::CICKind) -> Result<Option<(u32, u32)>, super::Ipl3ChecksumError> {
+        match super::calculate_checksum(rom_bytes, kind) {
+            Ok(checksum) => Ok(Some(checksum)),
+            Err(e) => match e {
+                super::Ipl3ChecksumError::BufferNotBigEnough { buffer_len, expected_len } => Ok(None),
+                _ => Err(e), // To trigger an exception on Python's side
+            },
+        }
     }
 
     #[pyfunction]
-    pub(crate) fn calculateChecksumAutodetect(rom_bytes: &[u8]) -> Option<(u32, u32)> {
-        super::calculate_checksum_autodetect(rom_bytes)
+    pub(crate) fn calculateChecksumAutodetect(rom_bytes: &[u8]) -> Result<Option<(u32, u32)>, super::Ipl3ChecksumError> {
+        match super::calculate_checksum_autodetect(rom_bytes) {
+            Ok(checksum) => Ok(Some(checksum)),
+            Err(e) => match e {
+                super::Ipl3ChecksumError::BufferNotBigEnough { buffer_len, expected_len } => Ok(None),
+                _ => Err(e), // To trigger an exception on Python's side
+            },
+        }
     }
 }
