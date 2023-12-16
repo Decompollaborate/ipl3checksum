@@ -72,7 +72,9 @@ impl CICKind {
     pub fn from_name(name: &str) -> Option<CICKind> {
         match name {
             "CIC_6101" | "6101" => Some(Self::CIC_6101),
-            "CIC_6102_7101" | "CIC_6102" | "CIC_7101" | "6102_7101" | "6102" | "7101" => Some(Self::CIC_6102_7101),
+            "CIC_6102_7101" | "CIC_6102" | "CIC_7101" | "6102_7101" | "6102" | "7101" => {
+                Some(Self::CIC_6102_7101)
+            }
             "CIC_7102" | "7102" => Some(Self::CIC_7102),
             "CIC_X103" | "CIC_6103" | "CIC_7103" | "X103" | "6103" | "7103" => Some(Self::CIC_X103),
             "CIC_X105" | "CIC_6105" | "CIC_7105" | "X105" | "6105" | "7105" => Some(Self::CIC_X105),
