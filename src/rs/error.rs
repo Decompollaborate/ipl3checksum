@@ -36,7 +36,7 @@ pub enum Ipl3ChecksumError {
         buffer_len: usize,
         expected_len: usize,
     },
-    #[error("Unable to detect the CIC variant because the computed hash did not match any of the known variants")]
+    #[error("Unable to detect CIC variant")]
     UnableToDetectCIC,
 }
 
