@@ -2,6 +2,8 @@
 #define IPL3CHECKSUM_ERROR_H
 #pragma once
 
+#include <stdlib.h>
+
 #ifdef __cplusplus
 extern "C"
 {
