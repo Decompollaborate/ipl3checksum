@@ -21,57 +21,80 @@ pub enum CICKind {
 impl CICKind {
     pub fn get_seed(&self) -> u32 {
         match self {
-            CICKind::CIC_6101 => 0x3F,
-            CICKind::CIC_6102_7101 => 0x3F,
-            CICKind::CIC_7102 => 0x3F,
-            CICKind::CIC_X103 => 0x78,
-            CICKind::CIC_X105 => 0x91,
-            CICKind::CIC_X106 => 0x85,
+            Self::CIC_6101 => 0x3F,
+            Self::CIC_6102_7101 => 0x3F,
+            Self::CIC_7102 => 0x3F,
+            Self::CIC_X103 => 0x78,
+            Self::CIC_X105 => 0x91,
+            Self::CIC_X106 => 0x85,
         }
     }
 
     pub fn get_magic(&self) -> u32 {
         match self {
-            CICKind::CIC_6101 => 0x5D588B65,
-            CICKind::CIC_6102_7101 => 0x5D588B65,
-            CICKind::CIC_7102 => 0x5D588B65,
-            CICKind::CIC_X103 => 0x6C078965,
-            CICKind::CIC_X105 => 0x5D588B65,
-            CICKind::CIC_X106 => 0x6C078965,
+            Self::CIC_6101 => 0x5D588B65,
+            Self::CIC_6102_7101 => 0x5D588B65,
+            Self::CIC_7102 => 0x5D588B65,
+            Self::CIC_X103 => 0x6C078965,
+            Self::CIC_X105 => 0x5D588B65,
+            Self::CIC_X106 => 0x6C078965,
         }
     }
 
     pub fn get_hash_md5(&self) -> &str {
         match self {
-            CICKind::CIC_6101 => "900b4a5b68edb71f4c7ed52acd814fc5",
-            CICKind::CIC_6102_7101 => "e24dd796b2fa16511521139d28c8356b",
-            CICKind::CIC_7102 => "955894c2e40a698bf98a67b78a4e28fa",
-            CICKind::CIC_X103 => "319038097346e12c26c3c21b56f86f23",
-            CICKind::CIC_X105 => "ff22a296e55d34ab0a077dc2ba5f5796",
-            CICKind::CIC_X106 => "6460387749ac0bd925aa5430bc7864fe",
+            Self::CIC_6101 => "900b4a5b68edb71f4c7ed52acd814fc5",
+            Self::CIC_6102_7101 => "e24dd796b2fa16511521139d28c8356b",
+            Self::CIC_7102 => "955894c2e40a698bf98a67b78a4e28fa",
+            Self::CIC_X103 => "319038097346e12c26c3c21b56f86f23",
+            Self::CIC_X105 => "ff22a296e55d34ab0a077dc2ba5f5796",
+            Self::CIC_X106 => "6460387749ac0bd925aa5430bc7864fe",
         }
     }
 
     pub fn from_hash_md5(hash_str: &str) -> Option<CICKind> {
         match hash_str {
-            "900b4a5b68edb71f4c7ed52acd814fc5" => Some(CICKind::CIC_6101),
-            "e24dd796b2fa16511521139d28c8356b" => Some(CICKind::CIC_6102_7101),
-            "955894c2e40a698bf98a67b78a4e28fa" => Some(CICKind::CIC_7102),
-            "319038097346e12c26c3c21b56f86f23" => Some(CICKind::CIC_X103),
-            "ff22a296e55d34ab0a077dc2ba5f5796" => Some(CICKind::CIC_X105),
-            "6460387749ac0bd925aa5430bc7864fe" => Some(CICKind::CIC_X106),
+            "900b4a5b68edb71f4c7ed52acd814fc5" => Some(Self::CIC_6101),
+            "e24dd796b2fa16511521139d28c8356b" => Some(Self::CIC_6102_7101),
+            "955894c2e40a698bf98a67b78a4e28fa" => Some(Self::CIC_7102),
+            "319038097346e12c26c3c21b56f86f23" => Some(Self::CIC_X103),
+            "ff22a296e55d34ab0a077dc2ba5f5796" => Some(Self::CIC_X105),
+            "6460387749ac0bd925aa5430bc7864fe" => Some(Self::CIC_X106),
+            _ => None,
+        }
+    }
+
+    pub fn get_name(&self) -> &str {
+        match self {
+            Self::CIC_6101 => "CIC_6101",
+            Self::CIC_6102_7101 => "CIC_6102_7101",
+            Self::CIC_7102 => "CIC_7102",
+            Self::CIC_X103 => "CIC_X103",
+            Self::CIC_X105 => "CIC_X105",
+            Self::CIC_X106 => "CIC_X106",
+        }
+    }
+
+    pub fn from_name(name: &str) -> Option<CICKind> {
+        match name {
+            "CIC_6101" | "6101" => Some(Self::CIC_6101),
+            "CIC_6102_7101" | "CIC_6102" | "CIC_7101" | "6102_7101" | "6102" | "7101" => Some(Self::CIC_6102_7101),
+            "CIC_7102" | "7102" => Some(Self::CIC_7102),
+            "CIC_X103" | "CIC_6103" | "CIC_7103" | "X103" | "6103" | "7103" => Some(Self::CIC_X103),
+            "CIC_X105" | "CIC_6105" | "CIC_7105" | "X105" | "6105" | "7105" => Some(Self::CIC_X105),
+            "CIC_X106" | "CIC_6106" | "CIC_7106" | "X106" | "6106" | "7106" => Some(Self::CIC_X106),
             _ => None,
         }
     }
 
     pub fn from_value(value: usize) -> Option<CICKind> {
         match value {
-            6101 => Some(CICKind::CIC_6101),
-            6102 | 7101 => Some(CICKind::CIC_6102_7101),
-            7102 => Some(CICKind::CIC_7102),
-            6103 | 7103 => Some(CICKind::CIC_X103),
-            6105 | 7105 => Some(CICKind::CIC_X105),
-            6106 | 7106 => Some(CICKind::CIC_X106),
+            6101 => Some(Self::CIC_6101),
+            6102 | 7101 => Some(Self::CIC_6102_7101),
+            7102 => Some(Self::CIC_7102),
+            6103 | 7103 => Some(Self::CIC_X103),
+            6105 | 7105 => Some(Self::CIC_X105),
+            6106 | 7106 => Some(Self::CIC_X106),
             _ => None,
         }
     }
@@ -97,25 +120,23 @@ mod python_bindings {
         }
 
         #[staticmethod]
-        pub fn fromHashMd5(hash_str: &str) -> Option<super::CICKind> {
-            super::CICKind::from_hash_md5(hash_str)
-        }
-
-        #[staticmethod]
-        pub fn fromValue(value: usize) -> Option<super::CICKind> {
-            super::CICKind::from_value(value)
+        pub fn fromHashMd5(hash_str: &str) -> Option<Self> {
+            Self::from_hash_md5(hash_str)
         }
 
         #[getter]
         pub fn name(&self) -> &str {
-            match self {
-                super::CICKind::CIC_6101 => "CIC_6101",
-                super::CICKind::CIC_6102_7101 => "CIC_6102_7101",
-                super::CICKind::CIC_7102 => "CIC_7102",
-                super::CICKind::CIC_X103 => "CIC_X103",
-                super::CICKind::CIC_X105 => "CIC_X105",
-                super::CICKind::CIC_X106 => "CIC_X106",
-            }
+            self.get_name()
+        }
+
+        #[staticmethod]
+        pub fn fromName(name: &str) -> Option<Self> {
+            Self::from_name(name)
+        }
+
+        #[staticmethod]
+        pub fn fromValue(value: usize) -> Option<Self> {
+            Self::from_value(value)
         }
     }
 }

@@ -35,10 +35,14 @@ class CICKind():
     def fromHashMd5(hash_str: str) -> CICKind|None:
         ...
 
-    @staticmethod
-    def fromValue(value: int) -> CICKind|None:
-        ...
-
     @property
     def name(self) -> str:
+        ...
+
+    @staticmethod
+    def fromName(name: str) -> CICKind|None:
+        ...
+
+    @staticmethod
+    def fromValue(value: int) -> CICKind|None:
         ...

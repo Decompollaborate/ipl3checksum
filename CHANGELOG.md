@@ -10,8 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add Rust support
-- New static method `CICKind.fromHashMd5`.
-  - Returns a CIC kind based on the passed md5 hash.
+- New static methods for `CICKind`.
+  - `CICKind.fromHashMd5`: Returns a CIC kind based on the passed md5 hash.
+  - `CICKind.fromName`: Returns a CIC kind based a string representing its name.
 
 ### Changed
 
