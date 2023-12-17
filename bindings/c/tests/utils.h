@@ -1,8 +1,8 @@
 /* SPDX-FileCopyrightText: © 2023 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
 
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef TESTS_UTILS_H
+#define TESTS_UTILS_H
 #pragma once
 
 #include <stddef.h>

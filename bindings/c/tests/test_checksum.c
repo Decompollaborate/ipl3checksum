@@ -38,7 +38,18 @@ int main(int argc, char *argv[]) {
         Ipl3Checksum_Error err = ipl3checksum_cickind_from_name(&kind, cic_kind_name);
 
         if (err.tag == Ipl3Checksum_Error_Okay) {
-            fprintf(stderr, "Parsed kind: '%i'\n", kind);
+            char *kind_name;
+            Ipl3Checksum_Error kind_name_ok = ipl3checksum_cickind_get_name(kind, &kind_name);
+
+            if (kind_name_ok.tag != Ipl3Checksum_Error_Okay) {
+                fprintf(stderr, "Failed to get cic kind's name: %s\n", get_ipl3checksum_error_str(kind_name_ok));
+                ret++;
+                goto cleanup;
+            }
+
+            fprintf(stderr, "Parsed kind: '%s'\n", kind_name);
+
+            ipl3checksum_free_string(kind_name);
         } else {
             fprintf(stderr, "Passed CIC kind was not valid: %s\n", get_ipl3checksum_error_str(err));
             ret++;

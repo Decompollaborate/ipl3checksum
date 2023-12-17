@@ -159,14 +159,20 @@ mod c_bindings {
         kind.get_magic()
     }
 
-    /*
     #[no_mangle]
     pub extern "C" fn ipl3checksum_cickind_get_hash_md5(
-        kind: CICKind
-    ) -> *const core::ffi::c_char {
-        std::ffi::CString::new(kind.get_hash_md5()).unwrap().as_ptr()
+        kind: CICKind,
+        dst_hash: *mut *mut core::ffi::c_char,
+    ) -> Ipl3ChecksumError {
+        let hash = match utils::c_bindings::c_string_from_rust_str(kind.get_hash_md5()) {
+            Err(e) => return e,
+            Ok(s) => s,
+        };
+
+        unsafe { *dst_hash = hash };
+
+        Ipl3ChecksumError::Okay
     }
-    */
 
     #[no_mangle]
     pub extern "C" fn ipl3checksum_cickind_from_hash_md5(
@@ -192,13 +198,20 @@ mod c_bindings {
         Ipl3ChecksumError::Okay
     }
 
-    /*
     #[no_mangle]
     pub extern "C" fn ipl3checksum_cickind_get_name(
-        kind: CICKind
-    ) ->  {
+        kind: CICKind,
+        dst_name: *mut *mut core::ffi::c_char,
+    ) -> Ipl3ChecksumError {
+        let name = match utils::c_bindings::c_string_from_rust_str(kind.get_name()) {
+            Err(e) => return e,
+            Ok(s) => s,
+        };
+
+        unsafe { *dst_name = name };
+
+        Ipl3ChecksumError::Okay
     }
-    */
 
     #[no_mangle]
     pub extern "C" fn ipl3checksum_cickind_from_name(

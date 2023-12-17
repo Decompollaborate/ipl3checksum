@@ -67,3 +67,37 @@ pub(crate) fn static_str_from_c_string(c_str: *const core::ffi::c_char) -> Resul
         Ok(s) => Ok(s),
     }
 }
+
+#[cfg(feature = "c_bindings")]
+pub(crate) mod c_bindings {
+    use crate::Ipl3ChecksumError;
+
+    pub(crate) fn free_c_string(s: *mut core::ffi::c_char) -> Result<(), Ipl3ChecksumError> {
+        if s.is_null() {
+            return Err(Ipl3ChecksumError::NullPointer);
+        }
+
+        unsafe {
+            drop(std::ffi::CString::from_raw(s));
+        }
+
+        Ok(())
+    }
+
+    #[no_mangle]
+    pub extern "C" fn ipl3checksum_free_string(s: *mut core::ffi::c_char) -> Ipl3ChecksumError {
+        match free_c_string(s) {
+            Err(e) => e,
+            Ok(_) => Ipl3ChecksumError::Okay
+        }
+    }
+
+    pub(crate) fn c_string_from_rust_str(s: &str) -> Result<*mut core::ffi::c_char, Ipl3ChecksumError> {
+        let c_str_song = match std::ffi::CString::new(s) {
+            Err(_) => return Err(Ipl3ChecksumError::StringConversion),
+            Ok(c_s) => c_s,
+        };
+
+        Ok(c_str_song.into_raw())
+    }
+}
