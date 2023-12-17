@@ -9,21 +9,13 @@ import ipl3checksum
 from pathlib import Path
 import struct
 
-cicsmapping = {
-    "CIC_6101":        ipl3checksum.CICKind.CIC_6101,
-    "CIC_6102_7101":   ipl3checksum.CICKind.CIC_6102_7101,
-    "CIC_7102":        ipl3checksum.CICKind.CIC_7102,
-    "CIC_X103":        ipl3checksum.CICKind.CIC_X103,
-    "CIC_X105":        ipl3checksum.CICKind.CIC_X105,
-    "CIC_X106":        ipl3checksum.CICKind.CIC_X106,
-}
-
 print(f"Running ipl3checksum version {ipl3checksum.__version__}")
 
 for ipl3folder in sorted(Path("tests/dummytests").iterdir()):
     print(ipl3folder.name)
 
-    kind = cicsmapping[ipl3folder.name]
+    kind = ipl3checksum.CICKind.fromName(ipl3folder.name)
+    assert kind is not None
 
     for binPath in sorted(ipl3folder.iterdir()):
         print(binPath)
