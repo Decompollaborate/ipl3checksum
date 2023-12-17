@@ -65,6 +65,7 @@ jobs:
           cp -r bindings/c/include/* package/include/
           cp LICENSE package/ipl3checksum.LICENSE
           cp README.md package/ipl3checksum.README.md
+          cp CHANGELOG.md package/ipl3checksum.CHANGELOG.md
           tree package
 
       - name: Package .tar.gz
