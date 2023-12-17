@@ -5,7 +5,8 @@ use crate::{cickinds::CICKind, error::Ipl3ChecksumError, utils};
 
 /// Tries to detect an IPL3 binary.
 ///
-/// The argument to this function must be exactly the IPL3 binary.
+/// The argument to this function must be exactly the IPL3 binary, meaning the
+/// binary size must match exactly the one of an IPL3 binary.
 ///
 /// ## Arguments
 ///
@@ -24,10 +25,7 @@ pub fn detect_cic_raw(raw_bytes: &[u8]) -> Result<CICKind, Ipl3ChecksumError> {
 
     let bytes_hash = utils::get_hash_md5(raw_bytes);
 
-    match CICKind::from_hash_md5(&bytes_hash) {
-        Some(cic) => Ok(cic),
-        None => Err(Ipl3ChecksumError::UnableToDetectCIC { hash: bytes_hash }),
-    }
+    CICKind::from_hash_md5(&bytes_hash)
 }
 
 /// Tries to detect an IPL3 in a ROM.
@@ -61,7 +59,7 @@ pub(crate) mod python_bindings {
                     buffer_len: _,
                     expected_len: _,
                 } => Ok(None),
-                super::Ipl3ChecksumError::UnableToDetectCIC { hash: _ } => Ok(None),
+                super::Ipl3ChecksumError::UnableToDetectCIC => Ok(None),
                 _ => Err(e), // To trigger an exception on Python's side
             },
         }
@@ -78,9 +76,64 @@ pub(crate) mod python_bindings {
                     buffer_len: _,
                     expected_len: _,
                 } => Ok(None),
-                super::Ipl3ChecksumError::UnableToDetectCIC { hash: _ } => Ok(None),
+                super::Ipl3ChecksumError::UnableToDetectCIC => Ok(None),
                 _ => Err(e), // To trigger an exception on Python's side
             },
         }
+    }
+}
+
+#[cfg(feature = "c_bindings")]
+mod c_bindings {
+    use crate::{utils, CICKind, Ipl3ChecksumError};
+
+    #[no_mangle]
+    pub extern "C" fn ipl3checksum_detect_cic_raw(
+        dst_kind: *mut CICKind,
+        raw_bytes_len: usize,
+        raw_bytes: *const u8,
+    ) -> Ipl3ChecksumError {
+        if dst_kind.is_null() || raw_bytes.is_null() {
+            return Ipl3ChecksumError::NullPointer;
+        }
+
+        let bytes = match utils::c_bindings::u8_vec_from_pointer_array(raw_bytes_len, raw_bytes) {
+            Err(e) => return e,
+            Ok(d) => d,
+        };
+
+        let kind = match super::detect_cic_raw(&bytes) {
+            Err(e) => return e,
+            Ok(k) => k,
+        };
+
+        unsafe { *dst_kind = kind };
+
+        Ipl3ChecksumError::Okay
+    }
+
+    #[no_mangle]
+    pub extern "C" fn ipl3checksum_detect_cic(
+        dst_kind: *mut CICKind,
+        rom_bytes_len: usize,
+        rom_bytes: *const u8,
+    ) -> Ipl3ChecksumError {
+        if dst_kind.is_null() || rom_bytes.is_null() {
+            return Ipl3ChecksumError::NullPointer;
+        }
+
+        let bytes = match utils::c_bindings::u8_vec_from_pointer_array(rom_bytes_len, rom_bytes) {
+            Err(e) => return e,
+            Ok(d) => d,
+        };
+
+        let kind = match super::detect_cic(&bytes) {
+            Err(e) => return e,
+            Ok(k) => k,
+        };
+
+        unsafe { *dst_kind = kind };
+
+        Ipl3ChecksumError::Okay
     }
 }

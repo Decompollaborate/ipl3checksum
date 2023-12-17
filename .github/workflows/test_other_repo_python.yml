@@ -1,4 +1,4 @@
-name: Test other repo
+name: Test other repo (Python)
 
 # Build on every branch push, tag push, and pull request change:
 on: [push, pull_request]

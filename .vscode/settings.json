@@ -1,6 +1,0 @@
-{
-    "rust-analyzer.cargo.features": [
-        "c_bindings",
-        "python_bindings"
-    ]
-}

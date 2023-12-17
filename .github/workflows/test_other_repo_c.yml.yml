@@ -1,0 +1,53 @@
+name: Test other repo (C)
+
+# Build on every branch push, tag push, and pull request change:
+on: [push, pull_request]
+
+jobs:
+  test_other_repo_c_detect:
+    name: Test other repo detect (C)
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Get extra dependencies
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ secrets.SECRETREPO }}
+        token: ${{ secrets.SECRETTOKEN }}
+        path: deps_repo
+
+    - name: Build
+      run: make -C bindings/c BUILD_MODE=release
+
+    - name: Test detection
+      run: bindings/c/tests/test_detect_other_repo.sh
+
+  test_other_repo_c_checksum_autodetect:
+    name: Test other repo checksum_autodetect (C)
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Get extra dependencies
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ secrets.SECRETREPO }}
+        token: ${{ secrets.SECRETTOKEN }}
+        path: deps_repo
+
+    - name: Build
+      run: make -C bindings/c BUILD_MODE=release
+
+    - name: Test checksum with autodetection
+      run: bindings/c/tests/test_checksum_autodetect_other_repo.sh

@@ -12,16 +12,21 @@
 [PyPI]: <https://img.shields.io/pypi/v/ipl3checksum>
 [GitHub contributors]: <https://img.shields.io/github/contributors/Decompollaborate/ipl3checksum?logo=purple>
 
-A Python and Rust library to calculate the IPL3 checksum for N64 ROMs.
+A library to calculate the IPL3 checksum for N64 ROMs.
+
+Written in Rust. Python and C bindings available.
 
 ## How to use it?
 
 To calculate the checksum of a ROM:
 
 ```py
+import ipl3checksum
+
 romBytes = # A big endian bytes-like object
 cickind = ipl3checksum.CICKind.CIC_6102_7101
 
+# or calculateChecksumAutodetect to let the library guess the correct CIC kind
 checksum = ipl3checksum.calculateChecksum(romBytes, cickind)
 
 # If this assert fails it is because the library was not able to compute the
@@ -36,7 +41,8 @@ This library also contains a CIC detector:
 
 ```py
 cickind = ipl3checksum.detectCIC(romBytes)
-# Either a `ipl3checksum.CICKind` or None if was not able to detect the CIC
+# Either a `ipl3checksum.CICKind` object or `None`` if was not able to detect
+# the CIC kind
 print(cickind)
 ```
 
@@ -118,6 +124,29 @@ Or add the following line manually to your `Cargo.toml` file:
 
 ```toml
 ipl3checksum = "1.1.0"
+```
+
+### C bindings
+
+This library provides bindings to call this library from C code. They are
+available on the [releases](https://github.com/decompals/ipl3checksum/releases)
+tab.
+
+To build said bindings from source, enable the `c_bindings` Rust feature:
+
+```bash
+cargo build --lib --features c_bindings
+```
+
+Headers are located at [bindings/c/include](bindings/c/include).
+
+#### Windows executables
+
+Due to Rust requirements, linking the C bindings of this library when building
+a C program adds extra library dependencies. Those libraries are the following:
+
+```plain_text
+-lws2_32 -lntdll -lbcrypt -ladvapi32 -luserenv
 ```
 
 ## Versioning and changelog
