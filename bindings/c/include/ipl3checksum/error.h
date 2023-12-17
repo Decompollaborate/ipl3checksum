@@ -12,14 +12,15 @@ extern "C"
 /* This needs to be synced with the Rust equivalent in `src/rs/error.rs` */
 typedef enum Ipl3Checksum_Error_Tag {
     Ipl3Checksum_Error_Okay,
+    Ipl3Checksum_Error_NullPointer,
+    Ipl3Checksum_Error_StringConversion,
+
     Ipl3Checksum_Error_UnalignedRead,
     Ipl3Checksum_Error_ByteConversion,
     Ipl3Checksum_Error_OutOfBounds,
-    Ipl3Checksum_Error_NullPointer,
     Ipl3Checksum_Error_BufferNotBigEnough,
     Ipl3Checksum_Error_BufferSizeIsWrong,
     Ipl3Checksum_Error_UnableToDetectCIC,
-    Ipl3Checksum_Error_StringConversion,
 } Ipl3Checksum_Error_Tag;
 
 /**

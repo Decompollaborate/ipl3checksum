@@ -12,8 +12,16 @@ use pyo3::prelude::*;
 #[cfg_attr(feature = "c_bindings", repr(C))]
 #[derive(Clone, Debug, PartialEq, Eq, Hash, thiserror::Error)]
 pub enum Ipl3ChecksumError {
+    #[cfg(feature = "c_bindings")]
     #[error("Not an error")]
     Okay,
+    #[cfg(feature = "c_bindings")]
+    #[error("Pointer is null")]
+    NullPointer,
+    #[cfg(feature = "c_bindings")]
+    #[error("Failed to convert a FFI string")]
+    StringConversion,
+
     #[error("Unaligned read at offset 0x{offset:X}")]
     UnalignedRead { offset: usize },
     #[error("Failed to convert bytes at offset 0x{offset:X}")]
@@ -24,8 +32,6 @@ pub enum Ipl3ChecksumError {
         requested_bytes: usize,
         buffer_len: usize,
     },
-    #[error("Pointer is null")]
-    NullPointer,
     #[error("The input byte buffer is not big enough. It should be at least 0x{expected_len:X} bytes long, but it was 0x{buffer_len:X} bytes")]
     BufferNotBigEnough {
         buffer_len: usize,
@@ -38,8 +44,6 @@ pub enum Ipl3ChecksumError {
     },
     #[error("Unable to detect CIC variant")]
     UnableToDetectCIC,
-    #[error("Failed to convert a FFI string")]
-    StringConversion,
 }
 
 #[cfg(feature = "python_bindings")]
