@@ -22,6 +22,26 @@ jobs:
       - name: Test dummies
         run: ./bindings/c/tests/test_checksum_dummies.sh
 
+  check_clippy_c_bindings:
+    name: Check clippy for C bindings
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout reposistory
+      uses: actions/checkout@v4
+
+    - name: Setup Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    - name: Setup clippy
+      run: rustup component add clippy
+
+    - name: Run clippy
+      run: cargo clippy --all-targets --features c_bindings -- -D warnings
+
   release:
     name: Release ${{ matrix.crate-type }} for ${{ matrix.target }}
     runs-on: ubuntu-20.04
