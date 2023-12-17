@@ -5,7 +5,8 @@ use crate::{cickinds::CICKind, error::Ipl3ChecksumError, utils};
 
 /// Tries to detect an IPL3 binary.
 ///
-/// The argument to this function must be exactly the IPL3 binary.
+/// The argument to this function must be exactly the IPL3 binary, meaning the
+/// binary size must match exactly the one of an IPL3 binary.
 ///
 /// ## Arguments
 ///

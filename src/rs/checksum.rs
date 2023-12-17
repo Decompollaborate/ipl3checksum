@@ -19,8 +19,6 @@ fn read_word_from_ram(rom_words: &[u32], entrypoint_ram: u32, ram_addr: u32) -> 
 ///
 /// * If no error happens then the calculated checksum is returned, stored as a tuple
 ///   containing two 32-bits words. Otherwise, `None` is returned.
-///   Possible errors:
-///     - `rom_bytes` not being big enough
 ///
 /// ## Examples
 ///
@@ -28,12 +26,12 @@ fn read_word_from_ram(rom_words: &[u32], entrypoint_ram: u32, ram_addr: u32) -> 
 /// use ipl3checksum;
 /// let bytes = vec![0; 0x101000];
 /// let kind = ipl3checksum::CICKind::CIC_6102_7101;
-/// let checksum = ipl3checksum::calculate_checksum(&bytes, &kind).unwrap();
+/// let checksum = ipl3checksum::calculate_checksum(&bytes, kind).unwrap();
 /// println!("{:08X} {:08X}", checksum.0, checksum.1);
 /// ```
 pub fn calculate_checksum(
     rom_bytes: &[u8],
-    kind: &CICKind,
+    kind: CICKind,
 ) -> Result<(u32, u32), Ipl3ChecksumError> {
     if rom_bytes.len() < 0x101000 {
         return Err(Ipl3ChecksumError::BufferNotBigEnough {
@@ -50,10 +48,10 @@ pub fn calculate_checksum(
     let mut s6 = seed;
 
     let mut a0 = rom_words[8 / 4];
-    if *kind == CICKind::CIC_X103 {
+    if kind == CICKind::CIC_X103 {
         a0 = a0.wrapping_sub(0x100000);
     }
-    if *kind == CICKind::CIC_X106 {
+    if kind == CICKind::CIC_X106 {
         a0 = a0.wrapping_sub(0x200000);
     }
     let entrypoint_ram = a0;
@@ -61,7 +59,7 @@ pub fn calculate_checksum(
     let mut at = magic;
     let lo = s6.wrapping_mul(at);
 
-    if *kind == CICKind::CIC_X105 {
+    if kind == CICKind::CIC_X105 {
         s6 = 0xA0000200;
     }
 
@@ -137,7 +135,7 @@ pub fn calculate_checksum(
         }
 
         // LA4000640:
-        if *kind == CICKind::CIC_X105 {
+        if kind == CICKind::CIC_X105 {
             // ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
             let mut t7 = rom_words[((s6 - 0xA0000004 + 0x000554) / 4) as usize];
 
@@ -177,7 +175,7 @@ pub fn calculate_checksum(
         }
     }
 
-    if *kind == CICKind::CIC_X103 {
+    if kind == CICKind::CIC_X103 {
         let t6 = a3 ^ t2;
         // a3 = utils.u32(t6 + t3);
         a3 = t6.wrapping_add(t3);
@@ -185,7 +183,7 @@ pub fn calculate_checksum(
         let t8 = s0 ^ a2;
         // s0 = utils.u32(t8 + t4);
         s0 = t8.wrapping_add(t4);
-    } else if *kind == CICKind::CIC_X106 {
+    } else if kind == CICKind::CIC_X106 {
         /*
         let t6 = utils.u32(a3 * t2);
         a3 = utils.u32(t6 + t3);
@@ -234,7 +232,7 @@ pub fn calculate_checksum(
 pub fn calculate_checksum_autodetect(rom_bytes: &[u8]) -> Result<(u32, u32), Ipl3ChecksumError> {
     let kind = detect::detect_cic(rom_bytes)?;
 
-    calculate_checksum(rom_bytes, &kind)
+    calculate_checksum(rom_bytes, kind)
 }
 
 #[cfg(test)]
@@ -250,15 +248,7 @@ mod tests {
 
             println!("{:?}", folder_name);
 
-            let kind = match folder_name.to_str().unwrap() {
-                "CIC_6101" => CICKind::CIC_6101,
-                "CIC_6102_7101" => CICKind::CIC_6102_7101,
-                "CIC_7102" => CICKind::CIC_7102,
-                "CIC_X103" => CICKind::CIC_X103,
-                "CIC_X105" => CICKind::CIC_X105,
-                "CIC_X106" => CICKind::CIC_X106,
-                _ => panic!("Unknown cic kind"),
-            };
+            let kind = CICKind::from_name(folder_name.to_str().unwrap()).unwrap();
             println!("CIC Kind: {:?}", kind);
 
             for bin_path_result in fs::read_dir(ipl3_folder.path()).unwrap() {
@@ -271,7 +261,8 @@ mod tests {
                 let bin_bytes = fs::read(&bin_path.path()).unwrap();
 
                 println!("    Calculating checksum...");
-                let checksum = super::calculate_checksum(&bin_bytes, &kind).unwrap();
+                let checksum = super::calculate_checksum(&bin_bytes, kind).unwrap();
+                println!("Used CIC Kind: {:?}", kind);
 
                 println!(
                     "    Calculated checksum is: 0x{:08X} 0x{:08X}",
@@ -308,7 +299,7 @@ pub(crate) mod python_bindings {
     #[pyfunction]
     pub(crate) fn calculateChecksum(
         rom_bytes: &[u8],
-        kind: &super::CICKind,
+        kind: super::CICKind,
     ) -> Result<Option<(u32, u32)>, super::Ipl3ChecksumError> {
         match super::calculate_checksum(rom_bytes, kind) {
             Ok(checksum) => Ok(Some(checksum)),
@@ -358,7 +349,7 @@ mod c_bindings {
             Ok(d) => d,
         };
 
-        let checksum = match super::calculate_checksum(&bytes, &kind) {
+        let checksum = match super::calculate_checksum(&bytes, kind) {
             Ok(chk) => chk,
             Err(e) => return e,
         };
