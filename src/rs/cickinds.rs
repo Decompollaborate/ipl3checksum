@@ -143,19 +143,15 @@ mod python_bindings {
 
 #[cfg(feature = "c_bindings")]
 mod c_bindings {
-    use crate::{CICKind, Ipl3ChecksumError, utils};
+    use crate::{utils, CICKind, Ipl3ChecksumError};
 
     #[no_mangle]
-    pub extern "C" fn ipl3checksum_cickind_get_seed(
-        kind: CICKind
-    ) -> u32 {
+    pub extern "C" fn ipl3checksum_cickind_get_seed(kind: CICKind) -> u32 {
         kind.get_seed()
     }
 
     #[no_mangle]
-    pub extern "C" fn ipl3checksum_cickind_get_magic(
-        kind: CICKind
-    ) -> u32 {
+    pub extern "C" fn ipl3checksum_cickind_get_magic(kind: CICKind) -> u32 {
         kind.get_magic()
     }
 
@@ -177,7 +173,7 @@ mod c_bindings {
     #[no_mangle]
     pub extern "C" fn ipl3checksum_cickind_from_hash_md5(
         kind_dst: *mut CICKind,
-        hash_str: *const core::ffi::c_char
+        hash_str: *const core::ffi::c_char,
     ) -> Ipl3ChecksumError {
         if kind_dst.is_null() || hash_str.is_null() {
             return Ipl3ChecksumError::NullPointer;
@@ -216,7 +212,7 @@ mod c_bindings {
     #[no_mangle]
     pub extern "C" fn ipl3checksum_cickind_from_name(
         kind_dst: *mut CICKind,
-        c_name: *const core::ffi::c_char
+        c_name: *const core::ffi::c_char,
     ) -> Ipl3ChecksumError {
         if kind_dst.is_null() || c_name.is_null() {
             return Ipl3ChecksumError::NullPointer;
@@ -240,7 +236,7 @@ mod c_bindings {
     #[no_mangle]
     pub extern "C" fn ipl3checksum_cickind_from_value(
         kind_dst: *mut CICKind,
-        value: usize
+        value: usize,
     ) -> Ipl3ChecksumError {
         if kind_dst.is_null() {
             return Ipl3ChecksumError::NullPointer;

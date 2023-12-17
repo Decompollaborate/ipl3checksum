@@ -87,7 +87,7 @@ pub(crate) mod python_bindings {
 
 #[cfg(feature = "c_bindings")]
 mod c_bindings {
-    use crate::{CICKind, Ipl3ChecksumError, utils};
+    use crate::{utils, CICKind, Ipl3ChecksumError};
 
     #[no_mangle]
     pub extern "C" fn ipl3checksum_detect_cic_raw(
@@ -109,7 +109,7 @@ mod c_bindings {
             Ok(k) => k,
         };
 
-        unsafe {*dst_kind = kind};
+        unsafe { *dst_kind = kind };
 
         Ipl3ChecksumError::Okay
     }
@@ -134,7 +134,7 @@ mod c_bindings {
             Ok(k) => k,
         };
 
-        unsafe {*dst_kind = kind};
+        unsafe { *dst_kind = kind };
 
         Ipl3ChecksumError::Okay
     }

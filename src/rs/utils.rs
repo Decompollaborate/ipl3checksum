@@ -59,7 +59,9 @@ pub(crate) fn u8_vec_from_pointer_array(
 }
 
 #[cfg(feature = "c_bindings")]
-pub(crate) fn static_str_from_c_string(c_str: *const core::ffi::c_char) -> Result<&'static str, Ipl3ChecksumError> {
+pub(crate) fn static_str_from_c_string(
+    c_str: *const core::ffi::c_char,
+) -> Result<&'static str, Ipl3ChecksumError> {
     let converted = unsafe { std::ffi::CStr::from_ptr(c_str) };
 
     match converted.to_str() {
@@ -88,11 +90,13 @@ pub(crate) mod c_bindings {
     pub extern "C" fn ipl3checksum_free_string(s: *mut core::ffi::c_char) -> Ipl3ChecksumError {
         match free_c_string(s) {
             Err(e) => e,
-            Ok(_) => Ipl3ChecksumError::Okay
+            Ok(_) => Ipl3ChecksumError::Okay,
         }
     }
 
-    pub(crate) fn c_string_from_rust_str(s: &str) -> Result<*mut core::ffi::c_char, Ipl3ChecksumError> {
+    pub(crate) fn c_string_from_rust_str(
+        s: &str,
+    ) -> Result<*mut core::ffi::c_char, Ipl3ChecksumError> {
         let c_str_song = match std::ffi::CString::new(s) {
             Err(_) => return Err(Ipl3ChecksumError::StringConversion),
             Ok(c_s) => c_s,
