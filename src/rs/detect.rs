@@ -100,7 +100,7 @@ mod c_bindings {
             return Ipl3ChecksumError::NullPointer;
         }
 
-        let bytes = match utils::u8_vec_from_pointer_array(raw_bytes_len, raw_bytes) {
+        let bytes = match utils::c_bindings::u8_vec_from_pointer_array(raw_bytes_len, raw_bytes) {
             Err(e) => return e,
             Ok(d) => d,
         };
@@ -125,7 +125,7 @@ mod c_bindings {
             return Ipl3ChecksumError::NullPointer;
         }
 
-        let bytes = match utils::u8_vec_from_pointer_array(rom_bytes_len, rom_bytes) {
+        let bytes = match utils::c_bindings::u8_vec_from_pointer_array(rom_bytes_len, rom_bytes) {
             Err(e) => return e,
             Ok(d) => d,
         };

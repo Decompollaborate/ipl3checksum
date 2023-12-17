@@ -179,7 +179,7 @@ mod c_bindings {
             return Ipl3ChecksumError::NullPointer;
         }
 
-        let hash = match utils::static_str_from_c_string(hash_str) {
+        let hash = match utils::c_bindings::static_str_from_c_string(hash_str) {
             Err(e) => return e,
             Ok(h) => h,
         };
@@ -218,7 +218,7 @@ mod c_bindings {
             return Ipl3ChecksumError::NullPointer;
         }
 
-        let name = match utils::static_str_from_c_string(c_name) {
+        let name = match utils::c_bindings::static_str_from_c_string(c_name) {
             Err(e) => return e,
             Ok(h) => h,
         };

@@ -41,38 +41,36 @@ pub(crate) fn get_hash_md5(bytes: &[u8]) -> String {
 }
 
 #[cfg(feature = "c_bindings")]
-pub(crate) fn u8_vec_from_pointer_array(
-    src_len: usize,
-    src: *const u8,
-) -> Result<Vec<u8>, Ipl3ChecksumError> {
-    if src.is_null() {
-        return Err(Ipl3ChecksumError::NullPointer);
-    }
-
-    let mut bytes = Vec::with_capacity(src_len);
-
-    for i in 0..src_len {
-        bytes.push(unsafe { *src.add(i) });
-    }
-
-    Ok(bytes)
-}
-
-#[cfg(feature = "c_bindings")]
-pub(crate) fn static_str_from_c_string(
-    c_str: *const core::ffi::c_char,
-) -> Result<&'static str, Ipl3ChecksumError> {
-    let converted = unsafe { std::ffi::CStr::from_ptr(c_str) };
-
-    match converted.to_str() {
-        Err(_) => Err(Ipl3ChecksumError::StringConversion),
-        Ok(s) => Ok(s),
-    }
-}
-
-#[cfg(feature = "c_bindings")]
 pub(crate) mod c_bindings {
     use crate::Ipl3ChecksumError;
+
+    pub(crate) fn u8_vec_from_pointer_array(
+        src_len: usize,
+        src: *const u8,
+    ) -> Result<Vec<u8>, Ipl3ChecksumError> {
+        if src.is_null() {
+            return Err(Ipl3ChecksumError::NullPointer);
+        }
+
+        let mut bytes = Vec::with_capacity(src_len);
+
+        for i in 0..src_len {
+            bytes.push(unsafe { *src.add(i) });
+        }
+
+        Ok(bytes)
+    }
+
+    pub(crate) fn static_str_from_c_string(
+        c_str: *const core::ffi::c_char,
+    ) -> Result<&'static str, Ipl3ChecksumError> {
+        let converted = unsafe { std::ffi::CStr::from_ptr(c_str) };
+
+        match converted.to_str() {
+            Err(_) => Err(Ipl3ChecksumError::StringConversion),
+            Ok(s) => Ok(s),
+        }
+    }
 
     pub(crate) fn free_c_string(s: *mut core::ffi::c_char) -> Result<(), Ipl3ChecksumError> {
         if s.is_null() {
