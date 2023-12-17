@@ -41,6 +41,8 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
+    fprintf(stderr, "Running ipl3checksum version %s\n", ipl3checksum_version_str);
+
     const char *bin_path = argv[1];
 
     size_t bin_size = 0;

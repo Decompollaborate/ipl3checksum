@@ -6,6 +6,7 @@ mod cickinds;
 mod detect;
 mod error;
 mod utils;
+pub mod version;
 
 pub use checksum::*;
 pub use cickinds::*;

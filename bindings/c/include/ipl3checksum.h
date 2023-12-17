@@ -7,5 +7,6 @@
 #include "ipl3checksum/checksum.h"
 #include "ipl3checksum/detect.h"
 #include "ipl3checksum/utils.h"
+#include "ipl3checksum/version.h"
 
 #endif

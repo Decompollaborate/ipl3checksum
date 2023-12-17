@@ -8,6 +8,9 @@ version = "1.1.0.dev0"
 description = "Library to calculate the IPL3 checksum for N64 ROMs"
 readme = "README.md"
 requires-python = ">=3.7"
+authors = [
+    { name="Anghelo Carvajal", email="angheloalf95@gmail.com" },
+]
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
