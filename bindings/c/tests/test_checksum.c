@@ -8,6 +8,23 @@
 
 #include "utils.h"
 
+bool get_cic_kind(Ipl3Checksum_CICKind *dst_kind, const char *cic_kind_name) {
+    fprintf(stderr, "Passed CIC kind: '%s'\n", cic_kind_name);
+
+    Ipl3Checksum_Error err = ipl3checksum_cickind_from_name(dst_kind, cic_kind_name);
+
+    if (err.tag != Ipl3Checksum_Error_Okay) {
+        fprintf(stderr, "Passed CIC kind was not valid: %s\n", get_ipl3checksum_error_str(err));
+        return false;
+    }
+
+    if (!eprint_cickind_name(*dst_kind)) {
+        return false;
+    }
+
+    return true;
+}
+
 void print_usage(int argc, char *argv[]) {
     (void)argc;
 
@@ -34,27 +51,9 @@ int main(int argc, char *argv[]) {
 
     fprintf(stderr, "Passed CIC kind: '%s'\n", cic_kind_name);
     Ipl3Checksum_CICKind kind;
-    {
-        Ipl3Checksum_Error err = ipl3checksum_cickind_from_name(&kind, cic_kind_name);
-
-        if (err.tag == Ipl3Checksum_Error_Okay) {
-            char *kind_name;
-            Ipl3Checksum_Error kind_name_ok = ipl3checksum_cickind_get_name(kind, &kind_name);
-
-            if (kind_name_ok.tag != Ipl3Checksum_Error_Okay) {
-                fprintf(stderr, "Failed to get cic kind's name: %s\n", get_ipl3checksum_error_str(kind_name_ok));
-                ret++;
-                goto cleanup;
-            }
-
-            fprintf(stderr, "Parsed kind: '%s'\n", kind_name);
-
-            ipl3checksum_free_string(kind_name);
-        } else {
-            fprintf(stderr, "Passed CIC kind was not valid: %s\n", get_ipl3checksum_error_str(err));
-            ret++;
-            goto cleanup;
-        }
+    if (!get_cic_kind(&kind, cic_kind_name)) {
+        ret++;
+        goto cleanup;
     }
 
     uint32_t expected_checksum0 = read_be_word(bin, 0x10);

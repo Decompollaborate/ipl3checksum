@@ -8,6 +8,23 @@
 
 #include "utils.h"
 
+bool detect(size_t bin_size, const uint8_t *bin) {
+
+    Ipl3Checksum_CICKind kind;
+    Ipl3Checksum_Error err = ipl3checksum_detect_cic(&kind, bin_size, bin);
+
+    if (err.tag != Ipl3Checksum_Error_Okay) {
+        fprintf(stderr, "Error trying to detect the cic: %s\n", get_ipl3checksum_error_str(err));
+        return false;
+    }
+
+    if (!eprint_cickind_name(kind)) {
+        return false;
+    }
+
+    return true;
+}
+
 void print_usage(int argc, char *argv[]) {
     (void)argc;
 
@@ -31,31 +48,10 @@ int main(int argc, char *argv[]) {
     assert(bin_size > 0);
     assert(bin != NULL);
 
-    {
-        Ipl3Checksum_CICKind kind;
-
-        Ipl3Checksum_Error err = ipl3checksum_detect_cic(&kind, bin_size, bin);
-
-        if (err.tag == Ipl3Checksum_Error_Okay) {
-            char *kind_name;
-            Ipl3Checksum_Error kind_name_ok = ipl3checksum_cickind_get_name(kind, &kind_name);
-
-            if (kind_name_ok.tag != Ipl3Checksum_Error_Okay) {
-                fprintf(stderr, "Failed to get cic kind's name: %s\n", get_ipl3checksum_error_str(kind_name_ok));
-                ret++;
-                goto cleanup;
-            }
-
-            fprintf(stderr, "Detected CIC kind: %s\n", kind_name);
-
-            ipl3checksum_free_string(kind_name);
-        } else {
-            fprintf(stderr, "Error trying to detect the cic: %s\n", get_ipl3checksum_error_str(err));
-            ret++;
-        }
+    if (!detect(bin_size, bin)) {
+        ret++;
     }
 
-cleanup:
     free(bin);
 
     return ret;

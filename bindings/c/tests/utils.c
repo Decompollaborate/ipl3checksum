@@ -59,3 +59,18 @@ const char *const ipl3checksum_error_str[] = {
 const char *get_ipl3checksum_error_str(Ipl3Checksum_Error error) {
     return ipl3checksum_error_str[error.tag];
 }
+
+bool eprint_cickind_name(Ipl3Checksum_CICKind kind) {
+    char *kind_name;
+    Ipl3Checksum_Error kind_name_ok = ipl3checksum_cickind_get_name(kind, &kind_name);
+
+    if (kind_name_ok.tag != Ipl3Checksum_Error_Okay) {
+        fprintf(stderr, "Failed to get cic kind's name: %s\n", get_ipl3checksum_error_str(kind_name_ok));
+        return false;
+    }
+
+    fprintf(stderr, "CIC kind name: '%s'\n", kind_name);
+
+    ipl3checksum_free_string(kind_name);
+    return true;
+}
