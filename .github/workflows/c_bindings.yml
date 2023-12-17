@@ -62,7 +62,7 @@ jobs:
         run: |
           mkdir -p package/lib package/include
           cp target/${{ matrix.target }}/release/libipl3checksum.a package/lib/ || cp target/${{ matrix.target }}/release/ipl3checksum.lib package/lib/
-          cp -r c_bindings/include/* package/include/
+          cp -r bindings/c/include/* package/include/
           cp LICENSE package/ipl3checksum.LICENSE
           cp README.md package/ipl3checksum.README.md
           tree package
