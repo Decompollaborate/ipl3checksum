@@ -49,5 +49,5 @@ jobs:
     - name: Build
       run: make -C bindings/c BUILD_MODE=release
 
-    - name: Test detection
+    - name: Test checksum with autodetection
       run: bindings/c/tests/test_checksum_autodetect_other_repo.sh

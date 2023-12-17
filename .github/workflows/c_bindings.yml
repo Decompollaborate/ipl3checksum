@@ -61,48 +61,48 @@ jobs:
       - name: Move files for packaging
         run: |
           mkdir -p package/lib package/include
-          cp target/${{ matrix.target }}/release/libcrunch64.a package/lib/ || cp target/${{ matrix.target }}/release/crunch64.lib package/lib/
+          cp target/${{ matrix.target }}/release/libipl3checksum.a package/lib/ || cp target/${{ matrix.target }}/release/ipl3checksum.lib package/lib/
           cp -r c_bindings/include/* package/include/
-          cp LICENSE package/crunch64.LICENSE
-          cp README.md package/crunch64.README.md
+          cp LICENSE package/ipl3checksum.LICENSE
+          cp README.md package/ipl3checksum.README.md
           tree package
 
       - name: Package .tar.gz
         if: matrix.archive == 'tar.gz'
         run: |
-          cd package && tar -czf ../crunch64-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz *
+          cd package && tar -czf ../ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz *
 
       - name: Package .zip
         if: matrix.archive == 'zip'
         run: |
-          cd package && zip -r ../crunch64-${{ matrix.crate-type }}-${{ matrix.target }}.zip *
+          cd package && zip -r ../ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.zip *
 
       - name: Upload .tar.gz archive
         if: matrix.archive == 'tar.gz'
         uses: actions/upload-artifact@v3
         with:
-          name: crunch64-${{ matrix.crate-type }}-${{ matrix.target }}
+          name: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}
           path: |
-            crunch64-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz
+            ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz
           if-no-files-found: error
 
       - name: Upload .zip archive
         if: matrix.archive == 'zip'
         uses: actions/upload-artifact@v3
         with:
-          name: crunch64-${{ matrix.crate-type }}-${{ matrix.target }}
+          name: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}
           path: |
-            crunch64-${{ matrix.crate-type }}-${{ matrix.target }}.zip
+            ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.zip
           if-no-files-found: error
 
       - name: Publish .tar.gz release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/') && matrix.archive == 'tar.gz'
         with:
-          files: crunch64-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz
+          files: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz
 
       - name: Publish .zip release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/') && matrix.archive == 'zip'
         with:
-          files: crunch64-${{ matrix.crate-type }}-${{ matrix.target }}.zip
+          files: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.zip

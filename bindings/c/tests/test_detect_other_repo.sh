@@ -12,7 +12,7 @@ else
     exit 1
 fi
 
-for i in $(find deps_repo -type f -name "*.bin"); do
+for i in $(find deps_repo -type f -name "*.z64"); do
     [ -f "$i" ] || break
     echo "Processing:" $i
 
