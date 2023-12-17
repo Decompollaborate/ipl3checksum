@@ -345,10 +345,11 @@ mod c_bindings {
             return super::Ipl3ChecksumError::NullPointer;
         }
 
-        let bytes = match super::utils::c_bindings::u8_vec_from_pointer_array(rom_bytes_len, rom_bytes) {
-            Err(e) => return e,
-            Ok(d) => d,
-        };
+        let bytes =
+            match super::utils::c_bindings::u8_vec_from_pointer_array(rom_bytes_len, rom_bytes) {
+                Err(e) => return e,
+                Ok(d) => d,
+            };
 
         let checksum = match super::calculate_checksum(&bytes, kind) {
             Ok(chk) => chk,
@@ -372,10 +373,11 @@ mod c_bindings {
             return super::Ipl3ChecksumError::NullPointer;
         }
 
-        let bytes = match super::utils::c_bindings::u8_vec_from_pointer_array(rom_bytes_len, rom_bytes) {
-            Err(e) => return e,
-            Ok(d) => d,
-        };
+        let bytes =
+            match super::utils::c_bindings::u8_vec_from_pointer_array(rom_bytes_len, rom_bytes) {
+                Err(e) => return e,
+                Ok(d) => d,
+            };
 
         let checksum = match super::calculate_checksum_autodetect(&bytes) {
             Ok(chk) => chk,

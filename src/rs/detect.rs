@@ -25,10 +25,7 @@ pub fn detect_cic_raw(raw_bytes: &[u8]) -> Result<CICKind, Ipl3ChecksumError> {
 
     let bytes_hash = utils::get_hash_md5(raw_bytes);
 
-    match CICKind::from_hash_md5(&bytes_hash) {
-        Some(cic) => Ok(cic),
-        None => Err(Ipl3ChecksumError::UnableToDetectCIC),
-    }
+    CICKind::from_hash_md5(&bytes_hash)
 }
 
 /// Tries to detect an IPL3 in a ROM.

@@ -4,6 +4,8 @@
 #[cfg(feature = "python_bindings")]
 use pyo3::prelude::*;
 
+use crate::Ipl3ChecksumError;
+
 /* This needs to be in sync with the C equivalent at `bindings/c/include/ipl3checksum/cickinds.h` */
 #[cfg_attr(feature = "python_bindings", pyclass(module = "ipl3checksum"))]
 // repr is kinda complex and I may have got it wrong.
@@ -50,15 +52,15 @@ impl CICKind {
         }
     }
 
-    pub fn from_hash_md5(hash_str: &str) -> Option<CICKind> {
+    pub fn from_hash_md5(hash_str: &str) -> Result<Self, Ipl3ChecksumError> {
         match hash_str {
-            "900b4a5b68edb71f4c7ed52acd814fc5" => Some(Self::CIC_6101),
-            "e24dd796b2fa16511521139d28c8356b" => Some(Self::CIC_6102_7101),
-            "955894c2e40a698bf98a67b78a4e28fa" => Some(Self::CIC_7102),
-            "319038097346e12c26c3c21b56f86f23" => Some(Self::CIC_X103),
-            "ff22a296e55d34ab0a077dc2ba5f5796" => Some(Self::CIC_X105),
-            "6460387749ac0bd925aa5430bc7864fe" => Some(Self::CIC_X106),
-            _ => None,
+            "900b4a5b68edb71f4c7ed52acd814fc5" => Ok(Self::CIC_6101),
+            "e24dd796b2fa16511521139d28c8356b" => Ok(Self::CIC_6102_7101),
+            "955894c2e40a698bf98a67b78a4e28fa" => Ok(Self::CIC_7102),
+            "319038097346e12c26c3c21b56f86f23" => Ok(Self::CIC_X103),
+            "ff22a296e55d34ab0a077dc2ba5f5796" => Ok(Self::CIC_X105),
+            "6460387749ac0bd925aa5430bc7864fe" => Ok(Self::CIC_X106),
+            _ => Err(Ipl3ChecksumError::UnableToDetectCIC),
         }
     }
 
@@ -73,29 +75,29 @@ impl CICKind {
         }
     }
 
-    pub fn from_name(name: &str) -> Option<CICKind> {
+    pub fn from_name(name: &str) -> Result<Self, Ipl3ChecksumError> {
         match name {
-            "CIC_6101" | "6101" => Some(Self::CIC_6101),
+            "CIC_6101" | "6101" => Ok(Self::CIC_6101),
             "CIC_6102_7101" | "CIC_6102" | "CIC_7101" | "6102_7101" | "6102" | "7101" => {
-                Some(Self::CIC_6102_7101)
+                Ok(Self::CIC_6102_7101)
             }
-            "CIC_7102" | "7102" => Some(Self::CIC_7102),
-            "CIC_X103" | "CIC_6103" | "CIC_7103" | "X103" | "6103" | "7103" => Some(Self::CIC_X103),
-            "CIC_X105" | "CIC_6105" | "CIC_7105" | "X105" | "6105" | "7105" => Some(Self::CIC_X105),
-            "CIC_X106" | "CIC_6106" | "CIC_7106" | "X106" | "6106" | "7106" => Some(Self::CIC_X106),
-            _ => None,
+            "CIC_7102" | "7102" => Ok(Self::CIC_7102),
+            "CIC_X103" | "CIC_6103" | "CIC_7103" | "X103" | "6103" | "7103" => Ok(Self::CIC_X103),
+            "CIC_X105" | "CIC_6105" | "CIC_7105" | "X105" | "6105" | "7105" => Ok(Self::CIC_X105),
+            "CIC_X106" | "CIC_6106" | "CIC_7106" | "X106" | "6106" | "7106" => Ok(Self::CIC_X106),
+            _ => Err(Ipl3ChecksumError::UnableToDetectCIC),
         }
     }
 
-    pub fn from_value(value: usize) -> Option<CICKind> {
+    pub fn from_value(value: usize) -> Result<Self, Ipl3ChecksumError> {
         match value {
-            6101 => Some(Self::CIC_6101),
-            6102 | 7101 => Some(Self::CIC_6102_7101),
-            7102 => Some(Self::CIC_7102),
-            6103 | 7103 => Some(Self::CIC_X103),
-            6105 | 7105 => Some(Self::CIC_X105),
-            6106 | 7106 => Some(Self::CIC_X106),
-            _ => None,
+            6101 => Ok(Self::CIC_6101),
+            6102 | 7101 => Ok(Self::CIC_6102_7101),
+            7102 => Ok(Self::CIC_7102),
+            6103 | 7103 => Ok(Self::CIC_X103),
+            6105 | 7105 => Ok(Self::CIC_X105),
+            6106 | 7106 => Ok(Self::CIC_X106),
+            _ => Err(Ipl3ChecksumError::UnableToDetectCIC),
         }
     }
 }
@@ -104,6 +106,8 @@ impl CICKind {
 #[allow(non_snake_case)]
 mod python_bindings {
     use pyo3::prelude::*;
+
+    use crate::Ipl3ChecksumError;
 
     #[pymethods]
     impl super::CICKind {
@@ -120,8 +124,14 @@ mod python_bindings {
         }
 
         #[staticmethod]
-        pub fn fromHashMd5(hash_str: &str) -> Option<Self> {
-            Self::from_hash_md5(hash_str)
+        pub fn fromHashMd5(hash_str: &str) -> Result<Option<Self>, Ipl3ChecksumError> {
+            match Self::from_hash_md5(hash_str) {
+                Ok(kind) => Ok(Some(kind)),
+                Err(e) => match e {
+                    Ipl3ChecksumError::UnableToDetectCIC => Ok(None),
+                    _ => Err(e),
+                },
+            }
         }
 
         #[getter]
@@ -130,13 +140,25 @@ mod python_bindings {
         }
 
         #[staticmethod]
-        pub fn fromName(name: &str) -> Option<Self> {
-            Self::from_name(name)
+        pub fn fromName(name: &str) -> Result<Option<Self>, Ipl3ChecksumError> {
+            match Self::from_name(name) {
+                Ok(kind) => Ok(Some(kind)),
+                Err(e) => match e {
+                    Ipl3ChecksumError::UnableToDetectCIC => Ok(None),
+                    _ => Err(e),
+                },
+            }
         }
 
         #[staticmethod]
-        pub fn fromValue(value: usize) -> Option<Self> {
-            Self::from_value(value)
+        pub fn fromValue(value: usize) -> Result<Option<Self>, Ipl3ChecksumError> {
+            match Self::from_value(value) {
+                Ok(kind) => Ok(Some(kind)),
+                Err(e) => match e {
+                    Ipl3ChecksumError::UnableToDetectCIC => Ok(None),
+                    _ => Err(e),
+                },
+            }
         }
     }
 }
@@ -185,8 +207,8 @@ mod c_bindings {
         };
 
         let kind = match CICKind::from_hash_md5(hash) {
-            Some(k) => k,
-            None => return Ipl3ChecksumError::UnableToDetectCIC,
+            Ok(k) => k,
+            Err(e) => return e,
         };
 
         unsafe { *kind_dst = kind };
@@ -224,8 +246,8 @@ mod c_bindings {
         };
 
         let kind = match CICKind::from_name(name) {
-            Some(k) => k,
-            None => return Ipl3ChecksumError::UnableToDetectCIC,
+            Ok(k) => k,
+            Err(e) => return e,
         };
 
         unsafe { *kind_dst = kind };
@@ -243,8 +265,8 @@ mod c_bindings {
         }
 
         let kind = match CICKind::from_value(value) {
-            Some(k) => k,
-            None => return Ipl3ChecksumError::UnableToDetectCIC,
+            Ok(k) => k,
+            Err(e) => return e,
         };
 
         unsafe { *kind_dst = kind };
