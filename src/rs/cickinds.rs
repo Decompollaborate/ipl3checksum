@@ -22,6 +22,8 @@ pub enum CICKind {
     // 6104/7104 does not exist
     CIC_X105, // Both 6105 and 7105
     CIC_X106, // Both 6106 and 7106
+
+    CIC_5101, // Aleck 64
 }
 
 impl CICKind {
@@ -31,6 +33,7 @@ impl CICKind {
             Self::CIC_X103 => 0x78,
             Self::CIC_X105 => 0x91,
             Self::CIC_X106 => 0x85,
+            Self::CIC_5101 => panic!(),
         }
     }
 
@@ -38,6 +41,7 @@ impl CICKind {
         match self {
             Self::CIC_6101 | Self::CIC_6102_7101 | Self::CIC_7102 | Self::CIC_X105 => 0x5D588B65,
             Self::CIC_X103 | Self::CIC_X106 => 0x6C078965,
+            Self::CIC_5101 => panic!(),
         }
     }
 
@@ -49,6 +53,7 @@ impl CICKind {
             Self::CIC_X103 => "319038097346e12c26c3c21b56f86f23",
             Self::CIC_X105 => "ff22a296e55d34ab0a077dc2ba5f5796",
             Self::CIC_X106 => "6460387749ac0bd925aa5430bc7864fe",
+            Self::CIC_5101 => "711f8c3ac54fc70a42626bf6c171443d",
         }
     }
 
@@ -60,6 +65,7 @@ impl CICKind {
             "319038097346e12c26c3c21b56f86f23" => Ok(Self::CIC_X103),
             "ff22a296e55d34ab0a077dc2ba5f5796" => Ok(Self::CIC_X105),
             "6460387749ac0bd925aa5430bc7864fe" => Ok(Self::CIC_X106),
+            "711f8c3ac54fc70a42626bf6c171443d" => Ok(Self::CIC_5101),
             _ => Err(Ipl3ChecksumError::UnableToDetectCIC),
         }
     }
@@ -72,6 +78,7 @@ impl CICKind {
             Self::CIC_X103 => "CIC_X103",
             Self::CIC_X105 => "CIC_X105",
             Self::CIC_X106 => "CIC_X106",
+            Self::CIC_5101 => "CIC_5101",
         }
     }
 
@@ -85,6 +92,7 @@ impl CICKind {
             "CIC_X103" | "CIC_6103" | "CIC_7103" | "X103" | "6103" | "7103" => Ok(Self::CIC_X103),
             "CIC_X105" | "CIC_6105" | "CIC_7105" | "X105" | "6105" | "7105" => Ok(Self::CIC_X105),
             "CIC_X106" | "CIC_6106" | "CIC_7106" | "X106" | "6106" | "7106" => Ok(Self::CIC_X106),
+            "CIC_5101" | "5101" => Ok(Self::CIC_5101),
             _ => Err(Ipl3ChecksumError::UnableToDetectCIC),
         }
     }
@@ -97,6 +105,7 @@ impl CICKind {
             6103 | 7103 => Ok(Self::CIC_X103),
             6105 | 7105 => Ok(Self::CIC_X105),
             6106 | 7106 => Ok(Self::CIC_X106),
+            5101 => Ok(Self::CIC_5101),
             _ => Err(Ipl3ChecksumError::UnableToDetectCIC),
         }
     }

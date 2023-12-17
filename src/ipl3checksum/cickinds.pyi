@@ -14,6 +14,8 @@ class CICKind():
     CIC_X105: CICKind # Both 6105 and 7105
     CIC_X106: CICKind # Both 6106 and 7106
 
+    CIC_5101: CICKind # Aleck 64
+
 
     def getSeed(self) -> int:
         """

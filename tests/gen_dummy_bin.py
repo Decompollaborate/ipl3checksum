@@ -18,6 +18,7 @@ cics = [
     (ipl3checksum.CICKind.CIC_X103, ),
     (ipl3checksum.CICKind.CIC_X105, ),
     (ipl3checksum.CICKind.CIC_X106, ),
+    (ipl3checksum.CICKind.CIC_5101, ),
 ]
 
 for kind, in cics:

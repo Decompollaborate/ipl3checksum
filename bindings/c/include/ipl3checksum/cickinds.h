@@ -21,6 +21,8 @@ typedef enum Ipl3Checksum_CICKind {
     // 6104/7104 does not exist
     Ipl3Checksum_CICKind_CIC_X105, // Both 6105 and 7105
     Ipl3Checksum_CICKind_CIC_X106, // Both 6106 and 7106
+
+    Ipl3Checksum_CICKind_CIC_5101, // Aleck 64
 } Ipl3Checksum_CICKind;
 
 uint32_t ipl3checksum_cickind_get_seed(Ipl3Checksum_CICKind self);
