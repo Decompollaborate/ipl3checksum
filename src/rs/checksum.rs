@@ -206,7 +206,8 @@ pub fn calculate_checksum(
 
 /// Calculates the checksum required by an official CIC of a N64 ROM.
 ///
-/// This function will try to autodetect the CIC kind automatically. If it fails to detect it then it will return `None`.
+/// This function will try to autodetect the CIC kind automatically.
+/// If it fails to detect it then an error will be returned.
 ///
 /// ## Arguments
 ///

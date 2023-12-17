@@ -27,10 +27,26 @@ uint32_t ipl3checksum_cickind_get_seed(Ipl3Checksum_CICKind self);
 
 uint32_t ipl3checksum_cickind_get_magic(Ipl3Checksum_CICKind self);
 
+/**
+ * Returns the md5 hash for the specified CIC kind.
+ *
+ * If no errors happen (return is an `Ipl3Checksum_Error_Okay`), then the hash
+ * is stored  on `dst_hash`.
+ * This string is dynamically allocated by the library and it should be freed
+ * (by passing it to `ipl3checksum_free_string`) to avoid memory leaks.
+ */
 Ipl3Checksum_Error ipl3checksum_cickind_get_hash_md5(Ipl3Checksum_CICKind self, char **dst_hash);
 
 Ipl3Checksum_Error ipl3checksum_cickind_from_hash_md5(Ipl3Checksum_CICKind *kind_dst, const char *hash_str);
 
+/**
+ * Returns an human readable name for the specified CIC kind.
+ *
+ * If no errors happen (return is an `Ipl3Checksum_Error_Okay`), then the name
+ * is stored  on `dst_name`.
+ * This string is dynamically allocated by the library and it should be freed
+ * (by passing it to `ipl3checksum_free_string`) to avoid memory leaks.
+ */
 Ipl3Checksum_Error ipl3checksum_cickind_get_name(Ipl3Checksum_CICKind self, char **dst_name);
 
 Ipl3Checksum_Error ipl3checksum_cickind_from_name(Ipl3Checksum_CICKind *kind_dst, const char *name);

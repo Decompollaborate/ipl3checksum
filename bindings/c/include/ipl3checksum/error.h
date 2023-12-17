@@ -22,6 +22,21 @@ typedef enum Ipl3Checksum_Error_Tag {
     Ipl3Checksum_Error_StringConversion,
 } Ipl3Checksum_Error_Tag;
 
+/**
+ * Most functions of this library return a Ipl3Checksum_Error object which
+ * indicates if the function ended successfully or if it failed (and why it
+ * failed). If a function is expected to return a value on success, then said
+ * value will be set via argument pointers.
+ *
+ * A successful execution has the `.tag` member set to `Ipl3Checksum_Error_Okay`,
+ * everything else is considered an error.
+ *
+ * If an error ocurred then the argument dst pointers will be left untouched.
+ *
+ * The `.payload` union member may have extra information on why the function
+ * call failed. This information is set only for a few selected
+ * `Ipl3Checksum_Error_Tag` tags.
+ */
 typedef struct Ipl3Checksum_Error {
     Ipl3Checksum_Error_Tag tag;
     union Ipl3Checksum_Error_Payload {
