@@ -40,14 +40,12 @@ pub fn calculate_checksum(
         });
     }
 
-    let rom_words = utils::read_u32_vec(rom_bytes, 0, 0x101000 / 4)?;
-
     let seed = kind.get_seed();
     let magic = kind.get_magic();
 
     let mut s6 = seed;
 
-    let mut a0 = rom_words[8 / 4];
+    let mut a0 = utils::read_u32(rom_bytes, 8)?;
     if kind == CICKind::CIC_X103 || kind == CICKind::CIC_5101 {
         a0 = a0.wrapping_sub(0x100000);
     }
@@ -63,7 +61,7 @@ pub fn calculate_checksum(
         s6 = 0xA0000200;
     }
 
-    let mut ra = 0x100000;
+    let mut ra: u32 = 0x100000;
 
     let mut t0: u32 = 0;
 
@@ -97,6 +95,8 @@ pub fn calculate_checksum(
         }
         _ => (),
     }
+
+    let rom_words = utils::read_u32_vec(rom_bytes, 0, (ra as usize + 0x1000) / 4)?;
 
     // poor man's do while
     // LA40005F0_loop
