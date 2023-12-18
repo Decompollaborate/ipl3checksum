@@ -49,6 +49,7 @@ print(cickind)
 ## Features
 
 - Supports all 6 retail CIC variants.
+- Supports the CIC 5101 variant (used on Aleck 64 games).
 - Can calculate the checksum of a ROM using the algorithm of any of the
 supported CIC variants.
 - Can detect any of the supported CIC variants.

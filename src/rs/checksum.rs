@@ -40,15 +40,13 @@ pub fn calculate_checksum(
         });
     }
 
-    let rom_words = utils::read_u32_vec(rom_bytes, 0, 0x101000 / 4)?;
-
     let seed = kind.get_seed();
     let magic = kind.get_magic();
 
     let mut s6 = seed;
 
-    let mut a0 = rom_words[8 / 4];
-    if kind == CICKind::CIC_X103 {
+    let mut a0 = utils::read_u32(rom_bytes, 8)?;
+    if kind == CICKind::CIC_X103 || kind == CICKind::CIC_5101 {
         a0 = a0.wrapping_sub(0x100000);
     }
     if kind == CICKind::CIC_X106 {
@@ -63,7 +61,7 @@ pub fn calculate_checksum(
         s6 = 0xA0000200;
     }
 
-    let ra = 0x100000;
+    let mut ra: u32 = 0x100000;
 
     let mut t0: u32 = 0;
 
@@ -81,6 +79,24 @@ pub fn calculate_checksum(
     let mut s0 = v0;
     let mut a2 = v0;
     let mut t4 = v0;
+
+    #[allow(clippy::single_match)]
+    match kind {
+        CICKind::CIC_5101 => {
+            if a0 == 0x80000400 {
+                ra = 0x3FE000;
+                if rom_bytes.len() < 0x3FE000 + 0x1000 {
+                    return Err(Ipl3ChecksumError::BufferNotBigEnough {
+                        buffer_len: rom_bytes.len(),
+                        expected_len: 0x3FE000 + 0x1000,
+                    });
+                }
+            }
+        }
+        _ => (),
+    }
+
+    let rom_words = utils::read_u32_vec(rom_bytes, 0, (ra as usize + 0x1000) / 4)?;
 
     // poor man's do while
     // LA40005F0_loop
@@ -175,7 +191,7 @@ pub fn calculate_checksum(
         }
     }
 
-    if kind == CICKind::CIC_X103 {
+    if kind == CICKind::CIC_X103 || kind == CICKind::CIC_5101 {
         let t6 = a3 ^ t2;
         // a3 = utils.u32(t6 + t3);
         a3 = t6.wrapping_add(t3);
@@ -296,13 +312,21 @@ mod tests {
 #[allow(non_snake_case)]
 pub(crate) mod python_bindings {
     use pyo3::prelude::*;
+    use std::borrow::Cow;
+
+    /**
+     * We use a `Cow` instead of a plain &[u8] the latter only allows Python's
+     * `bytes` objects, while Cow allows for both `bytes` and `bytearray`.
+     * This is important because an argument typed as `bytes` allows to pass a
+     * `bytearray` object too.
+     */
 
     #[pyfunction]
     pub(crate) fn calculateChecksum(
-        rom_bytes: &[u8],
+        rom_bytes: Cow<[u8]>,
         kind: super::CICKind,
     ) -> Result<Option<(u32, u32)>, super::Ipl3ChecksumError> {
-        match super::calculate_checksum(rom_bytes, kind) {
+        match super::calculate_checksum(&rom_bytes, kind) {
             Ok(checksum) => Ok(Some(checksum)),
             Err(e) => match e {
                 super::Ipl3ChecksumError::BufferNotBigEnough {
@@ -316,9 +340,9 @@ pub(crate) mod python_bindings {
 
     #[pyfunction]
     pub(crate) fn calculateChecksumAutodetect(
-        rom_bytes: &[u8],
+        rom_bytes: Cow<[u8]>,
     ) -> Result<Option<(u32, u32)>, super::Ipl3ChecksumError> {
-        match super::calculate_checksum_autodetect(rom_bytes) {
+        match super::calculate_checksum_autodetect(&rom_bytes) {
             Ok(checksum) => Ok(Some(checksum)),
             Err(e) => match e {
                 super::Ipl3ChecksumError::BufferNotBigEnough {

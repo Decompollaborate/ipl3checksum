@@ -51,7 +51,6 @@ int main(int argc, char *argv[]) {
     assert(bin_size > 0);
     assert(bin != NULL);
 
-    fprintf(stderr, "Passed CIC kind: '%s'\n", cic_kind_name);
     Ipl3Checksum_CICKind kind;
     if (!get_cic_kind(&kind, cic_kind_name)) {
         ret++;

@@ -26,6 +26,9 @@ uint32_t getSeed(uint32_t cic) {
         case 6106:
         case 7106:
             return 0x85;
+
+        case 5101:
+            return 0xAC;
     }
 }
 
@@ -44,6 +47,7 @@ uint32_t getMagic(uint32_t cic) {
         case 7103:
         case 6106:
         case 7106:
+        case 5101:
             return 0x6C078965;
     }
 }
@@ -64,6 +68,7 @@ void calculateChecksum(const uint8_t *rom, uint32_t cic, uint32_t *dst1, uint32_
     switch (cic) {
         case 6103:
         case 7103:
+        case 5101:
             a0 -= 0x100000;
             break;
 
@@ -103,6 +108,14 @@ void calculateChecksum(const uint8_t *rom, uint32_t cic, uint32_t *dst1, uint32_
     s0 = v0;
     a2 = v0;
     t4 = v0;
+
+    switch (cic) {
+        case 5101:
+            if (a0 == 0x80000400) {
+                ra = 0x3FE000;
+            }
+            break;
+    }
 
     do {
         /* lw $v0, 0x0($t1) */
@@ -170,6 +183,7 @@ void calculateChecksum(const uint8_t *rom, uint32_t cic, uint32_t *dst1, uint32_
     switch (cic) {
         case 6103:
         case 7103:
+        case 5101:
             t6 = a3 ^ t2;
             a3 = t6 + t3;
             t8 = s0 ^ a2;
