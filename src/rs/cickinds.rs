@@ -33,15 +33,14 @@ impl CICKind {
             Self::CIC_X103 => 0x78,
             Self::CIC_X105 => 0x91,
             Self::CIC_X106 => 0x85,
-            Self::CIC_5101 => panic!(),
+            Self::CIC_5101 => 0xAC, // Got by brute force, need to verify
         }
     }
 
     pub fn get_magic(&self) -> u32 {
         match self {
             Self::CIC_6101 | Self::CIC_6102_7101 | Self::CIC_7102 | Self::CIC_X105 => 0x5D588B65,
-            Self::CIC_X103 | Self::CIC_X106 => 0x6C078965,
-            Self::CIC_5101 => panic!(),
+            Self::CIC_X103 | Self::CIC_X106 | Self::CIC_5101 => 0x6C078965,
         }
     }
 

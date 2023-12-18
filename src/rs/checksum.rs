@@ -48,7 +48,7 @@ pub fn calculate_checksum(
     let mut s6 = seed;
 
     let mut a0 = rom_words[8 / 4];
-    if kind == CICKind::CIC_X103 {
+    if kind == CICKind::CIC_X103 || kind == CICKind::CIC_5101 {
         a0 = a0.wrapping_sub(0x100000);
     }
     if kind == CICKind::CIC_X106 {
@@ -63,7 +63,7 @@ pub fn calculate_checksum(
         s6 = 0xA0000200;
     }
 
-    let ra = 0x100000;
+    let mut ra = 0x100000;
 
     let mut t0: u32 = 0;
 
@@ -81,6 +81,18 @@ pub fn calculate_checksum(
     let mut s0 = v0;
     let mut a2 = v0;
     let mut t4 = v0;
+
+    if kind == CICKind::CIC_5101 {
+        if a0 == 0x80000400 {
+            ra = 0x3FE000;
+            if rom_bytes.len() < 0x3FE000 + 0x1000 {
+                return Err(Ipl3ChecksumError::BufferNotBigEnough {
+                    buffer_len: rom_bytes.len(),
+                    expected_len: 0x3FE000 + 0x1000,
+                });
+            }
+        }
+    }
 
     // poor man's do while
     // LA40005F0_loop
@@ -175,7 +187,7 @@ pub fn calculate_checksum(
         }
     }
 
-    if kind == CICKind::CIC_X103 {
+    if kind == CICKind::CIC_X103 || kind == CICKind::CIC_5101 {
         let t6 = a3 ^ t2;
         // a3 = utils.u32(t6 + t3);
         a3 = t6.wrapping_add(t3);

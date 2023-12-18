@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `CICKind.fromHashMd5`: Returns a CIC kind based on the passed md5 hash.
   - `CICKind.fromName`: Returns a CIC kind based a string representing its name.
 - Add C bindings.
+- Add support for IPL3 5101 variant (Used by Aleck 64 games).
 
 ### Changed
 
