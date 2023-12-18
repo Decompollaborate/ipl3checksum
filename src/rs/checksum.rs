@@ -82,16 +82,20 @@ pub fn calculate_checksum(
     let mut a2 = v0;
     let mut t4 = v0;
 
-    if kind == CICKind::CIC_5101 {
-        if a0 == 0x80000400 {
-            ra = 0x3FE000;
-            if rom_bytes.len() < 0x3FE000 + 0x1000 {
-                return Err(Ipl3ChecksumError::BufferNotBigEnough {
-                    buffer_len: rom_bytes.len(),
-                    expected_len: 0x3FE000 + 0x1000,
-                });
+    #[allow(clippy::single_match)]
+    match kind {
+        CICKind::CIC_5101 => {
+            if a0 == 0x80000400 {
+                ra = 0x3FE000;
+                if rom_bytes.len() < 0x3FE000 + 0x1000 {
+                    return Err(Ipl3ChecksumError::BufferNotBigEnough {
+                        buffer_len: rom_bytes.len(),
+                        expected_len: 0x3FE000 + 0x1000,
+                    });
+                }
             }
         }
+        _ => (),
     }
 
     // poor man's do while
@@ -308,13 +312,21 @@ mod tests {
 #[allow(non_snake_case)]
 pub(crate) mod python_bindings {
     use pyo3::prelude::*;
+    use std::borrow::Cow;
+
+    /**
+     * We use a `Cow` instead of a plain &[u8] the latter only allows Python's
+     * `bytes` objects, while Cow allows for both `bytes` and `bytearray`.
+     * This is important because an argument typed as `bytes` allows to pass a
+     * `bytearray` object too.
+     */
 
     #[pyfunction]
     pub(crate) fn calculateChecksum(
-        rom_bytes: &[u8],
+        rom_bytes: Cow<[u8]>,
         kind: super::CICKind,
     ) -> Result<Option<(u32, u32)>, super::Ipl3ChecksumError> {
-        match super::calculate_checksum(rom_bytes, kind) {
+        match super::calculate_checksum(&rom_bytes, kind) {
             Ok(checksum) => Ok(Some(checksum)),
             Err(e) => match e {
                 super::Ipl3ChecksumError::BufferNotBigEnough {
@@ -328,9 +340,9 @@ pub(crate) mod python_bindings {
 
     #[pyfunction]
     pub(crate) fn calculateChecksumAutodetect(
-        rom_bytes: &[u8],
+        rom_bytes: Cow<[u8]>,
     ) -> Result<Option<(u32, u32)>, super::Ipl3ChecksumError> {
-        match super::calculate_checksum_autodetect(rom_bytes) {
+        match super::calculate_checksum_autodetect(&rom_bytes) {
             Ok(checksum) => Ok(Some(checksum)),
             Err(e) => match e {
                 super::Ipl3ChecksumError::BufferNotBigEnough {
