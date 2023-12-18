@@ -26,7 +26,7 @@ requires = ["maturin>=1.2,<2.0"]
 build-backend = "maturin"
 
 [project.scripts]
-ipl3checksum = "ipl3checksum.frontends.climain:ipl3checksumMain"
+ipl3checksum = "ipl3checksum.__main__:ipl3checksumMain"
 
 [tool.cibuildwheel]
 skip = ["cp36-*"]

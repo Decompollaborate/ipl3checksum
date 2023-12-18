@@ -150,6 +150,19 @@ a C program adds extra library dependencies. Those libraries are the following:
 -lws2_32 -lntdll -lbcrypt -ladvapi32 -luserenv
 ```
 
+## Examples
+
+Various examples for the Python bindings are provided in the
+[frontends folder](src/ipl3checksum/frontends).
+
+Those examples are distributed with the Python library as cli tools. Each one
+of them can be executed with either `ipl3checksum utilityname` or
+ `python3 -m ipl3checksum utilityname`, for example `ipl3checksum detect_cic`.
+
+The list can be checked in runtime with `ipl3checksum --help`.
+
+- `detect_cic`: Tries to detect the cic used from the given big endian rom.
+
 ## Versioning and changelog
 
 This library follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
