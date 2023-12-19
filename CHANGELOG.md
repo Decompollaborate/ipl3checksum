@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add support for the IPL3 5101 variant (Used by Aleck 64 games).
 - New frontends:
   - `detect_cic`: Allows to detect the cic type used by a rom.
+  - `sum`: Calculates the ipl3 checksum of a rom.
 
 ### Changed
 

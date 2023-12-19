@@ -159,9 +159,11 @@ Those examples are distributed with the Python library as cli tools. Each one
 of them can be executed with either `ipl3checksum utilityname` or
  `python3 -m ipl3checksum utilityname`, for example `ipl3checksum detect_cic`.
 
-The list can be checked in runtime with `ipl3checksum --help`.
+The list can be checked in runtime with `ipl3checksum --help`. Suboptions for
+each tool can be checked with `ipl3checksum utilityname --help`.
 
 - `detect_cic`: Tries to detect the cic used from the given big endian rom.
+- `sum`: Calculates the ipl3 checksum o a given big endian rom.
 
 ## Versioning and changelog
 

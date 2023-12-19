@@ -18,6 +18,7 @@ def ipl3checksumMain():
     subparsers = parser.add_subparsers(description="action", help="The CLI utility to run", required=True)
 
     ipl3checksum.frontends.detect_cic.addSubparser(subparsers)
+    ipl3checksum.frontends.sum.addSubparser(subparsers)
 
     args = parser.parse_args()
     args.func(args)

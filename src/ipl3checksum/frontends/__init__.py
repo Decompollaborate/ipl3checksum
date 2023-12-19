@@ -7,3 +7,4 @@ from __future__ import annotations
 
 
 from . import detect_cic as detect_cic
+from . import sum as sum
