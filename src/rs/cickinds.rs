@@ -99,13 +99,36 @@ impl CICKind {
     /// Returns a Vec of valid names for `from_name`
     pub fn valid_names() -> Vec<&'static str> {
         vec![
-        "CIC_6101", "6101",
-        "CIC_6102_7101", "CIC_6102", "CIC_7101", "6102_7101", "6102", "7101",
-        "CIC_7102", "7102",
-        "CIC_X103", "CIC_6103", "CIC_7103", "X103", "6103", "7103",
-        "CIC_X105", "CIC_6105", "CIC_7105", "X105", "6105", "7105",
-        "CIC_X106", "CIC_6106", "CIC_7106", "X106", "6106", "7106",
-        "CIC_5101", "5101",
+            "CIC_6101",
+            "6101",
+            "CIC_6102_7101",
+            "CIC_6102",
+            "CIC_7101",
+            "6102_7101",
+            "6102",
+            "7101",
+            "CIC_7102",
+            "7102",
+            "CIC_X103",
+            "CIC_6103",
+            "CIC_7103",
+            "X103",
+            "6103",
+            "7103",
+            "CIC_X105",
+            "CIC_6105",
+            "CIC_7105",
+            "X105",
+            "6105",
+            "7105",
+            "CIC_X106",
+            "CIC_6106",
+            "CIC_7106",
+            "X106",
+            "6106",
+            "7106",
+            "CIC_5101",
+            "5101",
         ]
     }
 
@@ -172,7 +195,7 @@ mod python_bindings {
         }
 
         #[staticmethod]
-        pub fn validNames() -> Vec<&'static str>{
+        pub fn validNames() -> Vec<&'static str> {
             Self::valid_names()
         }
 
