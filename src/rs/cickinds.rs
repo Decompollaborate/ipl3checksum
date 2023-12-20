@@ -44,7 +44,7 @@ impl CICKind {
         }
     }
 
-    pub fn get_hash_md5(&self) -> &str {
+    pub fn get_hash_md5(&self) -> &'static str {
         match self {
             Self::CIC_6101 => "900b4a5b68edb71f4c7ed52acd814fc5",
             Self::CIC_6102_7101 => "e24dd796b2fa16511521139d28c8356b",
@@ -69,7 +69,7 @@ impl CICKind {
         }
     }
 
-    pub fn get_name(&self) -> &str {
+    pub fn get_name(&self) -> &'static str {
         match self {
             Self::CIC_6101 => "CIC_6101",
             Self::CIC_6102_7101 => "CIC_6102_7101",
@@ -94,6 +94,19 @@ impl CICKind {
             "CIC_5101" | "5101" => Ok(Self::CIC_5101),
             _ => Err(Ipl3ChecksumError::UnableToDetectCIC),
         }
+    }
+
+    /// Returns a Vec of valid names for `from_name`
+    pub fn valid_names() -> Vec<&'static str> {
+        vec![
+        "CIC_6101", "6101",
+        "CIC_6102_7101", "CIC_6102", "CIC_7101", "6102_7101", "6102", "7101",
+        "CIC_7102", "7102",
+        "CIC_X103", "CIC_6103", "CIC_7103", "X103", "6103", "7103",
+        "CIC_X105", "CIC_6105", "CIC_7105", "X105", "6105", "7105",
+        "CIC_X106", "CIC_6106", "CIC_7106", "X106", "6106", "7106",
+        "CIC_5101", "5101",
+        ]
     }
 
     pub fn from_value(value: usize) -> Result<Self, Ipl3ChecksumError> {
@@ -156,6 +169,11 @@ mod python_bindings {
                     _ => Err(e),
                 },
             }
+        }
+
+        #[staticmethod]
+        pub fn validNames() -> Vec<&'static str>{
+            Self::valid_names()
         }
 
         #[staticmethod]

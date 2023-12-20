@@ -46,5 +46,9 @@ class CICKind():
         ...
 
     @staticmethod
+    def validNames() -> list[str]:
+        ...
+
+    @staticmethod
     def fromValue(value: int) -> CICKind|None:
         ...
