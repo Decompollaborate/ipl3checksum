@@ -6,5 +6,6 @@
 from __future__ import annotations
 
 
+from . import check as check
 from . import detect_cic as detect_cic
 from . import sum as sum

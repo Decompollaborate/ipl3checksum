@@ -162,6 +162,7 @@ of them can be executed with either `ipl3checksum utilityname` or
 The list can be checked in runtime with `ipl3checksum --help`. Suboptions for
 each tool can be checked with `ipl3checksum utilityname --help`.
 
+- `check`: Checks if the checksum in the ROM matches the calculated one.
 - `detect_cic`: Tries to detect the cic used from the given big endian rom.
 - `sum`: Calculates the ipl3 checksum o a given big endian rom, allowing to
   optionally update the checksum.

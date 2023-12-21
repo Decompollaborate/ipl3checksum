@@ -11,7 +11,7 @@ import struct
 
 import ipl3checksum
 
-def doSum(romBytes: bytes, kindName: str | None, update: bool, outputPath: Path) -> int:
+def doCheck(romBytes: bytes, kindName: str | None) -> int:
     if kindName is None:
         # Detect kind if none was specified by the user
         kind = ipl3checksum.detectCIC(romBytes)
@@ -25,6 +25,9 @@ def doSum(romBytes: bytes, kindName: str | None, update: bool, outputPath: Path)
             print(f"Invalid choice for cic kind. Valid choices: {ipl3checksum.CICKind.validNames()}")
             return 1
 
+    ogChk0, ogChk1 = struct.unpack_from(f">II", romBytes, 0x10)
+    print(f"Checksum in ROM:     {ogChk0:08X} {ogChk1:08X}")
+
     checksum = ipl3checksum.calculateChecksum(romBytes, kind)
     if checksum is None:
         print(f"Unable to calculate checksum")
@@ -33,37 +36,27 @@ def doSum(romBytes: bytes, kindName: str | None, update: bool, outputPath: Path)
     chk0, chk1 = checksum
     print(f"Calculated checksum: {chk0:08X} {chk1:08X}")
 
-    if update:
-        print(f"Writing updated ROM to '{outputPath}'")
-        outputPath.parent.mkdir(parents=True, exist_ok=True)
-        with outputPath.open("wb") as f:
-            f.write(romBytes[:0x10])
-            f.write(struct.pack(f">II", chk0, chk1))
-            f.write(romBytes[0x18:])
+    if chk0 != ogChk0 or chk1 != ogChk1:
+        print(f"Checksum doesn't match")
+        return 1
 
+    print("Checksum matches")
     return 0
 
 
 def processArguments(args: argparse.Namespace):
     romPath: Path = args.rom_path
     kindName: str|None = args.kind
-    update: bool = args.update
-    outputPath: Path|None = args.output
 
     romBytes = romPath.read_bytes()
 
-    if outputPath is None:
-        outputPath = romPath
-
-    exit(doSum(romBytes, kindName, update, outputPath))
+    exit(doCheck(romBytes, kindName))
 
 def addSubparser(subparser: argparse._SubParsersAction[argparse.ArgumentParser]):
-    parser = subparser.add_parser("sum", help="Calculates the ipl3 checksum of a big endian ROM by detecting the CIC it uses.")
+    parser = subparser.add_parser("check", help="Checks if the checksum in the header matches the calculated checksum")
 
     parser.add_argument("rom_path", help="Path to a big endian ROM file", type=Path)
 
     parser.add_argument("-k", "-c", "--kind", "--cic", help="Used this variant to calculate the checksum instead of automatically detecting which kind the ROM uses", dest="kind", metavar="KIND", choices=ipl3checksum.CICKind.validNames())
-    parser.add_argument("-u", "--update", help="Updates the ROM with the calculated checksum. This option modified the input rom unless `--output` is used", action="store_true")
-    parser.add_argument("-o", "--output", help="Path to write the updated ROM. This option is ignored if `--update` is not used", type=Path)
 
     parser.set_defaults(func=processArguments)
