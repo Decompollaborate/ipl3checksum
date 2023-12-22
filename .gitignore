@@ -166,3 +166,4 @@ cython_debug/
 asm/
 *.z64
 *.elf
+.vscode/settings.json

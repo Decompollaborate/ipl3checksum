@@ -59,11 +59,6 @@ def recursePaths(folder: Path) -> int:
             errors += recursePaths(subpath)
             continue
 
-        if subpath.parts[-2] == "drmario64" and subpath.name == "baserom.cn.z64":
-            # iQue has a wrong checksum for some reason
-            print(f"Skipping {subpath}")
-            continue
-
         romBytes = subpath.read_bytes()
         romMagic = struct.unpack_from(f">I", romBytes, 0x0)[0]
 

@@ -1,0 +1,129 @@
+name: C bindings
+
+on: [push, pull_request]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test-c-bindings:
+    name: Test C bindings
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Make C test programs
+        run: make -C bindings/c BUILD_MODE=release
+
+      - name: Test dummies
+        run: ./bindings/c/tests/test_checksum_dummies.sh
+
+  check_clippy_c_bindings:
+    name: Check clippy for C bindings
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout reposistory
+      uses: actions/checkout@v4
+
+    - name: Setup Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    - name: Setup clippy
+      run: rustup component add clippy
+
+    - name: Run clippy
+      run: cargo clippy --all-targets --features c_bindings -- -D warnings
+
+  release:
+    name: Release ${{ matrix.crate-type }} for ${{ matrix.target }}
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [x86_64-pc-windows-gnu, x86_64-pc-windows-msvc, x86_64-apple-darwin, x86_64-unknown-linux-musl, x86_64-unknown-linux-gnu]
+        crate-type: [staticlib]
+        include:
+          - target: x86_64-pc-windows-gnu
+            archive: zip
+          - target: x86_64-pc-windows-msvc
+            archive: zip
+          - target: x86_64-apple-darwin
+            archive: zip
+          - target: x86_64-unknown-linux-musl
+            archive: tar.gz
+          - target: x86_64-unknown-linux-gnu
+            archive: tar.gz
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build lib
+        run: cargo rustc --lib --features c_bindings --release --crate-type ${{ matrix.crate-type }} --target ${{ matrix.target }}
+
+      - name: Print built files
+        run: |
+          tree target/${{ matrix.target }}/release
+
+      - name: Move files for packaging
+        run: |
+          mkdir -p package/lib package/include
+          cp target/${{ matrix.target }}/release/libipl3checksum.a package/lib/ || cp target/${{ matrix.target }}/release/ipl3checksum.lib package/lib/
+          cp -r bindings/c/include/* package/include/
+          cp LICENSE package/ipl3checksum.LICENSE
+          cp README.md package/ipl3checksum.README.md
+          cp CHANGELOG.md package/ipl3checksum.CHANGELOG.md
+          tree package
+
+      - name: Package .tar.gz
+        if: matrix.archive == 'tar.gz'
+        run: |
+          cd package && tar -czf ../ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz *
+
+      - name: Package .zip
+        if: matrix.archive == 'zip'
+        run: |
+          cd package && zip -r ../ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.zip *
+
+      - name: Upload .tar.gz archive
+        if: matrix.archive == 'tar.gz'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}
+          path: |
+            ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz
+          if-no-files-found: error
+
+      - name: Upload .zip archive
+        if: matrix.archive == 'zip'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}
+          path: |
+            ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.zip
+          if-no-files-found: error
+
+      - name: Publish .tar.gz release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/') && matrix.archive == 'tar.gz'
+        with:
+          files: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz
+
+      - name: Publish .zip release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/') && matrix.archive == 'zip'
+        with:
+          files: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.zip

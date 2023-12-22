@@ -1,0 +1,61 @@
+name: Test other repo (Python)
+
+# Build on every branch push, tag push, and pull request change:
+on: [push, pull_request]
+
+jobs:
+  test_other_repo_py_script:
+    name: Test other repo (Python script)
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        python3 -m pip install -U maturin
+
+    - name: Install local ipl3checksum
+      run: python3 -m pip install .
+
+    - name: Get extra dependencies
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ secrets.SECRETREPO }}
+        token: ${{ secrets.SECRETTOKEN }}
+        path: deps_repo
+
+    - name: Run repo tests
+      run: python3 tests/check_recursive.py deps_repo
+
+  test_other_repo_py_cli:
+    name: Test other repo (Python cli)
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        python3 -m pip install -U maturin
+
+    - name: Install local ipl3checksum
+      run: python3 -m pip install .
+
+    - name: Get extra dependencies
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ secrets.SECRETREPO }}
+        token: ${{ secrets.SECRETTOKEN }}
+        path: deps_repo
+
+    - name: Run repo tests
+      run: bindings/python/tests/test_check_other_repo.sh

@@ -3,25 +3,38 @@
 
 [project]
 name = "ipl3checksum"
-version = "1.0.1"
+# Version should be synced with src/ipl3checksum/__init__.py, Cargo.toml and src/rs/version.rs
+version = "1.1.0"
 description = "Library to calculate the IPL3 checksum for N64 ROMs"
 readme = "README.md"
 requires-python = ">=3.7"
-dynamic = ["dependencies"]
+authors = [
+    { name="Anghelo Carvajal", email="angheloalf95@gmail.com" },
+]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/decompollaborate/ipl3checksum"
 "Bug Tracker" = "https://github.com/decompollaborate/ipl3checksum/issues"
 
 [build-system]
-requires = ["hatchling", "hatch-requirements-txt"]
-build-backend = "hatchling.build"
+requires = ["maturin>=1.2,<2.0"]
+build-backend = "maturin"
 
 [project.scripts]
-ipl3checksum = "ipl3checksum.frontends.climain:ipl3checksumMain"
+ipl3checksum = "ipl3checksum.__main__:ipl3checksumMain"
 
 [tool.cibuildwheel]
 skip = ["cp36-*"]
 
 [tool.setuptools.package-data]
 ipl3checksum = ["py.typed"]
+
+[tool.maturin]
+features = ["pyo3/extension-module", "python_bindings"]
+# https://github.com/PyO3/maturin/blob/0dee40510083c03607834c821eea76964140a126/Readme.md#mixed-rustpython-projects
+python-source = "src"

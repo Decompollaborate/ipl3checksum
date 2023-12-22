@@ -5,16 +5,11 @@
 
 from __future__ import annotations
 
-__version_info__: tuple[int, int, int] = (1, 0, 1)
+# Version should be synced with pyproject.toml, Cargo.toml and src/rs/version.rs
+__version_info__: tuple[int, int, int] = (1, 1, 0)
 __version__ = ".".join(map(str, __version_info__))
 __author__ = "Decompollaborate"
 
-from . import utils as utils
+from .ipl3checksum import *
 
-from .cickinds import CICKind as CICKind
-
-from .checksum import calculateChecksum as calculateChecksum
-from .checksum import calculateChecksumAutodetect as calculateChecksumAutodetect
-
-from .detect import detectCIC as detectCIC
-from .detect import detectCICRaw as detectCICRaw
+from . import frontends as frontends

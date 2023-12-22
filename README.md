@@ -1,4 +1,10 @@
-# ipl3checksum ![PyPI - Downloads] ![GitHub License] ![GitHub release (latest SemVer)] ![PyPI] ![GitHub contributors]
+# ipl3checksum
+
+![PyPI - Downloads]
+![GitHub License]
+![GitHub release (latest SemVer)]
+![PyPI]
+![GitHub contributors]
 
 [PyPI - Downloads]: <https://img.shields.io/pypi/dm/ipl3checksum>
 [GitHub License]: <https://img.shields.io/github/license/Decompollaborate/ipl3checksum>
@@ -6,18 +12,26 @@
 [PyPI]: <https://img.shields.io/pypi/v/ipl3checksum>
 [GitHub contributors]: <https://img.shields.io/github/contributors/Decompollaborate/ipl3checksum?logo=purple>
 
-A Python library to calculate the IPL3 checksum for N64 ROMs.
+A library to calculate the IPL3 checksum for N64 ROMs.
+
+Written in Rust. Python and C bindings available.
 
 ## How to use it?
 
 To calculate the checksum of a ROM:
 
 ```py
+import ipl3checksum
+
 romBytes = # A big endian bytes-like object
 cickind = ipl3checksum.CICKind.CIC_6102_7101
 
+# or calculateChecksumAutodetect to let the library guess the correct CIC kind
 checksum = ipl3checksum.calculateChecksum(romBytes, cickind)
-assert checksum is not None # Not able to compute the checksum, probably because rom was too small
+
+# If this assert fails it is because the library was not able to compute the
+# checksum, probably because the passed rom was too small
+assert checksum is not None
 
 print(f"{checksum[0]:08X}")
 print(f"{checksum[1]:08X}")
@@ -27,15 +41,19 @@ This library also contains a CIC detector:
 
 ```py
 cickind = ipl3checksum.detectCIC(romBytes)
-print(cickind) # Either a `ipl3checksum.CICKind` or None if was not able to detect the CIC
+# Either a `ipl3checksum.CICKind` object or `None`` if was not able to detect
+# the CIC kind
+print(cickind)
 ```
 
 ## Features
 
 - Supports all 6 retail CIC variants.
+- Supports the CIC 5101 variant (used on Aleck 64 games).
 - Can calculate the checksum of a ROM using the algorithm of any of the
 supported CIC variants.
 - Can detect any of the supported CIC variants.
+- Fast calculation written in Rust.
 
 ### Restrictions/requirements
 
@@ -44,9 +62,12 @@ supported CIC variants.
 - Since the checksum algorithm is calculated on the first MiB after IPL3 (from
 `0x1000` to `0x101000`), then the library expects the passed ROM to be at least
 `0x101000` bytes long, otherwise the library will reject the ROM.
-  - If it is not the case, then pad your ROM with zeroes to that size.
+  - If your ROM is not big enough then it is suggested then pad your ROM with
+    zeroes until it reaches that size.
 
 ## Installing
+
+### Python version
 
 First you need to install the library, one way of doing it is via `pip`.
 
@@ -58,21 +79,25 @@ If you use a `requirements.txt` file in your repository, then you can add
 this library with the following line:
 
 ```txt
-ipl3checksum>=1.0.0,<2.0.0
+ipl3checksum>=1.1.0,<2.0.0
 ``````
 
 Now you can invoke the library from your script.
 
-### Development version
+#### Development version
 
-The unstable development version is located at the [develop](https://github.com/Decompollaborate/ipl3checksum/tree/develop)
+The unstable development version is located at the
+[develop](https://github.com/Decompollaborate/ipl3checksum/tree/develop)
 branch. PRs should be made into that branch instead of the main one.
 
-The recommended way to install a locally cloned repo is by passing the `-e`
-(editable) flag to `pip`.
+Since this library uses Rust code then you'll need a Rust compiler installed
+on your system. To build the Python bindings you'll also need `maturin`
+installed via `pip`.
+
+The recommended way to install a locally cloned repo the following.
 
 ```bash
-python3 -m pip install -e .
+python3 -m pip install .
 ```
 
 In case you want to mess with the latest development version without wanting to
@@ -85,6 +110,62 @@ python3 -m pip install git+https://github.com/Decompollaborate/ipl3checksum.git@
 
 NOTE: Installing the development version is not recommended unless you know what
 you are doing. Proceed at your own risk.
+
+### Rust version
+
+See this crate at <https://crates.io/crates/ipl3checksum>.
+
+To add this library to your project using Cargo:
+
+```bash
+cargo add ipl3checksum
+```
+
+Or add the following line manually to your `Cargo.toml` file:
+
+```toml
+ipl3checksum = "1.1.0"
+```
+
+### C bindings
+
+This library provides bindings to call this library from C code. They are
+available on the [releases](https://github.com/decompals/ipl3checksum/releases)
+tab.
+
+To build said bindings from source, enable the `c_bindings` Rust feature:
+
+```bash
+cargo build --lib --features c_bindings
+```
+
+Headers are located at [bindings/c/include](bindings/c/include).
+
+#### Windows executables
+
+Due to Rust requirements, linking the C bindings of this library when building
+a C program adds extra library dependencies. Those libraries are the following:
+
+```plain_text
+-lws2_32 -lntdll -lbcrypt -ladvapi32 -luserenv
+```
+
+## Examples
+
+Various examples for the Python bindings are provided in the
+[frontends folder](src/ipl3checksum/frontends).
+
+Those examples are distributed with the Python library as cli tools. Each one
+of them can be executed with either `ipl3checksum utilityname` or
+ `python3 -m ipl3checksum utilityname`, for example `ipl3checksum detect_cic`.
+
+The list can be checked in runtime with `ipl3checksum --help`. Suboptions for
+each tool can be checked with `ipl3checksum utilityname --help`.
+
+- `check`: Checks if the checksum in the ROM matches the calculated one.
+- `detect_cic`: Tries to detect the cic used from the given big endian rom.
+- `sum`: Calculates the ipl3 checksum o a given big endian rom, allowing to
+  optionally update the checksum.
 
 ## Versioning and changelog
 

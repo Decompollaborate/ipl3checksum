@@ -7,8 +7,23 @@ from __future__ import annotations
 
 import argparse
 
-from .frontends import climain
+import ipl3checksum
+
+
+def ipl3checksumMain():
+    parser = argparse.ArgumentParser(description="Interface to call any of the ipl3checksum's CLI utilities", prog="ipl3checksum")
+
+    parser.add_argument("-V", "--version", action="version", version=f"%(prog)s {ipl3checksum.__version__}")
+
+    subparsers = parser.add_subparsers(description="action", help="The CLI utility to run", required=True)
+
+    ipl3checksum.frontends.check.addSubparser(subparsers)
+    ipl3checksum.frontends.detect_cic.addSubparser(subparsers)
+    ipl3checksum.frontends.sum.addSubparser(subparsers)
+
+    args = parser.parse_args()
+    args.func(args)
 
 
 if __name__ == "__main__":
-    climain.ipl3checksumMain()
+    ipl3checksumMain()
