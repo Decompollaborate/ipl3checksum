@@ -1,6 +1,7 @@
 /* SPDX-FileCopyrightText: © 2023 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
 
+// Version should be synced with pyproject.toml, Cargo.toml and src/ipl3checksum/__init__.py
 pub static VERSION_MAJOR: i32 = 1;
 pub static VERSION_MINOR: i32 = 1;
 pub static VERSION_PATCH: i32 = 0;
