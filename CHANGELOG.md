@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Python bindings:
   - Fix `detectCIC` and `detect_cic_raw` functions not accepting `bytearray`
     objects.
+- Fix some typos
 
 ## [1.1.0] - 2023-12-22
 
