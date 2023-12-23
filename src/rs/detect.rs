@@ -47,12 +47,20 @@ pub fn detect_cic(rom_bytes: &[u8]) -> Result<CICKind, Ipl3ChecksumError> {
 #[allow(non_snake_case)]
 pub(crate) mod python_bindings {
     use pyo3::prelude::*;
+    use std::borrow::Cow;
+
+    /**
+     * We use a `Cow` instead of a plain &[u8] the latter only allows Python's
+     * `bytes` objects, while Cow allows for both `bytes` and `bytearray`.
+     * This is important because an argument typed as `bytes` allows to pass a
+     * `bytearray` object too.
+     */
 
     #[pyfunction]
     pub(crate) fn detectCICRaw(
-        raw_bytes: &[u8],
+        raw_bytes: Cow<[u8]>,
     ) -> Result<Option<super::CICKind>, super::Ipl3ChecksumError> {
-        match super::detect_cic_raw(raw_bytes) {
+        match super::detect_cic_raw(&raw_bytes) {
             Ok(cic) => Ok(Some(cic)),
             Err(e) => match e {
                 super::Ipl3ChecksumError::BufferSizeIsWrong {
@@ -67,9 +75,9 @@ pub(crate) mod python_bindings {
 
     #[pyfunction]
     pub(crate) fn detectCIC(
-        rom_bytes: &[u8],
+        rom_bytes: Cow<[u8]>,
     ) -> Result<Option<super::CICKind>, super::Ipl3ChecksumError> {
-        match super::detect_cic(rom_bytes) {
+        match super::detect_cic(&rom_bytes) {
             Ok(cic) => Ok(Some(cic)),
             Err(e) => match e {
                 super::Ipl3ChecksumError::BufferSizeIsWrong {
