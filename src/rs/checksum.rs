@@ -69,7 +69,6 @@ pub fn calculate_checksum(
 
     let t5: u32 = 0x20;
 
-    //let mut v0 = utils.u32(lo);
     let mut v0 = lo;
     v0 += 1;
 
@@ -105,38 +104,30 @@ pub fn calculate_checksum(
         // v0 = *t1
         v0 = read_word_from_ram(&rom_words, entrypoint_ram, t1);
 
-        //v1 = utils.u32(a3 + v0);
         let mut v1 = a3.wrapping_add(v0);
 
-        //at = utils.u32(v1) < utils.u32(a3);
         at = if v1 < a3 { 1 } else { 0 };
 
         let a1 = v1;
         // if (at == 0) goto LA4000608;
 
         if at != 0 {
-            //t2 = utils.u32(t2 + 0x1)
             t2 = t2.wrapping_add(0x1);
         }
 
         // LA4000608
         v1 = v0 & 0x1F;
-        //t7 = utils.u32(t5 - v1)
         let t7: u32 = t5.wrapping_sub(v1);
 
-        //let t8 = utils.u32(v0 >> t7)
-        //let t6 = utils.u32(v0 << v1)
         let t8 = v0.wrapping_shr(t7);
         let t6 = v0.wrapping_shl(v1);
 
         a0 = t6 | t8;
-        // at = utils.u32(a2) < utils.u32(v0);
         at = if a2 < v0 { 1 } else { 0 };
         a3 = a1;
 
         t3 ^= v0;
 
-        //s0 = utils.u32(s0 + a0)
         s0 = s0.wrapping_add(a0);
         // if (at == 0) goto LA400063C;
         if at != 0 {
@@ -155,33 +146,25 @@ pub fn calculate_checksum(
             // ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
             let mut t7 = rom_words[((s6 - 0xA0000004 + 0x000554) / 4) as usize];
 
-            //t0 = utils.u32(t0 + 0x4);
-            //s6 = utils.u32(s6 + 0x4);
             t0 = t0.wrapping_add(0x4);
             s6 = s6.wrapping_add(0x4);
 
             t7 ^= v0;
 
-            // t4 = utils.u32(t7 + t4);
             t4 = t7.wrapping_add(t4);
 
             t7 = 0xA00002FF;
 
-            // t1 = utils.u32(t1 + 0x4);
             t1 = t1.wrapping_add(0x4);
 
-            // s6 = utils.u32(s6 & t7);
             s6 &= t7;
         } else {
-            // t0 = utils.u32(t0 + 0x4);
             t0 = t0.wrapping_add(0x4);
 
             let t7 = v0 ^ s0;
 
-            // t1 = utils.u32(t1 + 0x4);
             t1 = t1.wrapping_add(0x4);
 
-            // t4 = utils.u32(t7 + t4);
             t4 = t7.wrapping_add(t4);
         }
 
@@ -193,19 +176,11 @@ pub fn calculate_checksum(
 
     if kind == CICKind::CIC_X103 || kind == CICKind::CIC_5101 {
         let t6 = a3 ^ t2;
-        // a3 = utils.u32(t6 + t3);
         a3 = t6.wrapping_add(t3);
 
         let t8 = s0 ^ a2;
-        // s0 = utils.u32(t8 + t4);
         s0 = t8.wrapping_add(t4);
     } else if kind == CICKind::CIC_X106 {
-        /*
-        let t6 = utils.u32(a3 * t2);
-        a3 = utils.u32(t6 + t3);
-        let t8 = utils.u32(s0 * a2);
-        s0 = utils.u32(t8 + t4);
-        */
         let t6 = a3.wrapping_mul(t2);
         a3 = t6.wrapping_add(t3);
         let t8 = s0.wrapping_mul(a2);
