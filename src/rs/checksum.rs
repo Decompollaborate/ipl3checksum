@@ -33,13 +33,6 @@ pub fn calculate_checksum(
     rom_bytes: &[u8],
     kind: CICKind,
 ) -> Result<(u32, u32), Ipl3ChecksumError> {
-    if rom_bytes.len() < 0x101000 {
-        return Err(Ipl3ChecksumError::BufferNotBigEnough {
-            buffer_len: rom_bytes.len(),
-            expected_len: 0x101000,
-        });
-    }
-
     let seed = kind.get_seed();
     let magic = kind.get_magic();
 
@@ -54,14 +47,11 @@ pub fn calculate_checksum(
     }
     let entrypoint_ram = a0;
 
-    let mut at = magic;
-    let lo = s6.wrapping_mul(at);
+    let lo = s6.wrapping_mul(magic);
 
     if kind == CICKind::CIC_X105 {
         s6 = 0xA0000200;
     }
-
-    let mut ra: u32 = 0x100000;
 
     let mut t0: u32 = 0;
 
@@ -69,8 +59,7 @@ pub fn calculate_checksum(
 
     let t5: u32 = 0x20;
 
-    let mut v0 = lo;
-    v0 += 1;
+    let mut v0 = lo.wrapping_add(1);
 
     let mut a3 = v0;
     let mut t2 = v0;
@@ -79,43 +68,33 @@ pub fn calculate_checksum(
     let mut a2 = v0;
     let mut t4 = v0;
 
-    #[allow(clippy::single_match)]
-    match kind {
-        CICKind::CIC_5101 => {
-            if a0 == 0x80000400 {
-                ra = 0x3FE000;
-                if rom_bytes.len() < 0x3FE000 + 0x1000 {
-                    return Err(Ipl3ChecksumError::BufferNotBigEnough {
-                        buffer_len: rom_bytes.len(),
-                        expected_len: 0x3FE000 + 0x1000,
-                    });
-                }
-            }
-        }
-        _ => (),
+    let ra: u32 = if (kind == CICKind::CIC_5101) && (a0 == 0x80000400) {
+        0x3FE000
+    } else {
+        0x100000
+    };
+
+    if rom_bytes.len() < ra as usize + 0x1000 {
+        return Err(Ipl3ChecksumError::BufferNotBigEnough {
+            buffer_len: rom_bytes.len(),
+            expected_len: ra as usize + 0x1000,
+        });
     }
 
     let rom_words = utils::read_u32_vec(rom_bytes, 0, (ra as usize + 0x1000) / 4)?;
 
-    // poor man's do while
-    // LA40005F0_loop
-    let mut loop_variable = true;
-    while loop_variable {
+    while t0 < ra {
         // v0 = *t1
         v0 = read_word_from_ram(&rom_words, entrypoint_ram, t1);
 
         let mut v1 = a3.wrapping_add(v0);
 
-        at = if v1 < a3 { 1 } else { 0 };
-
         let a1 = v1;
-        // if (at == 0) goto LA4000608;
 
-        if at != 0 {
+        if v1 < a3 {
             t2 = t2.wrapping_add(0x1);
         }
 
-        // LA4000608
         v1 = v0 & 0x1F;
         let t7: u32 = t5.wrapping_sub(v1);
 
@@ -123,30 +102,25 @@ pub fn calculate_checksum(
         let t6 = v0.wrapping_shl(v1);
 
         a0 = t6 | t8;
-        at = if a2 < v0 { 1 } else { 0 };
         a3 = a1;
 
         t3 ^= v0;
 
         s0 = s0.wrapping_add(a0);
-        // if (at == 0) goto LA400063C;
-        if at != 0 {
+        if a2 < v0 {
             let t9 = a3 ^ v0;
 
             a2 ^= t9;
-            // goto LA4000640;
-
-            // LA400063C:
         } else {
             a2 ^= a0;
         }
 
-        // LA4000640:
+        t0 = t0.wrapping_add(0x4);
+
         if kind == CICKind::CIC_X105 {
             // ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
             let mut t7 = rom_words[((s6 - 0xA0000004 + 0x000554) / 4) as usize];
 
-            t0 = t0.wrapping_add(0x4);
             s6 = s6.wrapping_add(0x4);
 
             t7 ^= v0;
@@ -155,23 +129,14 @@ pub fn calculate_checksum(
 
             t7 = 0xA00002FF;
 
-            t1 = t1.wrapping_add(0x4);
-
             s6 &= t7;
         } else {
-            t0 = t0.wrapping_add(0x4);
-
             let t7 = v0 ^ s0;
-
-            t1 = t1.wrapping_add(0x4);
 
             t4 = t7.wrapping_add(t4);
         }
 
-        // if (t0 != ra) goto LA40005F0;
-        if t0 == ra {
-            loop_variable = false;
-        }
+        t1 = t1.wrapping_add(0x4);
     }
 
     if kind == CICKind::CIC_X103 || kind == CICKind::CIC_5101 {
@@ -183,11 +148,13 @@ pub fn calculate_checksum(
     } else if kind == CICKind::CIC_X106 {
         let t6 = a3.wrapping_mul(t2);
         a3 = t6.wrapping_add(t3);
+
         let t8 = s0.wrapping_mul(a2);
         s0 = t8.wrapping_add(t4);
     } else {
         let t6 = a3 ^ t2;
         a3 = t6 ^ t3;
+
         let t8 = s0 ^ a2;
         s0 = t8 ^ t4;
     }
