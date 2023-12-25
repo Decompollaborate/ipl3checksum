@@ -71,9 +71,6 @@ pub fn calculate_checksum(
 
     let mut t0: u32 = 0;
 
-    // Only used on CICKind::CIC_X105
-    let mut s6: u32 = 0xA0000200;
-
     while t0 < ra {
         let v0 = read_word_from_ram(&rom_words, entrypoint_ram, entrypoint_ram.wrapping_add(t0));
 
@@ -107,11 +104,8 @@ pub fn calculate_checksum(
 
         if kind == CICKind::CIC_X105 {
             // ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
-            let t7 = rom_words[((s6 - 0xA0000004 + 0x000554) / 4) as usize];
-
-            s6 = s6.wrapping_add(0x4);
-
-            s6 &= 0xA00002FF;
+            let temp: u32 = (t0 & 0xFF) | 0x200;
+            let t7 = rom_words[((temp - 0x4 + 0x000554) / 4) as usize];
 
             t4 = t4.wrapping_add(v0 ^ t7);
         } else {
