@@ -14,6 +14,8 @@ fn get_entrypoint_addr(rom_bytes: &[u8], kind: CICKind) -> Result<u32, Ipl3Check
     }
 }
 
+const HEADER_IPL3_SIZE: usize = 0x1000;
+
 /// Calculates the checksum required by an official CIC of a N64 ROM.
 ///
 /// ## Arguments
@@ -51,25 +53,25 @@ pub fn calculate_checksum(
     let mut a2 = v0;
     let mut t4 = v0;
 
-    let ra: u32 =
+    let bytes_to_check: u32 =
         if (kind == CICKind::CIC_5101) && (get_entrypoint_addr(rom_bytes, kind)? == 0x80000400) {
             0x3FE000
         } else {
             0x100000
         };
 
-    if rom_bytes.len() < ra as usize + 0x1000 {
+    if rom_bytes.len() < bytes_to_check as usize + HEADER_IPL3_SIZE {
         return Err(Ipl3ChecksumError::BufferNotBigEnough {
             buffer_len: rom_bytes.len(),
-            expected_len: ra as usize + 0x1000,
+            expected_len: bytes_to_check as usize + HEADER_IPL3_SIZE,
         });
     }
 
-    let rom_words = utils::read_u32_vec(rom_bytes, 0, (ra as usize + 0x1000) / 4)?;
+    let rom_words = utils::read_u32_vec(rom_bytes, 0, (bytes_to_check as usize + HEADER_IPL3_SIZE) / 4)?;
 
-    let mut t0: u32 = 0;
-    while t0 < ra {
-        let v0 = rom_words[((t0 + 0x1000) / 4) as usize];
+    let mut i: u32 = 0;
+    while i < bytes_to_check {
+        let v0 = rom_words[(i as usize + HEADER_IPL3_SIZE) / 4];
 
         let mut v1 = a3.wrapping_add(v0);
 
@@ -101,7 +103,7 @@ pub fn calculate_checksum(
 
         if kind == CICKind::CIC_X105 {
             // ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
-            let temp: u32 = (t0 & 0xFF) | 0x200;
+            let temp: u32 = (i & 0xFF) | 0x200;
             let t7 = rom_words[((temp - 0x4 + 0x000554) / 4) as usize];
 
             t4 = t4.wrapping_add(v0 ^ t7);
@@ -109,7 +111,7 @@ pub fn calculate_checksum(
             t4 = t4.wrapping_add(v0 ^ s0);
         }
 
-        t0 = t0.wrapping_add(0x4);
+        i = i.wrapping_add(0x4);
     }
 
     match kind {
