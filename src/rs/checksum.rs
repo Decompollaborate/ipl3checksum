@@ -36,8 +36,6 @@ pub fn calculate_checksum(
     let seed = kind.get_seed();
     let magic = kind.get_magic();
 
-    let mut s6 = seed;
-
     let mut a0 = utils::read_u32(rom_bytes, 8)?;
     if kind == CICKind::CIC_X103 || kind == CICKind::CIC_5101 {
         a0 = a0.wrapping_sub(0x100000);
@@ -47,19 +45,7 @@ pub fn calculate_checksum(
     }
     let entrypoint_ram = a0;
 
-    let lo = s6.wrapping_mul(magic);
-
-    if kind == CICKind::CIC_X105 {
-        s6 = 0xA0000200;
-    }
-
-    let mut t0: u32 = 0;
-
-    let mut t1: u32 = a0;
-
-    let t5: u32 = 0x20;
-
-    let mut v0 = lo.wrapping_add(1);
+    let v0 = seed.wrapping_mul(magic).wrapping_add(1);
 
     let mut a3 = v0;
     let mut t2 = v0;
@@ -68,7 +54,7 @@ pub fn calculate_checksum(
     let mut a2 = v0;
     let mut t4 = v0;
 
-    let ra: u32 = if (kind == CICKind::CIC_5101) && (a0 == 0x80000400) {
+    let ra: u32 = if (kind == CICKind::CIC_5101) && (entrypoint_ram == 0x80000400) {
         0x3FE000
     } else {
         0x100000
@@ -83,9 +69,13 @@ pub fn calculate_checksum(
 
     let rom_words = utils::read_u32_vec(rom_bytes, 0, (ra as usize + 0x1000) / 4)?;
 
+    let mut t0: u32 = 0;
+
+    // Only used on CICKind::CIC_X105
+    let mut s6: u32 = 0xA0000200;
+
     while t0 < ra {
-        // v0 = *t1
-        v0 = read_word_from_ram(&rom_words, entrypoint_ram, t1);
+        let v0 = read_word_from_ram(&rom_words, entrypoint_ram, entrypoint_ram.wrapping_add(t0));
 
         let mut v1 = a3.wrapping_add(v0);
 
@@ -96,7 +86,7 @@ pub fn calculate_checksum(
         }
 
         v1 = v0 & 0x1F;
-        let t7: u32 = t5.wrapping_sub(v1);
+        let t7: u32 = 0x20_u32.wrapping_sub(v1);
 
         let t8 = v0.wrapping_shr(t7);
         let t6 = v0.wrapping_shl(v1);
@@ -115,48 +105,44 @@ pub fn calculate_checksum(
             a2 ^= a0;
         }
 
-        t0 = t0.wrapping_add(0x4);
-
         if kind == CICKind::CIC_X105 {
             // ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
-            let mut t7 = rom_words[((s6 - 0xA0000004 + 0x000554) / 4) as usize];
+            let t7 = rom_words[((s6 - 0xA0000004 + 0x000554) / 4) as usize];
 
             s6 = s6.wrapping_add(0x4);
 
-            t7 ^= v0;
+            s6 &= 0xA00002FF;
 
-            t4 = t7.wrapping_add(t4);
-
-            t7 = 0xA00002FF;
-
-            s6 &= t7;
+            t4 = t4.wrapping_add(v0 ^ t7);
         } else {
-            let t7 = v0 ^ s0;
-
-            t4 = t7.wrapping_add(t4);
+            t4 = t4.wrapping_add(v0 ^ s0);
         }
 
-        t1 = t1.wrapping_add(0x4);
+        t0 = t0.wrapping_add(0x4);
     }
 
-    if kind == CICKind::CIC_X103 || kind == CICKind::CIC_5101 {
-        let t6 = a3 ^ t2;
-        a3 = t6.wrapping_add(t3);
+    match kind {
+        CICKind::CIC_X103 | CICKind::CIC_5101 => {
+            let t6 = a3 ^ t2;
+            a3 = t6.wrapping_add(t3);
 
-        let t8 = s0 ^ a2;
-        s0 = t8.wrapping_add(t4);
-    } else if kind == CICKind::CIC_X106 {
-        let t6 = a3.wrapping_mul(t2);
-        a3 = t6.wrapping_add(t3);
+            let t8 = s0 ^ a2;
+            s0 = t8.wrapping_add(t4);
+        },
+        CICKind::CIC_X106 => {
+            let t6 = a3.wrapping_mul(t2);
+            a3 = t6.wrapping_add(t3);
 
-        let t8 = s0.wrapping_mul(a2);
-        s0 = t8.wrapping_add(t4);
-    } else {
-        let t6 = a3 ^ t2;
-        a3 = t6 ^ t3;
+            let t8 = s0.wrapping_mul(a2);
+            s0 = t8.wrapping_add(t4);
+        },
+        _ => {
+            let t6 = a3 ^ t2;
+            a3 = t6 ^ t3;
 
-        let t8 = s0 ^ a2;
-        s0 = t8 ^ t4;
+            let t8 = s0 ^ a2;
+            s0 = t8 ^ t4;
+        },
     }
 
     Ok((a3, s0))
