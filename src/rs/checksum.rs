@@ -4,6 +4,16 @@
 use crate::cickinds::CICKind;
 use crate::{detect, error::Ipl3ChecksumError, utils};
 
+fn get_entrypoint_addr(rom_bytes: &[u8], kind: CICKind) -> Result<u32, Ipl3ChecksumError> {
+    let entrypoint_addr: u32 = utils::read_u32(rom_bytes, 8)?;
+
+    match kind {
+        CICKind::CIC_X103 | CICKind::CIC_5101 => Ok(entrypoint_addr.wrapping_sub(0x100000)),
+        CICKind::CIC_X106 => Ok(entrypoint_addr.wrapping_sub(0x200000)),
+        _ => Ok(entrypoint_addr),
+    }
+}
+
 /// Calculates the checksum required by an official CIC of a N64 ROM.
 ///
 /// ## Arguments
@@ -32,15 +42,6 @@ pub fn calculate_checksum(
     let seed = kind.get_seed();
     let magic = kind.get_magic();
 
-    let mut a0 = utils::read_u32(rom_bytes, 8)?;
-    if kind == CICKind::CIC_X103 || kind == CICKind::CIC_5101 {
-        a0 = a0.wrapping_sub(0x100000);
-    }
-    if kind == CICKind::CIC_X106 {
-        a0 = a0.wrapping_sub(0x200000);
-    }
-    let entrypoint_ram = a0;
-
     let v0 = seed.wrapping_mul(magic).wrapping_add(1);
 
     let mut a3 = v0;
@@ -50,11 +51,12 @@ pub fn calculate_checksum(
     let mut a2 = v0;
     let mut t4 = v0;
 
-    let ra: u32 = if (kind == CICKind::CIC_5101) && (entrypoint_ram == 0x80000400) {
-        0x3FE000
-    } else {
-        0x100000
-    };
+    let ra: u32 =
+        if (kind == CICKind::CIC_5101) && (get_entrypoint_addr(rom_bytes, kind)? == 0x80000400) {
+            0x3FE000
+        } else {
+            0x100000
+        };
 
     if rom_bytes.len() < ra as usize + 0x1000 {
         return Err(Ipl3ChecksumError::BufferNotBigEnough {
@@ -83,7 +85,7 @@ pub fn calculate_checksum(
         let t8 = v0.wrapping_shr(t7);
         let t6 = v0.wrapping_shl(v1);
 
-        a0 = t6 | t8;
+        let a0 = t6 | t8;
         a3 = a1;
 
         t3 ^= v0;
@@ -117,21 +119,21 @@ pub fn calculate_checksum(
 
             let t8 = s0 ^ a2;
             s0 = t8.wrapping_add(t4);
-        },
+        }
         CICKind::CIC_X106 => {
             let t6 = a3.wrapping_mul(t2);
             a3 = t6.wrapping_add(t3);
 
             let t8 = s0.wrapping_mul(a2);
             s0 = t8.wrapping_add(t4);
-        },
+        }
         _ => {
             let t6 = a3 ^ t2;
             a3 = t6 ^ t3;
 
             let t8 = s0 ^ a2;
             s0 = t8 ^ t4;
-        },
+        }
     }
 
     Ok((a3, s0))
