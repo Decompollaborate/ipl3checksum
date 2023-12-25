@@ -53,13 +53,16 @@ pub fn calculate_checksum(
     let mut a2 = v0;
     let mut t4 = v0;
 
+    // Get how many bytes of the ROM (passed IPL3) to check
     let bytes_to_check: u32 =
+        // IPL3 5101 checks almost 4 times the normal amount depending on the entrypoint
         if (kind == CICKind::CIC_5101) && (get_entrypoint_addr(rom_bytes, kind)? == 0x80000400) {
-            0x3FE000
+            0x3FE000 // ~ 3.992 MiB
         } else {
             0x100000
         };
 
+    // Error if the ROM is not big enough
     if rom_bytes.len() < bytes_to_check as usize + HEADER_IPL3_SIZE {
         return Err(Ipl3ChecksumError::BufferNotBigEnough {
             buffer_len: rom_bytes.len(),
@@ -67,51 +70,45 @@ pub fn calculate_checksum(
         });
     }
 
-    let rom_words = utils::read_u32_vec(rom_bytes, 0, (bytes_to_check as usize + HEADER_IPL3_SIZE) / 4)?;
+    let rom_words = utils::read_u32_vec(
+        rom_bytes,
+        0,
+        (bytes_to_check as usize + HEADER_IPL3_SIZE) / 4,
+    )?;
 
-    let mut i: u32 = 0;
-    while i < bytes_to_check {
-        let v0 = rom_words[(i as usize + HEADER_IPL3_SIZE) / 4];
+    let words_to_check = bytes_to_check.wrapping_div(4) as usize;
+    for i in 0..words_to_check {
+        let word = rom_words[i + (HEADER_IPL3_SIZE / 4)];
 
-        let mut v1 = a3.wrapping_add(v0);
-
-        let a1 = v1;
-
-        if v1 < a3 {
+        let a1 = a3.wrapping_add(word);
+        if a1 < a3 {
             t2 = t2.wrapping_add(0x1);
         }
-
-        v1 = v0 & 0x1F;
-        let t7: u32 = 0x20_u32.wrapping_sub(v1);
-
-        let t8 = v0.wrapping_shr(t7);
-        let t6 = v0.wrapping_shl(v1);
-
-        let a0 = t6 | t8;
         a3 = a1;
 
-        t3 ^= v0;
+        let mask_left = word & 0x1F;
+        let mask_right: u32 = 0x20_u32.wrapping_sub(mask_left);
+
+        let a0 = word.wrapping_shl(mask_left) | word.wrapping_shr(mask_right);
+
+        t3 ^= word;
 
         s0 = s0.wrapping_add(a0);
-        if a2 < v0 {
-            let t9 = a3 ^ v0;
-
-            a2 ^= t9;
+        if a2 < word {
+            a2 ^= a3 ^ word;
         } else {
             a2 ^= a0;
         }
 
         if kind == CICKind::CIC_X105 {
             // ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
-            let temp: u32 = (i & 0xFF) | 0x200;
-            let t7 = rom_words[((temp - 0x4 + 0x000554) / 4) as usize];
+            let temp = (i & 0x3F) | 0x80;
+            let t7 = rom_words[temp + 0x154];
 
-            t4 = t4.wrapping_add(v0 ^ t7);
+            t4 = t4.wrapping_add(word ^ t7);
         } else {
-            t4 = t4.wrapping_add(v0 ^ s0);
+            t4 = t4.wrapping_add(word ^ s0);
         }
-
-        i = i.wrapping_add(0x4);
     }
 
     match kind {
