@@ -4,10 +4,6 @@
 use crate::cickinds::CICKind;
 use crate::{detect, error::Ipl3ChecksumError, utils};
 
-fn read_word_from_ram(rom_words: &[u32], entrypoint_ram: u32, ram_addr: u32) -> u32 {
-    rom_words[((ram_addr - entrypoint_ram + 0x1000) / 4) as usize]
-}
-
 /// Calculates the checksum required by an official CIC of a N64 ROM.
 ///
 /// ## Arguments
@@ -70,9 +66,8 @@ pub fn calculate_checksum(
     let rom_words = utils::read_u32_vec(rom_bytes, 0, (ra as usize + 0x1000) / 4)?;
 
     let mut t0: u32 = 0;
-
     while t0 < ra {
-        let v0 = read_word_from_ram(&rom_words, entrypoint_ram, entrypoint_ram.wrapping_add(t0));
+        let v0 = rom_words[((t0 + 0x1000) / 4) as usize];
 
         let mut v1 = a3.wrapping_add(v0);
 
