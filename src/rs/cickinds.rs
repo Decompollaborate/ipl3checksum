@@ -1,10 +1,10 @@
-/* SPDX-FileCopyrightText: © 2023 Decompollaborate */
+/* SPDX-FileCopyrightText: © 2023-2024 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
 
 #[cfg(feature = "python_bindings")]
 use pyo3::prelude::*;
 
-use crate::Ipl3ChecksumError;
+use crate::{checksum, Ipl3ChecksumError};
 
 /* This needs to be in sync with the C equivalent at `bindings/c/include/ipl3checksum/cickinds.h` */
 #[cfg_attr(feature = "python_bindings", pyclass(module = "ipl3checksum"))]
@@ -27,6 +27,9 @@ pub enum CICKind {
 }
 
 impl CICKind {
+    /// Seed value set by the PIF ROM before the CPU (and the IPL3) is executed.
+    ///
+    /// https://n64brew.dev/wiki/PIF-NUS#IPL3_checksum_algorithm
     pub fn get_seed(&self) -> u32 {
         match self {
             Self::CIC_6101 | Self::CIC_6102_7101 | Self::CIC_7102 => 0x3F,
@@ -37,10 +40,23 @@ impl CICKind {
         }
     }
 
+    /// Magic value hardcoded inside the IPL3 itself
     pub fn get_magic(&self) -> u32 {
         match self {
             Self::CIC_6101 | Self::CIC_6102_7101 | Self::CIC_7102 | Self::CIC_X105 => 0x5D588B65,
             Self::CIC_X103 | Self::CIC_X106 | Self::CIC_5101 => 0x6C078965,
+        }
+    }
+
+    /// Calculates the actual entrypoint address based on the entrypoint specified on the header.
+    ///
+    /// CIC 7102 is a notable case since its IPL3 hardcodes it, ignoring the entrypoint from the header.
+    pub fn get_entrypoint(&self, header_entrypoint: u32) -> u32 {
+        match self {
+            CICKind::CIC_7102 => 0x80000480,
+            CICKind::CIC_X103 | CICKind::CIC_5101 => header_entrypoint.wrapping_sub(0x100000),
+            CICKind::CIC_X106 => header_entrypoint.wrapping_sub(0x200000),
+            _ => header_entrypoint,
         }
     }
 
@@ -144,14 +160,46 @@ impl CICKind {
             _ => Err(Ipl3ChecksumError::UnableToDetectCIC),
         }
     }
+
+    /// Calculates the checksum required by an official CIC of a N64 ROM.
+    ///
+    /// ## Arguments
+    ///
+    /// * `rom_bytes` - The bytes of the N64 ROM in big endian format. It must have a minimum size of 0x101000 bytes.
+    ///
+    /// ## Return
+    ///
+    /// * If no error happens then the calculated checksum is returned, stored as a tuple
+    ///   containing two 32-bits words.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// use ipl3checksum;
+    /// let bytes = vec![0; 0x101000];
+    /// let kind = ipl3checksum::CICKind::CIC_6102_7101;
+    /// let checksum = kind.calculate_checksum(&bytes).unwrap();
+    /// println!("{:08X} {:08X}", checksum.0, checksum.1);
+    /// ```
+    pub fn calculate_checksum(&self, rom_bytes: &[u8]) -> Result<(u32, u32), Ipl3ChecksumError> {
+        checksum::calculate_checksum(rom_bytes, *self)
+    }
 }
 
 #[cfg(feature = "python_bindings")]
 #[allow(non_snake_case)]
 mod python_bindings {
     use pyo3::prelude::*;
+    use std::borrow::Cow;
 
     use crate::Ipl3ChecksumError;
+
+    /**
+     * We use a `Cow` instead of a plain &[u8] the latter only allows Python's
+     * `bytes` objects, while Cow allows for both `bytes` and `bytearray`.
+     * This is important because an argument typed as `bytes` allows to pass a
+     * `bytearray` object too.
+     */
 
     #[pymethods]
     impl super::CICKind {
@@ -161,6 +209,10 @@ mod python_bindings {
 
         pub fn getMagic(&self) -> u32 {
             self.get_magic()
+        }
+
+        pub fn getEntrypoint(&self, header_entrypoint: u32) -> u32 {
+            self.get_entrypoint(header_entrypoint)
         }
 
         pub fn getHashMd5(&self) -> &str {
@@ -209,6 +261,13 @@ mod python_bindings {
                 },
             }
         }
+
+        pub fn calculateChecksum(
+            &self,
+            rom_bytes: Cow<[u8]>,
+        ) -> Result<(u32, u32), Ipl3ChecksumError> {
+            self.calculate_checksum(&rom_bytes)
+        }
     }
 }
 
@@ -224,6 +283,14 @@ mod c_bindings {
     #[no_mangle]
     pub extern "C" fn ipl3checksum_cickind_get_magic(kind: CICKind) -> u32 {
         kind.get_magic()
+    }
+
+    #[no_mangle]
+    pub extern "C" fn ipl3checksum_cickind_get_entrypoint(
+        kind: CICKind,
+        header_entrypoint: u32,
+    ) -> u32 {
+        kind.get_entrypoint(header_entrypoint)
     }
 
     #[no_mangle]

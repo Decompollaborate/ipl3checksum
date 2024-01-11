@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2024-01-11
+
+### Added
+
+- `CICKind.get_entrypoint`: Returns the entrypoint address that would be used
+  on runtime.
+- `CICKind.calculate_checksum`: Convinience method that wraps
+  `checksum::calculate_checksum`.
+- Python bindings:
+  - Expose `Ipl3ChecksumError` to Python as a new exception for each error of
+    the enum. Refer to `ipl3checksum.exceptions`.
+
+### Changed
+
+- Rewrite the checksum algorithm for readability and simplicity.
+
 ## [1.1.1] - 2023-12-23
 
 ### Fixed
@@ -14,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Python bindings:
   - Fix `detectCIC` and `detect_cic_raw` functions not accepting `bytearray`
     objects.
-- Fix some typos
+- Fix some typos.
 
 ## [1.1.0] - 2023-12-22
 
@@ -62,6 +78,7 @@ version of the library.
 - Initial relase
 
 [unreleased]: https://github.com/Decompollaborate/ipl3checksum/compare/main...develop
+[1.2.0]: https://github.com/Decompollaborate/ipl3checksum/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/Decompollaborate/ipl3checksum/compare/1.0.1...1.1.0
 [1.0.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.0.0...1.0.1

@@ -1,12 +1,16 @@
-/* SPDX-FileCopyrightText: © 2023 Decompollaborate */
+/* SPDX-FileCopyrightText: © 2023-2024 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
 
 use crate::cickinds::CICKind;
 use crate::{detect, error::Ipl3ChecksumError, utils};
 
-fn read_word_from_ram(rom_words: &[u32], entrypoint_ram: u32, ram_addr: u32) -> u32 {
-    rom_words[((ram_addr - entrypoint_ram + 0x1000) / 4) as usize]
+fn get_entrypoint_addr(rom_bytes: &[u8], kind: CICKind) -> Result<u32, Ipl3ChecksumError> {
+    let entrypoint_addr: u32 = utils::read_u32(rom_bytes, 8)?;
+
+    Ok(kind.get_entrypoint(entrypoint_addr))
 }
+
+const HEADER_IPL3_SIZE: usize = 0x1000;
 
 /// Calculates the checksum required by an official CIC of a N64 ROM.
 ///
@@ -18,7 +22,7 @@ fn read_word_from_ram(rom_words: &[u32], entrypoint_ram: u32, ram_addr: u32) -> 
 /// ## Return
 ///
 /// * If no error happens then the calculated checksum is returned, stored as a tuple
-///   containing two 32-bits words. Otherwise, `None` is returned.
+///   containing two 32-bits words.
 ///
 /// ## Examples
 ///
@@ -33,45 +37,10 @@ pub fn calculate_checksum(
     rom_bytes: &[u8],
     kind: CICKind,
 ) -> Result<(u32, u32), Ipl3ChecksumError> {
-    if rom_bytes.len() < 0x101000 {
-        return Err(Ipl3ChecksumError::BufferNotBigEnough {
-            buffer_len: rom_bytes.len(),
-            expected_len: 0x101000,
-        });
-    }
-
     let seed = kind.get_seed();
     let magic = kind.get_magic();
 
-    let mut s6 = seed;
-
-    let mut a0 = utils::read_u32(rom_bytes, 8)?;
-    if kind == CICKind::CIC_X103 || kind == CICKind::CIC_5101 {
-        a0 = a0.wrapping_sub(0x100000);
-    }
-    if kind == CICKind::CIC_X106 {
-        a0 = a0.wrapping_sub(0x200000);
-    }
-    let entrypoint_ram = a0;
-
-    let mut at = magic;
-    let lo = s6.wrapping_mul(at);
-
-    if kind == CICKind::CIC_X105 {
-        s6 = 0xA0000200;
-    }
-
-    let mut ra: u32 = 0x100000;
-
-    let mut t0: u32 = 0;
-
-    let mut t1: u32 = a0;
-
-    let t5: u32 = 0x20;
-
-    //let mut v0 = utils.u32(lo);
-    let mut v0 = lo;
-    v0 += 1;
+    let v0 = seed.wrapping_mul(magic).wrapping_add(1);
 
     let mut a3 = v0;
     let mut t2 = v0;
@@ -80,141 +49,83 @@ pub fn calculate_checksum(
     let mut a2 = v0;
     let mut t4 = v0;
 
-    #[allow(clippy::single_match)]
-    match kind {
-        CICKind::CIC_5101 => {
-            if a0 == 0x80000400 {
-                ra = 0x3FE000;
-                if rom_bytes.len() < 0x3FE000 + 0x1000 {
-                    return Err(Ipl3ChecksumError::BufferNotBigEnough {
-                        buffer_len: rom_bytes.len(),
-                        expected_len: 0x3FE000 + 0x1000,
-                    });
-                }
-            }
-        }
-        _ => (),
+    // Get how many bytes of the ROM (passed IPL3) to check
+    let bytes_to_check: u32 =
+        // IPL3 5101 checks almost 4 times the normal amount depending on the entrypoint
+        if (kind == CICKind::CIC_5101) && (get_entrypoint_addr(rom_bytes, kind)? == 0x80000400) {
+            0x3FE000 // ~ 3.992 MiB
+        } else {
+            0x100000
+        };
+
+    // Error if the ROM is not big enough
+    if rom_bytes.len() < bytes_to_check as usize + HEADER_IPL3_SIZE {
+        return Err(Ipl3ChecksumError::BufferNotBigEnough {
+            buffer_len: rom_bytes.len(),
+            expected_len: bytes_to_check as usize + HEADER_IPL3_SIZE,
+        });
     }
 
-    let rom_words = utils::read_u32_vec(rom_bytes, 0, (ra as usize + 0x1000) / 4)?;
+    let rom_words = utils::read_u32_vec(
+        rom_bytes,
+        0,
+        (bytes_to_check as usize + HEADER_IPL3_SIZE) / 4,
+    )?;
 
-    // poor man's do while
-    // LA40005F0_loop
-    let mut loop_variable = true;
-    while loop_variable {
-        // v0 = *t1
-        v0 = read_word_from_ram(&rom_words, entrypoint_ram, t1);
+    let words_to_check = bytes_to_check.wrapping_div(4) as usize;
+    for i in 0..words_to_check {
+        let word = rom_words[i + (HEADER_IPL3_SIZE / 4)];
 
-        //v1 = utils.u32(a3 + v0);
-        let mut v1 = a3.wrapping_add(v0);
-
-        //at = utils.u32(v1) < utils.u32(a3);
-        at = if v1 < a3 { 1 } else { 0 };
-
-        let a1 = v1;
-        // if (at == 0) goto LA4000608;
-
-        if at != 0 {
-            //t2 = utils.u32(t2 + 0x1)
+        let a1 = a3.wrapping_add(word);
+        if a1 < a3 {
             t2 = t2.wrapping_add(0x1);
         }
-
-        // LA4000608
-        v1 = v0 & 0x1F;
-        //t7 = utils.u32(t5 - v1)
-        let t7: u32 = t5.wrapping_sub(v1);
-
-        //let t8 = utils.u32(v0 >> t7)
-        //let t6 = utils.u32(v0 << v1)
-        let t8 = v0.wrapping_shr(t7);
-        let t6 = v0.wrapping_shl(v1);
-
-        a0 = t6 | t8;
-        // at = utils.u32(a2) < utils.u32(v0);
-        at = if a2 < v0 { 1 } else { 0 };
         a3 = a1;
 
-        t3 ^= v0;
+        let a0 = word.rotate_left(word & 0x1F);
 
-        //s0 = utils.u32(s0 + a0)
+        t3 ^= word;
+
         s0 = s0.wrapping_add(a0);
-        // if (at == 0) goto LA400063C;
-        if at != 0 {
-            let t9 = a3 ^ v0;
-
-            a2 ^= t9;
-            // goto LA4000640;
-
-            // LA400063C:
+        if a2 < word {
+            a2 ^= a3 ^ word;
         } else {
             a2 ^= a0;
         }
 
-        // LA4000640:
         if kind == CICKind::CIC_X105 {
             // ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
-            let mut t7 = rom_words[((s6 - 0xA0000004 + 0x000554) / 4) as usize];
+            let temp = (i & 0x3F) | 0x80;
+            let t7 = rom_words[temp + 0x154];
 
-            //t0 = utils.u32(t0 + 0x4);
-            //s6 = utils.u32(s6 + 0x4);
-            t0 = t0.wrapping_add(0x4);
-            s6 = s6.wrapping_add(0x4);
-
-            t7 ^= v0;
-
-            // t4 = utils.u32(t7 + t4);
-            t4 = t7.wrapping_add(t4);
-
-            t7 = 0xA00002FF;
-
-            // t1 = utils.u32(t1 + 0x4);
-            t1 = t1.wrapping_add(0x4);
-
-            // s6 = utils.u32(s6 & t7);
-            s6 &= t7;
+            t4 = t4.wrapping_add(word ^ t7);
         } else {
-            // t0 = utils.u32(t0 + 0x4);
-            t0 = t0.wrapping_add(0x4);
-
-            let t7 = v0 ^ s0;
-
-            // t1 = utils.u32(t1 + 0x4);
-            t1 = t1.wrapping_add(0x4);
-
-            // t4 = utils.u32(t7 + t4);
-            t4 = t7.wrapping_add(t4);
-        }
-
-        // if (t0 != ra) goto LA40005F0;
-        if t0 == ra {
-            loop_variable = false;
+            t4 = t4.wrapping_add(word ^ s0);
         }
     }
 
-    if kind == CICKind::CIC_X103 || kind == CICKind::CIC_5101 {
-        let t6 = a3 ^ t2;
-        // a3 = utils.u32(t6 + t3);
-        a3 = t6.wrapping_add(t3);
+    match kind {
+        CICKind::CIC_X103 | CICKind::CIC_5101 => {
+            let t6 = a3 ^ t2;
+            a3 = t6.wrapping_add(t3);
 
-        let t8 = s0 ^ a2;
-        // s0 = utils.u32(t8 + t4);
-        s0 = t8.wrapping_add(t4);
-    } else if kind == CICKind::CIC_X106 {
-        /*
-        let t6 = utils.u32(a3 * t2);
-        a3 = utils.u32(t6 + t3);
-        let t8 = utils.u32(s0 * a2);
-        s0 = utils.u32(t8 + t4);
-        */
-        let t6 = a3.wrapping_mul(t2);
-        a3 = t6.wrapping_add(t3);
-        let t8 = s0.wrapping_mul(a2);
-        s0 = t8.wrapping_add(t4);
-    } else {
-        let t6 = a3 ^ t2;
-        a3 = t6 ^ t3;
-        let t8 = s0 ^ a2;
-        s0 = t8 ^ t4;
+            let t8 = s0 ^ a2;
+            s0 = t8.wrapping_add(t4);
+        }
+        CICKind::CIC_X106 => {
+            let t6 = a3.wrapping_mul(t2);
+            a3 = t6.wrapping_add(t3);
+
+            let t8 = s0.wrapping_mul(a2);
+            s0 = t8.wrapping_add(t4);
+        }
+        _ => {
+            let t6 = a3 ^ t2;
+            a3 = t6 ^ t3;
+
+            let t8 = s0 ^ a2;
+            s0 = t8 ^ t4;
+        }
     }
 
     Ok((a3, s0))

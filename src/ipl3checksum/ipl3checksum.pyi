@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: © 2023 Decompollaborate
+# SPDX-FileCopyrightText: © 2023-2024 Decompollaborate
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
@@ -12,3 +12,5 @@ from .checksum import calculateChecksumAutodetect as calculateChecksumAutodetect
 
 from .detect import detectCIC as detectCIC
 from .detect import detectCICRaw as detectCICRaw
+
+from .exceptions import exceptions as exceptions

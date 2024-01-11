@@ -1,10 +1,5 @@
-/* SPDX-FileCopyrightText: © 2023 Decompollaborate */
+/* SPDX-FileCopyrightText: © 2023-2024 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
-
-#[cfg(feature = "python_bindings")]
-use pyo3::exceptions::PyRuntimeError;
-#[cfg(feature = "python_bindings")]
-use pyo3::prelude::*;
 
 /* This needs to be in sync with the C equivalent at `bindings/c/include/ipl3checksum/error.h` */
 // repr is kinda complex and I may have got it wrong.
@@ -22,11 +17,11 @@ pub enum Ipl3ChecksumError {
     #[error("Failed to convert a FFI string")]
     StringConversion,
 
-    #[error("Unaligned read at offset 0x{offset:X}")]
+    #[error("Unaligned read at offset 0x{offset:X}. \n (This is probably a library bug, please report me)")]
     UnalignedRead { offset: usize },
-    #[error("Failed to convert bytes at offset 0x{offset:X}")]
+    #[error("Failed to convert bytes at offset 0x{offset:X} \n (This is probably a library bug, please report me)")]
     ByteConversion { offset: usize },
-    #[error("Tried to access data out of bounds at offset 0x{offset:X}. Requested bytes: 0x{requested_bytes:X}. Buffer length: 0x{buffer_len:X}")]
+    #[error("Tried to access data out of bounds at offset 0x{offset:X}. Requested bytes: 0x{requested_bytes:X}. Buffer length: 0x{buffer_len:X} \n (This is probably a library bug, please report me)")]
     OutOfBounds {
         offset: usize,
         requested_bytes: usize,
@@ -47,8 +42,47 @@ pub enum Ipl3ChecksumError {
 }
 
 #[cfg(feature = "python_bindings")]
-impl std::convert::From<Ipl3ChecksumError> for PyErr {
-    fn from(err: Ipl3ChecksumError) -> PyErr {
-        PyRuntimeError::new_err(err.to_string())
+pub(crate) mod python_bindings {
+    use pyo3::exceptions::PyRuntimeError;
+    use pyo3::prelude::*;
+
+    pyo3::create_exception!(ipl3checksum, Ipl3ChecksumError, PyRuntimeError);
+
+    pyo3::create_exception!(ipl3checksum, UnalignedRead, Ipl3ChecksumError);
+    pyo3::create_exception!(ipl3checksum, ByteConversion, Ipl3ChecksumError);
+    pyo3::create_exception!(ipl3checksum, OutOfBounds, Ipl3ChecksumError);
+    pyo3::create_exception!(ipl3checksum, BufferNotBigEnough, Ipl3ChecksumError);
+    pyo3::create_exception!(ipl3checksum, BufferSizeIsWrong, Ipl3ChecksumError);
+    pyo3::create_exception!(ipl3checksum, UnableToDetectCIC, Ipl3ChecksumError);
+
+    impl std::convert::From<super::Ipl3ChecksumError> for PyErr {
+        fn from(err: super::Ipl3ChecksumError) -> PyErr {
+            match err {
+                super::Ipl3ChecksumError::UnalignedRead { .. } => {
+                    UnalignedRead::new_err(err.to_string())
+                }
+                super::Ipl3ChecksumError::ByteConversion { .. } => {
+                    ByteConversion::new_err(err.to_string())
+                }
+                super::Ipl3ChecksumError::OutOfBounds { .. } => {
+                    OutOfBounds::new_err(err.to_string())
+                }
+                super::Ipl3ChecksumError::BufferNotBigEnough { .. } => {
+                    BufferNotBigEnough::new_err(err.to_string())
+                }
+                super::Ipl3ChecksumError::BufferSizeIsWrong { .. } => {
+                    BufferSizeIsWrong::new_err(err.to_string())
+                }
+                super::Ipl3ChecksumError::UnableToDetectCIC => {
+                    UnableToDetectCIC::new_err(err.to_string())
+                }
+                #[cfg(feature = "c_bindings")]
+                super::Ipl3ChecksumError::Okay
+                | super::Ipl3ChecksumError::NullPointer
+                | super::Ipl3ChecksumError::StringConversion => {
+                    Ipl3ChecksumError::new_err(err.to_string())
+                }
+            }
+        }
     }
 }

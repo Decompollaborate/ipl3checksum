@@ -1,10 +1,10 @@
-# SPDX-FileCopyrightText: © 2023 Decompollaborate
+# SPDX-FileCopyrightText: © 2023-2024 Decompollaborate
 # SPDX-License-Identifier: MIT
 
 [package]
 name = "ipl3checksum"
 # Version should be synced with src/ipl3checksum/__init__.py, pyproject.toml and src/rs/version.rs
-version = "1.1.1"
+version = "1.2.0"
 edition = "2021"
 description = "Library to calculate the IPL3 checksum for N64 ROMs"
 repository = "https://github.com/decompollaborate/ipl3checksum"
@@ -17,8 +17,8 @@ crate-type = ["lib", "staticlib", "cdylib"]
 
 [dependencies]
 md5 = "0.7.0"
-pyo3 = { version="0.20.0", features = ["extension-module"], optional = true }
-thiserror = "1.0.51"
+pyo3 = { version="0.20.2", features = ["extension-module"], optional = true }
+thiserror = "1.0.56"
 
 [features]
 c_bindings = []

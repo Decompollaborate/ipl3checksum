@@ -1,25 +1,42 @@
-# SPDX-FileCopyrightText: © 2023 Decompollaborate
+# SPDX-FileCopyrightText: © 2023-2024 Decompollaborate
 # SPDX-License-Identifier: MIT
 
 [project]
 name = "ipl3checksum"
 # Version should be synced with src/ipl3checksum/__init__.py, Cargo.toml and src/rs/version.rs
-version = "1.1.1"
+version = "1.2.0"
 description = "Library to calculate the IPL3 checksum for N64 ROMs"
 readme = "README.md"
 requires-python = ">=3.7"
+license = {file = "LICENSE"}
+keywords = ["IPL3", "CIC", "checksum", "N64", "Nintendo 64"]
 authors = [
     { name="Anghelo Carvajal", email="angheloalf95@gmail.com" },
 ]
 classifiers = [
     "Programming Language :: Rust",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Python :: 3",
+
+    "Development Status :: 5 - Production/Stable",
+
+    "Intended Audience :: Developers",
+
+    "License :: OSI Approved :: MIT License",
+
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+
+    "Typing :: Typed",
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/decompollaborate/ipl3checksum"
-"Bug Tracker" = "https://github.com/decompollaborate/ipl3checksum/issues"
+Repository = "https://github.com/Decompollaborate/ipl3checksum"
+Issues = "https://github.com/Decompollaborate/ipl3checksum/issues"
+Changelog = "https://github.com/Decompollaborate/ipl3checksum/blob/master/CHANGELOG.md"
 
 [build-system]
 requires = ["maturin>=1.2,<2.0"]

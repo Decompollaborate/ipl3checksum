@@ -29,6 +29,8 @@ uint32_t ipl3checksum_cickind_get_seed(Ipl3Checksum_CICKind self);
 
 uint32_t ipl3checksum_cickind_get_magic(Ipl3Checksum_CICKind self);
 
+uint32_t ipl3checksum_cickind_get_entrypoint(Ipl3Checksum_CICKind self, uint32_t header_entrypoint);
+
 /**
  * Returns the md5 hash for the specified CIC kind.
  *
