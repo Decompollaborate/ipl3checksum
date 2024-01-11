@@ -21,3 +21,6 @@ jobs:
 
     - name: Update tests outputs
       run: python3 tests/check_correct_sum.py
+
+    - name: Test exceptions
+      run: python3 tests/exception_test.py

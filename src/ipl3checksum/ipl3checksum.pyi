@@ -13,4 +13,4 @@ from .checksum import calculateChecksumAutodetect as calculateChecksumAutodetect
 from .detect import detectCIC as detectCIC
 from .detect import detectCICRaw as detectCICRaw
 
-import exceptions as exceptions
+from .exceptions import exceptions as exceptions
