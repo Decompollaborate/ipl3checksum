@@ -17,8 +17,8 @@ crate-type = ["lib", "staticlib", "cdylib"]
 
 [dependencies]
 md5 = "0.7.0"
-pyo3 = { version="0.20.0", features = ["extension-module"], optional = true }
-thiserror = "1.0.51"
+pyo3 = { version="0.20.2", features = ["extension-module"], optional = true }
+thiserror = "1.0.56"
 
 [features]
 c_bindings = []
