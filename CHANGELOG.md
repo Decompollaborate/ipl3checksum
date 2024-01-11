@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `CICKind.get_entrypoint`: Returns the entrypoint address that would be used
   on runtime.
+- `CICKind.calculate_checksum`: Convinience method that wraps
+  `checksum::calculate_checksum`.
 
 ### Changed
 

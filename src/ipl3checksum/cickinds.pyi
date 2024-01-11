@@ -60,3 +60,14 @@ class CICKind():
     @staticmethod
     def fromValue(value: int) -> CICKind|None:
         ...
+
+    def calculateChecksum(self, romBytes: bytes) -> tuple[int, int]:
+        """Calculates the checksum required by an official CIC of a N64 ROM.
+
+        Args:
+            romBytes (bytes): The bytes of the N64 ROM in big endian format. It must have a minimum size of 0x101000 bytes.
+
+        Returns:
+            tuple[int, int]: If no error happens then the calculated checksum is returned, stored as a tuple
+            containing two 32-bits words. If an errors occurs an exception will be raised.
+        """

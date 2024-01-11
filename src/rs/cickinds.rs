@@ -4,7 +4,7 @@
 #[cfg(feature = "python_bindings")]
 use pyo3::prelude::*;
 
-use crate::Ipl3ChecksumError;
+use crate::{Ipl3ChecksumError, checksum};
 
 /* This needs to be in sync with the C equivalent at `bindings/c/include/ipl3checksum/cickinds.h` */
 #[cfg_attr(feature = "python_bindings", pyclass(module = "ipl3checksum"))]
@@ -160,14 +160,46 @@ impl CICKind {
             _ => Err(Ipl3ChecksumError::UnableToDetectCIC),
         }
     }
+
+    /// Calculates the checksum required by an official CIC of a N64 ROM.
+    ///
+    /// ## Arguments
+    ///
+    /// * `rom_bytes` - The bytes of the N64 ROM in big endian format. It must have a minimum size of 0x101000 bytes.
+    ///
+    /// ## Return
+    ///
+    /// * If no error happens then the calculated checksum is returned, stored as a tuple
+    ///   containing two 32-bits words.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// use ipl3checksum;
+    /// let bytes = vec![0; 0x101000];
+    /// let kind = ipl3checksum::CICKind::CIC_6102_7101;
+    /// let checksum = kind.calculate_checksum(&bytes).unwrap();
+    /// println!("{:08X} {:08X}", checksum.0, checksum.1);
+    /// ```
+    pub fn calculate_checksum(&self, rom_bytes: &[u8]) -> Result<(u32, u32), Ipl3ChecksumError> {
+        checksum::calculate_checksum(rom_bytes, *self)
+    }
 }
 
 #[cfg(feature = "python_bindings")]
 #[allow(non_snake_case)]
 mod python_bindings {
     use pyo3::prelude::*;
+    use std::borrow::Cow;
 
     use crate::Ipl3ChecksumError;
+
+    /**
+     * We use a `Cow` instead of a plain &[u8] the latter only allows Python's
+     * `bytes` objects, while Cow allows for both `bytes` and `bytearray`.
+     * This is important because an argument typed as `bytes` allows to pass a
+     * `bytearray` object too.
+     */
 
     #[pymethods]
     impl super::CICKind {
@@ -228,6 +260,10 @@ mod python_bindings {
                     _ => Err(e),
                 },
             }
+        }
+
+        pub fn calculateChecksum(&self, rom_bytes: Cow<[u8]>) -> Result<(u32, u32), Ipl3ChecksumError> {
+            self.calculate_checksum(&rom_bytes)
         }
     }
 }

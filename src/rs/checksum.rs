@@ -22,7 +22,7 @@ const HEADER_IPL3_SIZE: usize = 0x1000;
 /// ## Return
 ///
 /// * If no error happens then the calculated checksum is returned, stored as a tuple
-///   containing two 32-bits words. Otherwise, `None` is returned.
+///   containing two 32-bits words.
 ///
 /// ## Examples
 ///
