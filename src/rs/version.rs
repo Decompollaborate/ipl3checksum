@@ -1,4 +1,4 @@
-/* SPDX-FileCopyrightText: © 2023 Decompollaborate */
+/* SPDX-FileCopyrightText: © 2023-2024 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
 
 // Version should be synced with pyproject.toml, Cargo.toml and src/ipl3checksum/__init__.py
