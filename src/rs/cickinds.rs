@@ -4,7 +4,7 @@
 #[cfg(feature = "python_bindings")]
 use pyo3::prelude::*;
 
-use crate::{Ipl3ChecksumError, checksum};
+use crate::{checksum, Ipl3ChecksumError};
 
 /* This needs to be in sync with the C equivalent at `bindings/c/include/ipl3checksum/cickinds.h` */
 #[cfg_attr(feature = "python_bindings", pyclass(module = "ipl3checksum"))]
@@ -262,7 +262,10 @@ mod python_bindings {
             }
         }
 
-        pub fn calculateChecksum(&self, rom_bytes: Cow<[u8]>) -> Result<(u32, u32), Ipl3ChecksumError> {
+        pub fn calculateChecksum(
+            &self,
+            rom_bytes: Cow<[u8]>,
+        ) -> Result<(u32, u32), Ipl3ChecksumError> {
             self.calculate_checksum(&rom_bytes)
         }
     }
@@ -283,7 +286,10 @@ mod c_bindings {
     }
 
     #[no_mangle]
-    pub extern "C" fn ipl3checksum_cickind_get_entrypoint(kind: CICKind, header_entrypoint: u32) -> u32 {
+    pub extern "C" fn ipl3checksum_cickind_get_entrypoint(
+        kind: CICKind,
+        header_entrypoint: u32,
+    ) -> u32 {
         kind.get_entrypoint(header_entrypoint)
     }
 
