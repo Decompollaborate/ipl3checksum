@@ -3,13 +3,13 @@
 
 // Version should be synced with pyproject.toml, Cargo.toml and src/ipl3checksum/__init__.py
 pub static VERSION_MAJOR: i32 = 1;
-pub static VERSION_MINOR: i32 = 1;
-pub static VERSION_PATCH: i32 = 2;
+pub static VERSION_MINOR: i32 = 2;
+pub static VERSION_PATCH: i32 = 0;
 
 pub static VERSION_INFO: (i32, i32, i32) = (VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 
 // TODO: figure out a way to construct this string by using VERSION_MAJOR, VERSION_MINOR and VERSION_PATCH (concat! and stringify! didn't work)
-pub static VERSION_STR: &str = "1.1.2";
+pub static VERSION_STR: &str = "1.2.0";
 
 pub static AUTHOR: &str = "Decompollaborate";
 
@@ -24,7 +24,7 @@ mod c_bindings {
 
     // TODO: construct this from super::VERSION_STR
     #[no_mangle]
-    static ipl3checksum_version_str: &[u8] = b"1.1.2\0";
+    static ipl3checksum_version_str: &[u8] = b"1.2.0\0";
 
     // TODO: construct this from super::AUTHOR
     #[no_mangle]

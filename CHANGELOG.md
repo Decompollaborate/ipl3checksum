@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2024-01-11
+
 ### Added
 
 - `CICKind.get_entrypoint`: Returns the entrypoint address that would be used
@@ -76,6 +78,7 @@ version of the library.
 - Initial relase
 
 [unreleased]: https://github.com/Decompollaborate/ipl3checksum/compare/main...develop
+[1.2.0]: https://github.com/Decompollaborate/ipl3checksum/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/Decompollaborate/ipl3checksum/compare/1.0.1...1.1.0
 [1.0.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.0.0...1.0.1
