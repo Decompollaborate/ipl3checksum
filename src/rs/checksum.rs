@@ -86,10 +86,7 @@ pub fn calculate_checksum(
         }
         a3 = a1;
 
-        let mask_left = word & 0x1F;
-        let mask_right: u32 = 0x20_u32.wrapping_sub(mask_left);
-
-        let a0 = word.wrapping_shl(mask_left) | word.wrapping_shr(mask_right);
+        let a0 = word.rotate_left(word & 0x1F);
 
         t3 ^= word;
 
