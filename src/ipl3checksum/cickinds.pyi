@@ -69,5 +69,5 @@ class CICKind():
 
         Returns:
             tuple[int, int]: If no error happens then the calculated checksum is returned, stored as a tuple
-            containing two 32-bits words. If an errors occurs an exception will be raised.
+            containing two 32-bits words. If an errors occurs an exception will be raised (see ipl3checksum.exceptions).
         """

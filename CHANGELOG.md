@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on runtime.
 - `CICKind.calculate_checksum`: Convinience method that wraps
   `checksum::calculate_checksum`.
+- Python bindings:
+  - Expose `Ipl3ChecksumError` to Python as a new exception for each error of
+    the enum. Refer to `ipl3checksum.exceptions`.
 
 ### Changed
 
