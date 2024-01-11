@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `CICKind.get_entrypoint`: Returns the entrypoint address that would be used
+  on runtime.
+
 ### Changed
 
 - Rewrite the checksum algorithm for readability and simplicity.

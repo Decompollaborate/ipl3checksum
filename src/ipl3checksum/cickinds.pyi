@@ -20,12 +20,20 @@ class CICKind():
     def getSeed(self) -> int:
         """
         Seed value set by the PIF ROM before the CPU (and the IPL3) is executed.
+
         https://n64brew.dev/wiki/PIF-NUS#IPL3_checksum_algorithm
         """
 
     def getMagic(self) -> int:
         """
         Magic value hardcoded inside the IPL3 itself
+        """
+
+    def getEntrypoint(self, header_entrypoint: int) -> int:
+        """
+        Calculates the actual entrypoint address based on the entrypoint specified on the header.
+
+        CIC 7102 is a notable case since its IPL3 hardcodes it, ignoring the entrypoint from the header.
         """
 
     def getHashMd5(self) -> str:

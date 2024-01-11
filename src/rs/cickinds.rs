@@ -27,6 +27,9 @@ pub enum CICKind {
 }
 
 impl CICKind {
+    /// Seed value set by the PIF ROM before the CPU (and the IPL3) is executed.
+    ///
+    /// https://n64brew.dev/wiki/PIF-NUS#IPL3_checksum_algorithm
     pub fn get_seed(&self) -> u32 {
         match self {
             Self::CIC_6101 | Self::CIC_6102_7101 | Self::CIC_7102 => 0x3F,
@@ -37,10 +40,23 @@ impl CICKind {
         }
     }
 
+    /// Magic value hardcoded inside the IPL3 itself
     pub fn get_magic(&self) -> u32 {
         match self {
             Self::CIC_6101 | Self::CIC_6102_7101 | Self::CIC_7102 | Self::CIC_X105 => 0x5D588B65,
             Self::CIC_X103 | Self::CIC_X106 | Self::CIC_5101 => 0x6C078965,
+        }
+    }
+
+    /// Calculates the actual entrypoint address based on the entrypoint specified on the header.
+    ///
+    /// CIC 7102 is a notable case since its IPL3 hardcodes it, ignoring the entrypoint from the header.
+    pub fn get_entrypoint(&self, header_entrypoint: u32) -> u32 {
+        match self {
+            CICKind::CIC_7102 => 0x80000480,
+            CICKind::CIC_X103 | CICKind::CIC_5101 => header_entrypoint.wrapping_sub(0x100000),
+            CICKind::CIC_X106 => header_entrypoint.wrapping_sub(0x200000),
+            _ => header_entrypoint,
         }
     }
 
@@ -163,6 +179,10 @@ mod python_bindings {
             self.get_magic()
         }
 
+        pub fn getEntrypoint(&self, header_entrypoint: u32) -> u32 {
+            self.get_entrypoint(header_entrypoint)
+        }
+
         pub fn getHashMd5(&self) -> &str {
             self.get_hash_md5()
         }
@@ -224,6 +244,11 @@ mod c_bindings {
     #[no_mangle]
     pub extern "C" fn ipl3checksum_cickind_get_magic(kind: CICKind) -> u32 {
         kind.get_magic()
+    }
+
+    #[no_mangle]
+    pub extern "C" fn ipl3checksum_cickind_get_entrypoint(kind: CICKind, header_entrypoint: u32) -> u32 {
+        kind.get_entrypoint(header_entrypoint)
     }
 
     #[no_mangle]

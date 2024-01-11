@@ -7,11 +7,7 @@ use crate::{detect, error::Ipl3ChecksumError, utils};
 fn get_entrypoint_addr(rom_bytes: &[u8], kind: CICKind) -> Result<u32, Ipl3ChecksumError> {
     let entrypoint_addr: u32 = utils::read_u32(rom_bytes, 8)?;
 
-    match kind {
-        CICKind::CIC_X103 | CICKind::CIC_5101 => Ok(entrypoint_addr.wrapping_sub(0x100000)),
-        CICKind::CIC_X106 => Ok(entrypoint_addr.wrapping_sub(0x200000)),
-        _ => Ok(entrypoint_addr),
-    }
+    Ok(kind.get_entrypoint(entrypoint_addr))
 }
 
 const HEADER_IPL3_SIZE: usize = 0x1000;
