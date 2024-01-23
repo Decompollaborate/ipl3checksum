@@ -58,12 +58,12 @@ def processArguments(args: argparse.Namespace):
     exit(doSum(romBytes, kindName, update, outputPath))
 
 def addSubparser(subparser: argparse._SubParsersAction[argparse.ArgumentParser]):
-    parser = subparser.add_parser("sum", help="Calculates the ipl3 checksum of a big endian ROM by detecting the CIC it uses.")
+    parser = subparser.add_parser("sum", help="Calculates the ipl3 checksum of a big endian ROM by detecting the CIC it uses and optionally update it.")
 
     parser.add_argument("rom_path", help="Path to a big endian ROM file", type=Path)
 
-    parser.add_argument("-k", "-c", "--kind", "--cic", help="Used this variant to calculate the checksum instead of automatically detecting which kind the ROM uses", dest="kind", metavar="KIND", choices=ipl3checksum.CICKind.validNames())
-    parser.add_argument("-u", "--update", help="Updates the ROM with the calculated checksum. This option modified the input rom unless `--output` is used", action="store_true")
+    parser.add_argument("-k", "-c", "--kind", "--cic", help="Use this variant to calculate the checksum instead of automatically detecting which kind the ROM uses", dest="kind", metavar="KIND", choices=ipl3checksum.CICKind.validNames())
+    parser.add_argument("-u", "--update", help="Updates the ROM with the calculated checksum. This option modifies the input rom unless `--output` is used", action="store_true")
     parser.add_argument("-o", "--output", help="Path to write the updated ROM. This option is ignored if `--update` is not used", type=Path)
 
     parser.set_defaults(func=processArguments)
