@@ -7,9 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2024-12-15
+
 ### Added
 
 - Prebuilt binaries for Python 3.13.
+
+### Changed
+
+- Python 3.9 or later is now required.
+  - Bump from Python 3.7 to 3.9.
+  - Older versions can't be checked on CI anymore, so I prefer to not claim to
+    support something that may have broken without anybody noticing.
+  - Nothing really changed. Just the CI tools I was using are refusing to use
+    any Python version older than this. Sorry if you were affected by this.
 
 ### Fixed
 
@@ -86,6 +97,7 @@ version of the library.
 - Initial relase
 
 [unreleased]: https://github.com/Decompollaborate/ipl3checksum/compare/main...develop
+[1.2.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/Decompollaborate/ipl3checksum/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/Decompollaborate/ipl3checksum/compare/1.0.1...1.1.0

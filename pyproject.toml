@@ -7,7 +7,7 @@ name = "ipl3checksum"
 version = "1.2.1"
 description = "Library to calculate the IPL3 checksum for N64 ROMs"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 license = {file = "LICENSE"}
 keywords = ["IPL3", "CIC", "checksum", "N64", "Nintendo 64"]
 authors = [
