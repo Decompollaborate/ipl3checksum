@@ -80,7 +80,7 @@ this library with the following line:
 
 ```txt
 ipl3checksum>=1.2.1,<2.0.0
-``````
+```
 
 Now you can invoke the library from your script.
 
