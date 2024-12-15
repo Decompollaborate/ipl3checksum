@@ -79,8 +79,8 @@ If you use a `requirements.txt` file in your repository, then you can add
 this library with the following line:
 
 ```txt
-ipl3checksum>=1.1.0,<2.0.0
-``````
+ipl3checksum>=1.2.1,<2.0.0
+```
 
 Now you can invoke the library from your script.
 
@@ -124,7 +124,7 @@ cargo add ipl3checksum
 Or add the following line manually to your `Cargo.toml` file:
 
 ```toml
-ipl3checksum = "1.1.0"
+ipl3checksum = "1.2.1"
 ```
 
 ### C bindings

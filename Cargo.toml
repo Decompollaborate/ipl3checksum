@@ -4,11 +4,12 @@
 [package]
 name = "ipl3checksum"
 # Version should be synced with src/ipl3checksum/__init__.py, pyproject.toml and src/rs/version.rs
-version = "1.2.0"
+version = "1.2.1"
 edition = "2021"
 description = "Library to calculate the IPL3 checksum for N64 ROMs"
 repository = "https://github.com/decompollaborate/ipl3checksum"
 license = "MIT"
+rust-version = "1.60.0"
 
 [lib]
 name = "ipl3checksum"

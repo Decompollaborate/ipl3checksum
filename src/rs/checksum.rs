@@ -186,7 +186,7 @@ mod tests {
 
                 println!("    Reading...");
 
-                let bin_bytes = fs::read(&bin_path.path()).unwrap();
+                let bin_bytes = fs::read(bin_path.path()).unwrap();
 
                 println!("    Calculating checksum...");
                 let checksum = super::calculate_checksum(&bin_bytes, kind).unwrap();
