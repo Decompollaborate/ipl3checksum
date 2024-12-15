@@ -9,6 +9,7 @@ edition = "2021"
 description = "Library to calculate the IPL3 checksum for N64 ROMs"
 repository = "https://github.com/decompollaborate/ipl3checksum"
 license = "MIT"
+rust-version = "1.60.0"
 
 [lib]
 name = "ipl3checksum"
