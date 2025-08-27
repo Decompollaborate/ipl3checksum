@@ -4,7 +4,7 @@ name: Lint Python code
 on: [push, pull_request]
 
 jobs:
-  checks:
+  mypy_lint:
     name: mypy lint
     runs-on: ubuntu-latest
     steps:
@@ -30,6 +30,7 @@ jobs:
           . .venv/bin/activate
           python3 -m mypy --show-column-numbers --hide-error-context .
 
+  ruff_lint:
     name: ruff lint
     runs-on: ubuntu-latest
     steps:
@@ -55,6 +56,7 @@ jobs:
           . .venv/bin/activate
           ruff check src/
 
+  ruff_format:
     name: ruff format
     runs-on: ubuntu-latest
     steps:
