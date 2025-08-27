@@ -56,38 +56,38 @@ jobs:
             archive: zip
             os_image: windows-latest
             os_name: windows
-            cp_cmd: Copy-Item,
+            cp_cmd: Copy-Item
             cp_r_cmd: Copy-Item -Recurse,
           - target: x86_64-pc-windows-msvc
             archive: zip
             os_image: windows-latest
             os_name: windows
-            cp_cmd: Copy-Item,
+            cp_cmd: Copy-Item
             cp_r_cmd: Copy-Item -Recurse,
           - target: x86_64-apple-darwin
             archive: zip
             os_image: macos-latest
             os_name: macos
-            cp_cmd: cp,
-            cp_r_cmd: cp -r,
+            cp_cmd: cp
+            cp_r_cmd: cp -r
           - target: aarch64-apple-darwin
             archive: zip
             os_image: macos-latest
             os_name: macos
-            cp_cmd: cp,
-            cp_r_cmd: cp -r,
+            cp_cmd: cp
+            cp_r_cmd: cp -r
           - target: x86_64-unknown-linux-musl
             archive: tar.gz
             os_image: ubuntu-22.04
             os_name: linux
-            cp_cmd: cp,
-            cp_r_cmd: cp -r,
+            cp_cmd: cp
+            cp_r_cmd: cp -r
           - target: x86_64-unknown-linux-gnu
             archive: tar.gz
             os_image: ubuntu-22.04
             os_name: linux
-            cp_cmd: cp,
-            cp_r_cmd: cp -r,
+            cp_cmd: cp
+            cp_r_cmd: cp -r
 
     steps:
       - name: Checkout repo
@@ -114,7 +114,7 @@ jobs:
         run: |
           mkdir -p package/lib
           mkdir -p package/include
-          ${{ matrix.cp_cmd }} target/${{ matrix.target }}/release/libipl3checksum.a package/lib/ || cp target/${{ matrix.target }}/release/ipl3checksum.lib package/lib/
+          ${{ matrix.cp_cmd }} target/${{ matrix.target }}/release/libipl3checksum.a package/lib/ || ${{ matrix.cp_cmd }} target/${{ matrix.target }}/release/ipl3checksum.lib package/lib/
           ${{ matrix.cp_r_cmd }} bindings/c/include/* package/include/
           ${{ matrix.cp_cmd }} LICENSE package/ipl3checksum.LICENSE
           ${{ matrix.cp_cmd }} README.md package/ipl3checksum.README.md
