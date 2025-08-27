@@ -9,7 +9,7 @@ edition = "2021"
 description = "Library to calculate the IPL3 checksum for N64 ROMs"
 repository = "https://github.com/decompollaborate/ipl3checksum"
 license = "MIT"
-rust-version = "1.60.0"
+rust-version = "1.61.0"
 categories = ["no-std", "no-std::no-alloc"]
 keywords = ["n64", "metadata", "rom-header"]
 
@@ -28,6 +28,7 @@ c_bindings = ["alloc"]
 python_bindings = ["dep:pyo3", "std"]
 
 [dependencies]
-md5 = "0.7.0"
-pyo3 = { version="0.20.2", features = ["extension-module"], optional = true }
+md5 = "0.8"
 thiserror = { version = "2", default-features = false }
+
+pyo3 = { version="0.25", features = ["extension-module"], optional = true }
