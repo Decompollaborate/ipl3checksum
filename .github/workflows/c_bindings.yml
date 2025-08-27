@@ -114,11 +114,11 @@ jobs:
         run: |
           mkdir -p package/lib
           mkdir -p package/include
-          ${{ cp_cmd }} target/${{ matrix.target }}/release/libipl3checksum.a package/lib/ || cp target/${{ matrix.target }}/release/ipl3checksum.lib package/lib/
-          ${{ cp_r_cmd }} bindings/c/include/* package/include/
-          ${{ cp_cmd }} LICENSE package/ipl3checksum.LICENSE
-          ${{ cp_cmd }} README.md package/ipl3checksum.README.md
-          ${{ cp_cmd }} CHANGELOG.md package/ipl3checksum.CHANGELOG.md
+          ${{ matrix.cp_cmd }} target/${{ matrix.target }}/release/libipl3checksum.a package/lib/ || cp target/${{ matrix.target }}/release/ipl3checksum.lib package/lib/
+          ${{ matrix.cp_r_cmd }} bindings/c/include/* package/include/
+          ${{ matrix.cp_cmd }} LICENSE package/ipl3checksum.LICENSE
+          ${{ matrix.cp_cmd }} README.md package/ipl3checksum.README.md
+          ${{ matrix.cp_cmd }} CHANGELOG.md package/ipl3checksum.CHANGELOG.md
           tree package
 
       - name: Package .tar.gz
