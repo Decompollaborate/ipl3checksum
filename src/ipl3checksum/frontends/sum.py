@@ -16,7 +16,7 @@ def doSum(romBytes: bytes, kindName: str | None, update: bool, outputPath: Path)
         # Detect kind if none was specified by the user
         kind = ipl3checksum.detectCIC(romBytes)
         if kind is None:
-            print(f"Unable to detect CIC kind")
+            print("Unable to detect CIC kind")
             return 1
         print(f"Detected kind is '{kind.name}'")
     else:
@@ -27,7 +27,7 @@ def doSum(romBytes: bytes, kindName: str | None, update: bool, outputPath: Path)
 
     checksum = ipl3checksum.calculateChecksum(romBytes, kind)
     if checksum is None:
-        print(f"Unable to calculate checksum")
+        print("Unable to calculate checksum")
         return 1
 
     chk0, chk1 = checksum
@@ -38,7 +38,7 @@ def doSum(romBytes: bytes, kindName: str | None, update: bool, outputPath: Path)
         outputPath.parent.mkdir(parents=True, exist_ok=True)
         with outputPath.open("wb") as f:
             f.write(romBytes[:0x10])
-            f.write(struct.pack(f">II", chk0, chk1))
+            f.write(struct.pack(">II", chk0, chk1))
             f.write(romBytes[0x18:])
 
     return 0

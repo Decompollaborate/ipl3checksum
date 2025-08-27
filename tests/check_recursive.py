@@ -17,7 +17,7 @@ def checkChecksum(romPath: Path, romBytes: bytes) -> bool:
     print()
     print(romPath)
 
-    binChecksum = struct.unpack_from(f">II", romBytes, 0x10)
+    binChecksum = struct.unpack_from(">II", romBytes, 0x10)
 
     print(f"    Expected checksum is: 0x{binChecksum[0]:08X} 0x{binChecksum[1]:08X}")
 
@@ -60,7 +60,7 @@ def recursePaths(folder: Path) -> int:
             continue
 
         romBytes = subpath.read_bytes()
-        romMagic = struct.unpack_from(f">I", romBytes, 0x0)[0]
+        romMagic = struct.unpack_from(">I", romBytes, 0x0)[0]
 
         print(f"  Rom magic: {romMagic:08X}")
         if romMagic != 0x80371240:

@@ -30,7 +30,7 @@ for ipl3folder in sorted(Path("tests/dummytests").iterdir()):
         print(f"    Calculated checksum is: 0x{checksum[0]:08X} 0x{checksum[1]:08X}")
 
         print("    Checking checksum...")
-        binChecksum = struct.unpack_from(f">II", binBytes, 0x10)
+        binChecksum = struct.unpack_from(">II", binBytes, 0x10)
 
         print(f"    Expected checksum is: 0x{binChecksum[0]:08X} 0x{binChecksum[1]:08X}")
 

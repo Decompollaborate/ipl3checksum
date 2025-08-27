@@ -16,7 +16,7 @@ def doCheck(romBytes: bytes, kindName: str | None) -> int:
         # Detect kind if none was specified by the user
         kind = ipl3checksum.detectCIC(romBytes)
         if kind is None:
-            print(f"Unable to detect CIC kind")
+            print("Unable to detect CIC kind")
             return 1
         print(f"Detected kind is '{kind.name}'")
     else:
@@ -25,19 +25,19 @@ def doCheck(romBytes: bytes, kindName: str | None) -> int:
             print(f"Invalid choice for cic kind. Valid choices: {ipl3checksum.CICKind.validNames()}")
             return 1
 
-    ogChk0, ogChk1 = struct.unpack_from(f">II", romBytes, 0x10)
+    ogChk0, ogChk1 = struct.unpack_from(">II", romBytes, 0x10)
     print(f"Checksum in ROM:     {ogChk0:08X} {ogChk1:08X}")
 
     checksum = ipl3checksum.calculateChecksum(romBytes, kind)
     if checksum is None:
-        print(f"Unable to calculate checksum")
+        print("Unable to calculate checksum")
         return 1
 
     chk0, chk1 = checksum
     print(f"Calculated checksum: {chk0:08X} {chk1:08X}")
 
     if chk0 != ogChk0 or chk1 != ogChk1:
-        print(f"Checksum doesn't match")
+        print("Checksum doesn't match")
         return 1
 
     print("Checksum matches")

@@ -14,7 +14,7 @@ def doDetectCic(romBytes: bytes) -> int:
     kind = ipl3checksum.detectCIC(romBytes)
 
     if kind is None:
-        print(f"Unable to detect CIC kind")
+        print("Unable to detect CIC kind")
         return 1
 
     print(f"Detected kind is '{kind.name}'")

@@ -38,7 +38,7 @@ for kind, in cics:
     assert checksum is not None
     w1, w2 = checksum
 
-    struct.pack_into(f">II", generatedBin, 0x10, w1, w2)
+    struct.pack_into(">II", generatedBin, 0x10, w1, w2)
 
     binPath = Path(f"tests/dummytests/{kind.name}")
     binPath.mkdir(parents=True, exist_ok=True)
