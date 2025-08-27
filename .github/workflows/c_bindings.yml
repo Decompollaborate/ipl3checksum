@@ -4,6 +4,9 @@ on: [push, pull_request]
 
 env:
   CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+  RUSTDOCFLAGS: "-D warnings"
+
 
 jobs:
   test-c-bindings:
@@ -14,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
 
       - name: Make C test programs
         run: make -C bindings/c BUILD_MODE=release
@@ -27,21 +30,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout reposistory
-      uses: actions/checkout@v4
+      - name: Checkout reposistory
+        uses: actions/checkout@main
 
-    - name: Setup Rust toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
 
-    - name: Setup clippy
-      run: rustup component add clippy
+      - name: Setup clippy
+        run: rustup component add clippy
 
-    - name: Run clippy
-      run: cargo clippy --all-targets --features c_bindings -- -D warnings
+      - name: Run clippy
+        run: cargo clippy --all-targets --features c_bindings
 
+  # Releases artifacts to the github release tab
   release:
     name: Release ${{ matrix.crate-type }} for ${{ matrix.target }}
     runs-on: ubuntu-20.04
@@ -64,7 +65,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -100,7 +101,7 @@ jobs:
 
       - name: Upload .tar.gz archive
         if: matrix.archive == 'tar.gz'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@main
         with:
           name: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}
           path: |
@@ -109,7 +110,7 @@ jobs:
 
       - name: Upload .zip archive
         if: matrix.archive == 'zip'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@main
         with:
           name: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}
           path: |

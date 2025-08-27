@@ -12,25 +12,25 @@ jobs:
       fail-fast: false
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@main
 
-    - name: Install Dependencies
-      run: |
-        python3 -m pip install -U maturin
+      - name: Install Dependencies
+        run: |
+          python3 -m pip install -U maturin
 
-    - name: Install local ipl3checksum
-      run: python3 -m pip install .
+      - name: Install local ipl3checksum
+        run: python3 -m pip install .
 
-    - name: Get extra dependencies
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ secrets.SECRETREPO }}
-        token: ${{ secrets.SECRETTOKEN }}
-        path: deps_repo
+      - name: Get extra dependencies
+        uses: actions/checkout@main
+        with:
+          repository: ${{ secrets.SECRETREPO }}
+          token: ${{ secrets.SECRETTOKEN }}
+          path: deps_repo
 
-    - name: Run repo tests
-      run: python3 tests/check_recursive.py deps_repo
+      - name: Run repo tests
+        run: python3 tests/check_recursive.py deps_repo
 
   test_other_repo_py_cli:
     name: Test other repo (Python cli)
@@ -40,22 +40,22 @@ jobs:
       fail-fast: false
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@main
 
-    - name: Install Dependencies
-      run: |
-        python3 -m pip install -U maturin
+      - name: Install Dependencies
+        run: |
+          python3 -m pip install -U maturin
 
-    - name: Install local ipl3checksum
-      run: python3 -m pip install .
+      - name: Install local ipl3checksum
+        run: python3 -m pip install .
 
-    - name: Get extra dependencies
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ secrets.SECRETREPO }}
-        token: ${{ secrets.SECRETTOKEN }}
-        path: deps_repo
+      - name: Get extra dependencies
+        uses: actions/checkout@main
+        with:
+          repository: ${{ secrets.SECRETREPO }}
+          token: ${{ secrets.SECRETTOKEN }}
+          path: deps_repo
 
-    - name: Run repo tests
-      run: bindings/python/tests/test_check_other_repo.sh
+      - name: Run repo tests
+        run: bindings/python/tests/test_check_other_repo.sh

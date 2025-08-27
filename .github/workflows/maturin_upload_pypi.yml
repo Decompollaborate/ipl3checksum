@@ -13,6 +13,10 @@ on:
 permissions:
   contents: read
 
+env:
+  RUSTFLAGS: "-D warnings"
+  RUSTDOCFLAGS: "-D warnings"
+
 jobs:
   linux:
     runs-on: ubuntu-latest
@@ -22,10 +26,10 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@main
         with:
           python-version: '3.13'
 
@@ -38,7 +42,7 @@ jobs:
           manylinux: auto
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@main
         with:
           name: wheels
           path: dist
@@ -52,10 +56,10 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@main
         with:
           python-version: '3.13'
           architecture: ${{ matrix.target }}
@@ -68,7 +72,7 @@ jobs:
           sccache: 'true'
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@main
         with:
           name: wheels
           path: dist
@@ -81,10 +85,10 @@ jobs:
         target: [x86_64, aarch64]
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@main
         with:
           python-version: '3.13'
 
@@ -96,7 +100,7 @@ jobs:
           sccache: 'true'
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@main
         with:
           name: wheels
           path: dist
@@ -108,7 +112,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
 
       - name: Build sdist
         uses: PyO3/maturin-action@v1
@@ -117,7 +121,7 @@ jobs:
           args: --out dist
 
       - name: Upload sdist
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@main
         with:
           name: wheels
           path: dist
@@ -127,20 +131,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout reposistory
-      uses: actions/checkout@v4
+      - name: Checkout reposistory
+        uses: actions/checkout@main
 
-    - name: Setup Rust toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
+      - name: Setup Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
 
-    - name: Setup clippy
-      run: rustup component add clippy
+      - name: Setup clippy
+        run: rustup component add clippy
 
-    - name: Run clippy
-      run: cargo clippy --all-targets --features python_bindings -- -D warnings
+      - name: Run clippy
+        run: cargo clippy --all-targets --features python_bindings
 
   release:
     name: Release
@@ -151,7 +155,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@main
         with:
           name: wheels
 

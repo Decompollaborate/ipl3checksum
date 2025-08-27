@@ -1,4 +1,4 @@
-name: Tests cases
+name: Tests cases (Python lib)
 
 # Build on every branch push, tag push, and pull request change:
 on: [push, pull_request]
@@ -9,18 +9,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@main
 
-    - name: Install Dependencies
-      run: |
-        pip3 install -U maturin
+      - name: Install Dependencies
+        run: |
+          pip3 install -U maturin
 
-    - name: Install local ipl3checksum
-      run: pip install .
+      - name: Install local ipl3checksum
+        run: pip install .
 
-    - name: Update tests outputs
-      run: python3 tests/check_correct_sum.py
+      - name: Update tests outputs
+        run: python3 tests/check_correct_sum.py
 
-    - name: Test exceptions
-      run: python3 tests/exception_test.py
+      - name: Test exceptions
+        run: python3 tests/exception_test.py

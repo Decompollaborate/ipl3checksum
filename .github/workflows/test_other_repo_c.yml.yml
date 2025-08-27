@@ -12,42 +12,42 @@ jobs:
       fail-fast: false
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@main
 
-    - name: Get extra dependencies
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ secrets.SECRETREPO }}
-        token: ${{ secrets.SECRETTOKEN }}
-        path: deps_repo
+      - name: Get extra dependencies
+        uses: actions/checkout@main
+        with:
+          repository: ${{ secrets.SECRETREPO }}
+          token: ${{ secrets.SECRETTOKEN }}
+          path: deps_repo
 
-    - name: Build
-      run: make -C bindings/c BUILD_MODE=release
+      - name: Build
+        run: make -C bindings/c BUILD_MODE=release
 
-    - name: Test detection
-      run: bindings/c/tests/test_detect_other_repo.sh
+      - name: Test detection
+        run: bindings/c/tests/test_detect_other_repo.sh
 
   test_other_repo_c_checksum_autodetect:
-    name: Test other repo checksum_autodetect (C)
-    runs-on: ubuntu-latest
+      name: Test other repo checksum_autodetect (C)
+      runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
+      strategy:
+        fail-fast: false
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@main
 
-    - name: Get extra dependencies
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ secrets.SECRETREPO }}
-        token: ${{ secrets.SECRETTOKEN }}
-        path: deps_repo
+        - name: Get extra dependencies
+          uses: actions/checkout@main
+          with:
+            repository: ${{ secrets.SECRETREPO }}
+            token: ${{ secrets.SECRETTOKEN }}
+            path: deps_repo
 
-    - name: Build
-      run: make -C bindings/c BUILD_MODE=release
+        - name: Build
+          run: make -C bindings/c BUILD_MODE=release
 
-    - name: Test checksum with autodetection
-      run: bindings/c/tests/test_checksum_autodetect_other_repo.sh
+        - name: Test checksum with autodetection
+          run: bindings/c/tests/test_checksum_autodetect_other_repo.sh
