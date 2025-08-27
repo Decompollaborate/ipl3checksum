@@ -58,37 +58,31 @@ jobs:
         crate-type: [staticlib]
         include:
           - target: x86_64-pc-windows-gnu
-            archive: zip
             os_image: windows-latest
             os_name: windows
             cp_cmd: Copy-Item
             cp_r_cmd: Copy-Item -Recurse
           - target: x86_64-pc-windows-msvc
-            archive: zip
             os_image: windows-latest
             os_name: windows
             cp_cmd: Copy-Item
             cp_r_cmd: Copy-Item -Recurse
           - target: x86_64-apple-darwin
-            archive: zip
             os_image: macos-latest
             os_name: macos
             cp_cmd: cp
             cp_r_cmd: cp -r
           - target: aarch64-apple-darwin
-            archive: zip
             os_image: macos-latest
             os_name: macos
             cp_cmd: cp
             cp_r_cmd: cp -r
           - target: x86_64-unknown-linux-musl
-            archive: tar.gz
             os_image: ubuntu-22.04
             os_name: linux
             cp_cmd: cp
             cp_r_cmd: cp -r
           - target: x86_64-unknown-linux-gnu
-            archive: tar.gz
             os_image: ubuntu-22.04
             os_name: linux
             cp_cmd: cp
@@ -126,26 +120,20 @@ jobs:
           ${{ matrix.cp_cmd }} CHANGELOG.md package/ipl3checksum.CHANGELOG.md
           tree package
 
-      - name: Package .tar.gz
-        if: matrix.archive == 'tar.gz'
+      - name: Package archive
         run: |
           cd package && tar -czf ../ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz *
-
-      - name: Package .zip
-        if: matrix.archive == 'zip'
-        run: |
-          cd package && zip -r ../ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.zip *
 
       - name: Upload archive artifact
         uses: actions/upload-artifact@main
         with:
           name: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}
           path: |
-            ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.${{ matrix.archive }}
+            ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz
           if-no-files-found: error
 
       - name: Publish to Github release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.${{ matrix.archive }}
+          files: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz
