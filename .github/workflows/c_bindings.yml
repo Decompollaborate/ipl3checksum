@@ -12,8 +12,6 @@ jobs:
   test-c-bindings:
     name: Test C bindings
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
 
     steps:
       - name: Checkout repo
@@ -49,7 +47,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [x86_64-pc-windows-gnu, x86_64-pc-windows-msvc, x86_64-apple-darwin, x86_64-unknown-linux-musl, x86_64-unknown-linux-gnu]
+        target: [
+          x86_64-pc-windows-gnu,
+          x86_64-pc-windows-msvc,
+          x86_64-apple-darwin,
+          aarch64-apple-darwin,
+          x86_64-unknown-linux-musl,
+          x86_64-unknown-linux-gnu,
+        ]
         crate-type: [staticlib]
         include:
           - target: x86_64-pc-windows-gnu
@@ -57,13 +62,13 @@ jobs:
             os_image: windows-latest
             os_name: windows
             cp_cmd: Copy-Item
-            cp_r_cmd: Copy-Item -Recurse,
+            cp_r_cmd: Copy-Item -Recurse
           - target: x86_64-pc-windows-msvc
             archive: zip
             os_image: windows-latest
             os_name: windows
             cp_cmd: Copy-Item
-            cp_r_cmd: Copy-Item -Recurse,
+            cp_r_cmd: Copy-Item -Recurse
           - target: x86_64-apple-darwin
             archive: zip
             os_image: macos-latest
