@@ -62,31 +62,37 @@ jobs:
             os_name: windows
             cp_cmd: Copy-Item
             cp_r_cmd: Copy-Item -Recurse
+            lib_name: libipl3checksum.a
           - target: x86_64-pc-windows-msvc
             os_image: windows-latest
             os_name: windows
             cp_cmd: Copy-Item
             cp_r_cmd: Copy-Item -Recurse
+            lib_name: ipl3checksum.lib
           - target: x86_64-apple-darwin
             os_image: macos-latest
             os_name: macos
             cp_cmd: cp
             cp_r_cmd: cp -r
+            lib_name: libipl3checksum.a
           - target: aarch64-apple-darwin
             os_image: macos-latest
             os_name: macos
             cp_cmd: cp
             cp_r_cmd: cp -r
+            lib_name: libipl3checksum.a
           - target: x86_64-unknown-linux-musl
             os_image: ubuntu-22.04
             os_name: linux
             cp_cmd: cp
             cp_r_cmd: cp -r
+            lib_name: libipl3checksum.a
           - target: x86_64-unknown-linux-gnu
             os_image: ubuntu-22.04
             os_name: linux
             cp_cmd: cp
             cp_r_cmd: cp -r
+            lib_name: libipl3checksum.a
 
     steps:
       - name: Checkout repo
@@ -118,7 +124,7 @@ jobs:
         run: |
           mkdir -p package/lib
           mkdir -p package/include
-          ${{ matrix.cp_cmd }} target/${{ matrix.target }}/release/libipl3checksum.a package/lib/ || ${{ matrix.cp_cmd }} target/${{ matrix.target }}/release/ipl3checksum.lib package/lib/
+          ${{ matrix.cp_cmd }} target/${{ matrix.target }}/release/${{ lib_name }} package/lib/
           ${{ matrix.cp_r_cmd }} bindings/c/include/* package/include/
           ${{ matrix.cp_cmd }} LICENSE package/ipl3checksum.LICENSE
           ${{ matrix.cp_cmd }} README.md package/ipl3checksum.README.md
