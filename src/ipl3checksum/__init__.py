@@ -10,6 +10,6 @@ __version_info__: tuple[int, int, int] = (1, 2, 1)
 __version__ = ".".join(map(str, __version_info__))
 __author__ = "Decompollaborate"
 
-from .ipl3checksum import * # noqa: F403
+from .ipl3checksum import *  # noqa: F403
 
 from . import frontends as frontends

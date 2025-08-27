@@ -11,6 +11,7 @@ import struct
 
 import ipl3checksum
 
+
 def doCheck(romBytes: bytes, kindName: str | None) -> int:
     if kindName is None:
         # Detect kind if none was specified by the user
@@ -22,7 +23,9 @@ def doCheck(romBytes: bytes, kindName: str | None) -> int:
     else:
         kind = ipl3checksum.CICKind.fromName(kindName)
         if kind is None:
-            print(f"Invalid choice for cic kind. Valid choices: {ipl3checksum.CICKind.validNames()}")
+            print(
+                f"Invalid choice for cic kind. Valid choices: {ipl3checksum.CICKind.validNames()}"
+            )
             return 1
 
     ogChk0, ogChk1 = struct.unpack_from(">II", romBytes, 0x10)
@@ -46,17 +49,30 @@ def doCheck(romBytes: bytes, kindName: str | None) -> int:
 
 def processArguments(args: argparse.Namespace):
     romPath: Path = args.rom_path
-    kindName: str|None = args.kind
+    kindName: str | None = args.kind
 
     romBytes = romPath.read_bytes()
 
     exit(doCheck(romBytes, kindName))
 
+
 def addSubparser(subparser: argparse._SubParsersAction[argparse.ArgumentParser]):
-    parser = subparser.add_parser("check", help="Checks if the checksum in the header matches the calculated checksum")
+    parser = subparser.add_parser(
+        "check",
+        help="Checks if the checksum in the header matches the calculated checksum",
+    )
 
     parser.add_argument("rom_path", help="Path to a big endian ROM file", type=Path)
 
-    parser.add_argument("-k", "-c", "--kind", "--cic", help="Used this variant to calculate the checksum instead of automatically detecting which kind the ROM uses", dest="kind", metavar="KIND", choices=ipl3checksum.CICKind.validNames())
+    parser.add_argument(
+        "-k",
+        "-c",
+        "--kind",
+        "--cic",
+        help="Used this variant to calculate the checksum instead of automatically detecting which kind the ROM uses",
+        dest="kind",
+        metavar="KIND",
+        choices=ipl3checksum.CICKind.validNames(),
+    )
 
     parser.set_defaults(func=processArguments)

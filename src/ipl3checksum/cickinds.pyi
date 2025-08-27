@@ -5,17 +5,16 @@
 
 from __future__ import annotations
 
-class CICKind():
+class CICKind:
     CIC_6101: CICKind
     CIC_6102_7101: CICKind
     CIC_7102: CICKind
-    CIC_X103: CICKind # Both 6103 and 7103
+    CIC_X103: CICKind  # Both 6103 and 7103
     # 6104/7104 does not exist
-    CIC_X105: CICKind # Both 6105 and 7105
-    CIC_X106: CICKind # Both 6106 and 7106
+    CIC_X105: CICKind  # Both 6105 and 7105
+    CIC_X106: CICKind  # Both 6106 and 7106
 
-    CIC_5101: CICKind # Aleck 64
-
+    CIC_5101: CICKind  # Aleck 64
 
     def getSeed(self) -> int:
         """
@@ -42,25 +41,15 @@ class CICKind():
         """
 
     @staticmethod
-    def fromHashMd5(hash_str: str) -> CICKind|None:
-        ...
-
+    def fromHashMd5(hash_str: str) -> CICKind | None: ...
     @property
-    def name(self) -> str:
-        ...
-
+    def name(self) -> str: ...
     @staticmethod
-    def fromName(name: str) -> CICKind|None:
-        ...
-
+    def fromName(name: str) -> CICKind | None: ...
     @staticmethod
-    def validNames() -> list[str]:
-        ...
-
+    def validNames() -> list[str]: ...
     @staticmethod
-    def fromValue(value: int) -> CICKind|None:
-        ...
-
+    def fromValue(value: int) -> CICKind | None: ...
     def calculateChecksum(self, romBytes: bytes) -> tuple[int, int]:
         """Calculates the checksum required by an official CIC of a N64 ROM.
 

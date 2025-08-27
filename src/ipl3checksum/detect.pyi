@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from .cickinds import CICKind
 
-def detectCICRaw(rawBytes: bytes) -> CICKind|None:
+def detectCICRaw(rawBytes: bytes) -> CICKind | None:
     """Tries to detect an IPL3 binary.
 
     The argument to this function must be exactly the IPL3 binary.
@@ -19,8 +19,7 @@ def detectCICRaw(rawBytes: bytes) -> CICKind|None:
         CICKind|None: The detected CIC kind, or `None` if was not able to detect the CIC kind.
     """
 
-
-def detectCIC(romBytes: bytes) -> CICKind|None:
+def detectCIC(romBytes: bytes) -> CICKind | None:
     """Tries to detect an IPL3 in a ROM.
 
     The argument to this function must be a ROM in big endian format.

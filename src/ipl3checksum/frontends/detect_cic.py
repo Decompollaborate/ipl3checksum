@@ -10,6 +10,7 @@ from pathlib import Path
 
 import ipl3checksum
 
+
 def doDetectCic(romBytes: bytes) -> int:
     kind = ipl3checksum.detectCIC(romBytes)
 
@@ -29,8 +30,11 @@ def processArguments(args: argparse.Namespace):
 
     exit(doDetectCic(romBytes))
 
+
 def addSubparser(subparser: argparse._SubParsersAction[argparse.ArgumentParser]):
-    parser = subparser.add_parser("detect_cic", help="Detects the CIC variant of a given rom")
+    parser = subparser.add_parser(
+        "detect_cic", help="Detects the CIC variant of a given rom"
+    )
 
     parser.add_argument("rom_path", help="Path to a big endian ROM file", type=Path)
 

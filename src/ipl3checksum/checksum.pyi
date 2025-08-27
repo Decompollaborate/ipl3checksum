@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from .cickinds import CICKind
 
-def calculateChecksum(romBytes: bytes, kind: CICKind) -> tuple[int, int]|None:
+def calculateChecksum(romBytes: bytes, kind: CICKind) -> tuple[int, int] | None:
     """Calculates the checksum required by an official CIC of a N64 ROM.
 
     Args:
@@ -20,7 +20,7 @@ def calculateChecksum(romBytes: bytes, kind: CICKind) -> tuple[int, int]|None:
         - `romBytes` not being big enough
     """
 
-def calculateChecksumAutodetect(romBytes: bytes) -> tuple[int, int]|None:
+def calculateChecksumAutodetect(romBytes: bytes) -> tuple[int, int] | None:
     """Calculates the checksum required by an official CIC of a N64 ROM.
 
     This function will try to autodetect the CIC kind automatically. If it fails to detect it then it will return `None`.

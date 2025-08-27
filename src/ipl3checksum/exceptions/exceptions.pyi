@@ -5,12 +5,10 @@
 
 from __future__ import annotations
 
-
 class Ipl3ChecksumError(RuntimeError):
     """
     Base exception for all the exceptions raised by this library.
     """
-
 
 class UnalignedRead(Ipl3ChecksumError):
     """
