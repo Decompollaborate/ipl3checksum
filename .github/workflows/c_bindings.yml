@@ -45,7 +45,7 @@ jobs:
   # Releases artifacts to the github release tab
   release:
     name: Release ${{ matrix.crate-type }} for ${{ matrix.target }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os_image }}
     strategy:
       fail-fast: false
       matrix:
@@ -54,19 +54,40 @@ jobs:
         include:
           - target: x86_64-pc-windows-gnu
             archive: zip
-            os: windows-latest
+            os_image: windows-latest
+            os_name: windows
+            cp_cmd: Copy-Item,
+            cp_r_cmd: Copy-Item -Recurse,
           - target: x86_64-pc-windows-msvc
             archive: zip
-            os: windows-latest
+            os_image: windows-latest
+            os_name: windows
+            cp_cmd: Copy-Item,
+            cp_r_cmd: Copy-Item -Recurse,
           - target: x86_64-apple-darwin
             archive: zip
-            os: macos-latest
+            os_image: macos-latest
+            os_name: macos
+            cp_cmd: cp,
+            cp_r_cmd: cp -r,
+          - target: aarch64-apple-darwin
+            archive: zip
+            os_image: macos-latest
+            os_name: macos
+            cp_cmd: cp,
+            cp_r_cmd: cp -r,
           - target: x86_64-unknown-linux-musl
             archive: tar.gz
-            os: ubuntu-22.04
+            os_image: ubuntu-22.04
+            os_name: linux
+            cp_cmd: cp,
+            cp_r_cmd: cp -r,
           - target: x86_64-unknown-linux-gnu
             archive: tar.gz
-            os: ubuntu-22.04
+            os_image: ubuntu-22.04
+            os_name: linux
+            cp_cmd: cp,
+            cp_r_cmd: cp -r,
 
     steps:
       - name: Checkout repo
@@ -77,6 +98,11 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
+      - name: Install other dependencies
+        if: matrix.os_name == 'macos'
+        run: |
+          brew install tree
+
       - name: Build lib
         run: cargo rustc --lib --features c_bindings --release --crate-type ${{ matrix.crate-type }} --target ${{ matrix.target }}
 
@@ -86,12 +112,13 @@ jobs:
 
       - name: Move files for packaging
         run: |
-          mkdir -p package/lib package/include
-          cp target/${{ matrix.target }}/release/libipl3checksum.a package/lib/ || cp target/${{ matrix.target }}/release/ipl3checksum.lib package/lib/
-          cp -r bindings/c/include/* package/include/
-          cp LICENSE package/ipl3checksum.LICENSE
-          cp README.md package/ipl3checksum.README.md
-          cp CHANGELOG.md package/ipl3checksum.CHANGELOG.md
+          mkdir -p package/lib
+          mkdir -p package/include
+          ${{ cp_cmd }} target/${{ matrix.target }}/release/libipl3checksum.a package/lib/ || cp target/${{ matrix.target }}/release/ipl3checksum.lib package/lib/
+          ${{ cp_r_cmd }} bindings/c/include/* package/include/
+          ${{ cp_cmd }} LICENSE package/ipl3checksum.LICENSE
+          ${{ cp_cmd }} README.md package/ipl3checksum.README.md
+          ${{ cp_cmd }} CHANGELOG.md package/ipl3checksum.CHANGELOG.md
           tree package
 
       - name: Package .tar.gz
