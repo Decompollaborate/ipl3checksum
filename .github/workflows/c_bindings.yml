@@ -45,7 +45,7 @@ jobs:
   # Releases artifacts to the github release tab
   release:
     name: Release ${{ matrix.crate-type }} for ${{ matrix.target }}
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -54,14 +54,19 @@ jobs:
         include:
           - target: x86_64-pc-windows-gnu
             archive: zip
+            os: windows-latest
           - target: x86_64-pc-windows-msvc
             archive: zip
+            os: windows-latest
           - target: x86_64-apple-darwin
             archive: zip
+            os: macos-latest
           - target: x86_64-unknown-linux-musl
             archive: tar.gz
+            os: ubuntu-22.04
           - target: x86_64-unknown-linux-gnu
             archive: tar.gz
+            os: ubuntu-22.04
 
     steps:
       - name: Checkout repo
@@ -99,32 +104,15 @@ jobs:
         run: |
           cd package && zip -r ../ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.zip *
 
-      - name: Upload .tar.gz archive
-        if: matrix.archive == 'tar.gz'
+      - name: Upload archive artifact
         uses: actions/upload-artifact@main
         with:
           name: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}
           path: |
-            ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz
+            ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.${{ matrix.archive }}
           if-no-files-found: error
 
-      - name: Upload .zip archive
-        if: matrix.archive == 'zip'
-        uses: actions/upload-artifact@main
-        with:
-          name: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}
-          path: |
-            ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.zip
-          if-no-files-found: error
-
-      - name: Publish .tar.gz release
+      - name: Publish to Github release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/') && matrix.archive == 'tar.gz'
         with:
-          files: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.tar.gz
-
-      - name: Publish .zip release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/') && matrix.archive == 'zip'
-        with:
-          files: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.zip
+          files: ipl3checksum-${{ matrix.crate-type }}-${{ matrix.target }}.${{ matrix.archive }}
