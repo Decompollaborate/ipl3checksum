@@ -124,7 +124,7 @@ jobs:
         run: |
           mkdir -p package/lib
           mkdir -p package/include
-          ${{ matrix.cp_cmd }} target/${{ matrix.target }}/release/${{ lib_name }} package/lib/
+          ${{ matrix.cp_cmd }} target/${{ matrix.target }}/release/${{ matrix.lib_name }} package/lib/
           ${{ matrix.cp_r_cmd }} bindings/c/include/* package/include/
           ${{ matrix.cp_cmd }} LICENSE package/ipl3checksum.LICENSE
           ${{ matrix.cp_cmd }} README.md package/ipl3checksum.README.md
