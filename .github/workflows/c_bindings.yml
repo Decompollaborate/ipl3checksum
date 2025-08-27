@@ -98,6 +98,11 @@ jobs:
           targets: ${{ matrix.target }}
 
       - name: Install other dependencies
+        if: matrix.os_name == 'windows'
+        run: |
+          choco install tree
+
+      - name: Install other dependencies
         if: matrix.os_name == 'macos'
         run: |
           brew install tree
