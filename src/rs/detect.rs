@@ -1,7 +1,7 @@
 /* SPDX-FileCopyrightText: © 2023-2024 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
 
-use crate::{cickinds::CICKind, error::Ipl3ChecksumError, utils};
+use crate::{cickinds::CICKind, error::Ipl3ChecksumError};
 
 /// Tries to detect an IPL3 binary.
 ///
@@ -23,9 +23,9 @@ pub fn detect_cic_raw(raw_bytes: &[u8]) -> Result<CICKind, Ipl3ChecksumError> {
         });
     }
 
-    let bytes_hash = utils::get_hash_md5(raw_bytes);
+    let md5::Digest(arr) = md5::compute(raw_bytes);
 
-    CICKind::from_hash_md5(&bytes_hash)
+    CICKind::from_hash_md5_arr(&arr)
 }
 
 /// Tries to detect an IPL3 in a ROM.

@@ -22,27 +22,11 @@ pub(crate) fn read_u32(bytes: &[u8], offset: usize) -> Result<u32, Ipl3ChecksumE
     }
 }
 
-pub(crate) fn read_u32_vec(
-    bytes: &[u8],
-    offset: usize,
-    len: usize,
-) -> Result<Vec<u32>, Ipl3ChecksumError> {
-    let mut ret = Vec::with_capacity(len);
-
-    for i in 0..len {
-        ret.push(read_u32(bytes, offset + i * 4).unwrap());
-    }
-
-    Ok(ret)
-}
-
-pub(crate) fn get_hash_md5(bytes: &[u8]) -> String {
-    format!("{:x}", md5::compute(bytes))
-}
-
 #[cfg(feature = "c_bindings")]
 pub(crate) mod c_bindings {
     use crate::Ipl3ChecksumError;
+
+    use alloc::vec::Vec;
 
     pub(crate) fn u8_vec_from_pointer_array(
         src_len: usize,
@@ -64,7 +48,7 @@ pub(crate) mod c_bindings {
     pub(crate) fn static_str_from_c_string(
         c_str: *const core::ffi::c_char,
     ) -> Result<&'static str, Ipl3ChecksumError> {
-        let converted = unsafe { std::ffi::CStr::from_ptr(c_str) };
+        let converted = unsafe { core::ffi::CStr::from_ptr(c_str) };
 
         match converted.to_str() {
             Err(_) => Err(Ipl3ChecksumError::StringConversion),
@@ -78,7 +62,7 @@ pub(crate) mod c_bindings {
         }
 
         unsafe {
-            drop(std::ffi::CString::from_raw(s));
+            drop(alloc::ffi::CString::from_raw(s));
         }
 
         Ok(())
@@ -95,7 +79,7 @@ pub(crate) mod c_bindings {
     pub(crate) fn c_string_from_rust_str(
         s: &str,
     ) -> Result<*mut core::ffi::c_char, Ipl3ChecksumError> {
-        let c_str_song = match std::ffi::CString::new(s) {
+        let c_str_song = match alloc::ffi::CString::new(s) {
             Err(_) => return Err(Ipl3ChecksumError::StringConversion),
             Ok(c_s) => c_s,
         };

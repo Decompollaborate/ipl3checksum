@@ -127,6 +127,9 @@ Or add the following line manually to your `Cargo.toml` file:
 ipl3checksum = "1.2.1"
 ```
 
+This crate is `no_std` compatible! Simply turn off the default features to use
+it this way.
+
 ### C bindings
 
 This library provides bindings to call this library from C code. They are

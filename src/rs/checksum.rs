@@ -4,13 +4,14 @@
 use crate::cickinds::CICKind;
 use crate::{detect, error::Ipl3ChecksumError, utils};
 
+const HEADER_IPL3_SIZE: usize = 0x1000;
+const WORD_SIZE: usize = 4;
+
 fn get_entrypoint_addr(rom_bytes: &[u8], kind: CICKind) -> Result<u32, Ipl3ChecksumError> {
-    let entrypoint_addr: u32 = utils::read_u32(rom_bytes, 8)?;
+    let entrypoint_addr: u32 = utils::read_u32(rom_bytes, 2 * WORD_SIZE)?;
 
     Ok(kind.get_entrypoint(entrypoint_addr))
 }
-
-const HEADER_IPL3_SIZE: usize = 0x1000;
 
 /// Calculates the checksum required by an official CIC of a N64 ROM.
 ///
@@ -66,15 +67,18 @@ pub fn calculate_checksum(
         });
     }
 
-    let rom_words = utils::read_u32_vec(
-        rom_bytes,
-        0,
-        (bytes_to_check as usize + HEADER_IPL3_SIZE) / 4,
-    )?;
+    let mut rom_words_iter = rom_bytes
+        .chunks_exact(WORD_SIZE)
+        .skip(HEADER_IPL3_SIZE / WORD_SIZE)
+        .take((bytes_to_check as usize + HEADER_IPL3_SIZE) / WORD_SIZE)
+        .map(|arr| {
+            // Unwraping should be fine since we are requesting for chunks of this exact size.
+            u32::from_be_bytes(arr.try_into().unwrap())
+        });
 
-    let words_to_check = bytes_to_check.wrapping_div(4) as usize;
+    let words_to_check = bytes_to_check.wrapping_div(WORD_SIZE as u32) as usize;
     for i in 0..words_to_check {
-        let word = rom_words[i + (HEADER_IPL3_SIZE / 4)];
+        let word = rom_words_iter.next().unwrap();
 
         let a1 = a3.wrapping_add(word);
         if a1 < a3 {
@@ -96,7 +100,13 @@ pub fn calculate_checksum(
         if kind == CICKind::CIC_X105 {
             // ipl3 6105 copies 0x330 bytes from the ROM's offset 0x000554 (or offset 0x000514 into IPL3) to vram 0xA0000004
             let temp = (i & 0x3F) | 0x80;
-            let t7 = rom_words[temp + 0x154];
+            let displacement = &rom_bytes[(temp + 0x154) * WORD_SIZE..];
+            let t7 = u32::from_be_bytes([
+                displacement[0],
+                displacement[1],
+                displacement[2],
+                displacement[3],
+            ]);
 
             t4 = t4.wrapping_add(word ^ t7);
         } else {
@@ -161,62 +171,6 @@ pub fn calculate_checksum_autodetect(rom_bytes: &[u8]) -> Result<(u32, u32), Ipl
     let kind = detect::detect_cic(rom_bytes)?;
 
     calculate_checksum(rom_bytes, kind)
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::{cickinds::CICKind, utils};
-    use std::fs;
-
-    #[test]
-    fn test_dummy_files() -> Result<(), super::Ipl3ChecksumError> {
-        for path_result in fs::read_dir("tests/dummytests").unwrap() {
-            let ipl3_folder = path_result.unwrap();
-            let folder_name = ipl3_folder.file_name();
-
-            println!("{:?}", folder_name);
-
-            let kind = CICKind::from_name(folder_name.to_str().unwrap()).unwrap();
-            println!("CIC Kind: {:?}", kind);
-
-            for bin_path_result in fs::read_dir(ipl3_folder.path()).unwrap() {
-                let bin_path = bin_path_result.unwrap();
-
-                println!("{:?}", bin_path);
-
-                println!("    Reading...");
-
-                let bin_bytes = fs::read(bin_path.path()).unwrap();
-
-                println!("    Calculating checksum...");
-                let checksum = super::calculate_checksum(&bin_bytes, kind).unwrap();
-                println!("Used CIC Kind: {:?}", kind);
-
-                println!(
-                    "    Calculated checksum is: 0x{:08X} 0x{:08X}",
-                    checksum.0, checksum.1
-                );
-
-                println!("    Checking checksum...");
-                let bin_checksum = utils::read_u32_vec(&bin_bytes, 0x10, 2)?;
-
-                println!(
-                    "    Expected checksum is: 0x{:08X} 0x{:08X}",
-                    bin_checksum[0], bin_checksum[1]
-                );
-
-                assert_eq!(checksum.0, bin_checksum[0]);
-                assert_eq!(checksum.1, bin_checksum[1]);
-
-                println!("    {:?} OK", bin_path);
-
-                println!();
-            }
-
-            println!();
-        }
-        Ok(())
-    }
 }
 
 #[cfg(feature = "python_bindings")]

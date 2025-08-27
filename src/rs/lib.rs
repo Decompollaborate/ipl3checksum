@@ -1,6 +1,11 @@
 /* SPDX-FileCopyrightText: © 2023-2024 Decompollaborate */
 /* SPDX-License-Identifier: MIT */
 
+#![cfg_attr(not(feature = "std"), no_std)]
+#![cfg(feature = "alloc")]
+#[macro_use]
+extern crate alloc;
+
 mod checksum;
 mod cickinds;
 mod detect;
@@ -84,6 +89,3 @@ mod python_bindings {
         Ok(())
     }
 }
-
-#[cfg(test)]
-mod tests {}

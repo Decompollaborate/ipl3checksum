@@ -6,6 +6,28 @@ use pyo3::prelude::*;
 
 use crate::{checksum, Ipl3ChecksumError};
 
+const MD5_CIC_6101: [u8; 16] = [
+    0x90, 0x0b, 0x4a, 0x5b, 0x68, 0xed, 0xb7, 0x1f, 0x4c, 0x7e, 0xd5, 0x2a, 0xcd, 0x81, 0x4f, 0xc5,
+];
+const MD5_CIC_6102_7101: [u8; 16] = [
+    0xe2, 0x4d, 0xd7, 0x96, 0xb2, 0xfa, 0x16, 0x51, 0x15, 0x21, 0x13, 0x9d, 0x28, 0xc8, 0x35, 0x6b,
+];
+const MD5_CIC_7102: [u8; 16] = [
+    0x95, 0x58, 0x94, 0xc2, 0xe4, 0x0a, 0x69, 0x8b, 0xf9, 0x8a, 0x67, 0xb7, 0x8a, 0x4e, 0x28, 0xfa,
+];
+const MD5_CIC_X103: [u8; 16] = [
+    0x31, 0x90, 0x38, 0x09, 0x73, 0x46, 0xe1, 0x2c, 0x26, 0xc3, 0xc2, 0x1b, 0x56, 0xf8, 0x6f, 0x23,
+];
+const MD5_CIC_X105: [u8; 16] = [
+    0xff, 0x22, 0xa2, 0x96, 0xe5, 0x5d, 0x34, 0xab, 0x0a, 0x07, 0x7d, 0xc2, 0xba, 0x5f, 0x57, 0x96,
+];
+const MD5_CIC_X106: [u8; 16] = [
+    0x64, 0x60, 0x38, 0x77, 0x49, 0xac, 0x0b, 0xd9, 0x25, 0xaa, 0x54, 0x30, 0xbc, 0x78, 0x64, 0xfe,
+];
+const MD5_CIC_5101: [u8; 16] = [
+    0x71, 0x1f, 0x8c, 0x3a, 0xc5, 0x4f, 0xc7, 0x0a, 0x42, 0x62, 0x6b, 0xf6, 0xc1, 0x71, 0x44, 0x3d,
+];
+
 /* This needs to be in sync with the C equivalent at `bindings/c/include/ipl3checksum/cickinds.h` */
 #[cfg_attr(feature = "python_bindings", pyclass(module = "ipl3checksum"))]
 // repr is kinda complex and I may have got it wrong.
@@ -71,6 +93,17 @@ impl CICKind {
             Self::CIC_5101 => "711f8c3ac54fc70a42626bf6c171443d",
         }
     }
+    pub fn get_hash_md5_arr(&self) -> [u8; 16] {
+        match self {
+            Self::CIC_6101 => MD5_CIC_6101,
+            Self::CIC_6102_7101 => MD5_CIC_6102_7101,
+            Self::CIC_7102 => MD5_CIC_7102,
+            Self::CIC_X103 => MD5_CIC_X103,
+            Self::CIC_X105 => MD5_CIC_X105,
+            Self::CIC_X106 => MD5_CIC_X106,
+            Self::CIC_5101 => MD5_CIC_5101,
+        }
+    }
 
     pub fn from_hash_md5(hash_str: &str) -> Result<Self, Ipl3ChecksumError> {
         match hash_str {
@@ -81,6 +114,18 @@ impl CICKind {
             "ff22a296e55d34ab0a077dc2ba5f5796" => Ok(Self::CIC_X105),
             "6460387749ac0bd925aa5430bc7864fe" => Ok(Self::CIC_X106),
             "711f8c3ac54fc70a42626bf6c171443d" => Ok(Self::CIC_5101),
+            _ => Err(Ipl3ChecksumError::UnableToDetectCIC),
+        }
+    }
+    pub fn from_hash_md5_arr(arr: &[u8; 16]) -> Result<Self, Ipl3ChecksumError> {
+        match *arr {
+            MD5_CIC_6101 => Ok(Self::CIC_6101),
+            MD5_CIC_6102_7101 => Ok(Self::CIC_6102_7101),
+            MD5_CIC_7102 => Ok(Self::CIC_7102),
+            MD5_CIC_X103 => Ok(Self::CIC_X103),
+            MD5_CIC_X105 => Ok(Self::CIC_X105),
+            MD5_CIC_X106 => Ok(Self::CIC_X106),
+            MD5_CIC_5101 => Ok(Self::CIC_5101),
             _ => Err(Ipl3ChecksumError::UnableToDetectCIC),
         }
     }
@@ -112,8 +157,9 @@ impl CICKind {
         }
     }
 
+    #[cfg(feature = "alloc")]
     /// Returns a Vec of valid names for `from_name`
-    pub fn valid_names() -> Vec<&'static str> {
+    pub fn valid_names() -> alloc::vec::Vec<&'static str> {
         vec![
             "CIC_6101",
             "6101",

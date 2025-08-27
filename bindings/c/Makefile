@@ -29,7 +29,7 @@ CARGO_FLAGS ?=
 ifneq ($(BUILD_MODE), debug)
     CARGO_FLAGS += --release
 endif
-$(shell cargo build --lib --features c_bindings $(CARGO_FLAGS))
+$(shell cargo build --lib --no-default-features --features c_bindings $(CARGO_FLAGS))
 
 
 %.elf: %.c $(LIB) tests/utils.c

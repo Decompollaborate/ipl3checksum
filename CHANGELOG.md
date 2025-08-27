@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add `no_std` compatibility to the Rust crate.
+
 ### Changed
 
 - The prebuilt lib for C bindings are now always packaged as `.tar.gz` for
