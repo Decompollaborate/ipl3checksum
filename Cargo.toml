@@ -31,4 +31,4 @@ python_bindings = ["dep:pyo3", "std"]
 md5 = "0.8"
 thiserror = { version = "2", default-features = false }
 
-pyo3 = { version="0.25", features = ["extension-module"], optional = true }
+pyo3 = { version="0.26", features = ["extension-module"], optional = true }
