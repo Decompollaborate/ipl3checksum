@@ -38,14 +38,8 @@ mod python_bindings {
             checksum::python_bindings::calculateChecksumAutodetect,
             m
         )?)?;
-        m.add_function(wrap_pyfunction!(
-            detect::python_bindings::detectCICRaw,
-            m
-        )?)?;
-        m.add_function(wrap_pyfunction!(
-            detect::python_bindings::detectCIC,
-            m
-        )?)?;
+        m.add_function(wrap_pyfunction!(detect::python_bindings::detectCICRaw, m)?)?;
+        m.add_function(wrap_pyfunction!(detect::python_bindings::detectCIC, m)?)?;
 
         // Exceptions
 
