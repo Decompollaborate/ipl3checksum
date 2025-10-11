@@ -87,8 +87,7 @@ Now you can invoke the library from your script.
 #### Development version
 
 The unstable development version is located at the
-[develop](https://github.com/Decompollaborate/ipl3checksum/tree/develop)
-branch. PRs should be made into that branch instead of the main one.
+[1.x](https://github.com/Decompollaborate/ipl3checksum/tree/1.x) branch.
 
 Since this library uses Rust code then you'll need a Rust compiler installed
 on your system. To build the Python bindings you'll also need `maturin`
@@ -105,7 +104,7 @@ clone the repository, then you could use the following commands:
 
 ```bash
 python3 -m pip uninstall ipl3checksum
-python3 -m pip install git+https://github.com/Decompollaborate/ipl3checksum.git@develop
+python3 -m pip install git+https://github.com/Decompollaborate/ipl3checksum.git@1.x
 ```
 
 NOTE: Installing the development version is not recommended unless you know what

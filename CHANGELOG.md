@@ -109,7 +109,7 @@ version of the library.
 
 - Initial relase
 
-[unreleased]: https://github.com/Decompollaborate/ipl3checksum/compare/main...develop
+[unreleased]: https://github.com/Decompollaborate/ipl3checksum/compare/1.2.1...HEAD
 [1.2.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/Decompollaborate/ipl3checksum/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.1.0...1.1.1
