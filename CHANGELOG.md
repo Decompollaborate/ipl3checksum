@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2025-10-11
+
 ### Added
 
 - Add `no_std` compatibility to the Rust crate.
+- Prebuilt binaries for Python 3.14.
 
 ### Changed
 
@@ -109,7 +112,8 @@ version of the library.
 
 - Initial relase
 
-[unreleased]: https://github.com/Decompollaborate/ipl3checksum/compare/1.2.1...HEAD
+[unreleased]: https://github.com/Decompollaborate/ipl3checksum/compare/1.3.0...HEAD
+[1.3.0]: https://github.com/Decompollaborate/ipl3checksum/compare/1.2.1...1.3.0
 [1.2.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/Decompollaborate/ipl3checksum/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.1.0...1.1.1
