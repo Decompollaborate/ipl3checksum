@@ -14,6 +14,7 @@ pub static VERSION_STR: &str = "1.3.0";
 pub static AUTHOR: &str = "Decompollaborate";
 
 #[cfg(feature = "c_bindings")]
+#[allow(non_upper_case_globals)]
 mod c_bindings {
     #[no_mangle]
     static ipl3checksum_version_major: i32 = super::VERSION_MAJOR;
