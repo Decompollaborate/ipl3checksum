@@ -5,22 +5,51 @@ on: [push, pull_request]
 
 jobs:
   test_other_repo_py_script:
-    name: Test other repo (Python script)
-    runs-on: ubuntu-latest
-
+    name: Test other repo (Python ${{ matrix.py_version }})
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
+      matrix:
+        py_version:
+          - '3.7'
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+          - '3.13'
+          - '3.14'
+          - '3.14t'
+          - '3.x' # Explicit latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@main
 
-      - name: Install Dependencies
-        run: |
-          python3 -m pip install -U maturin
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Install local ipl3checksum
-        run: python3 -m pip install .
+      - name: Set up Python ${{ matrix.py_version }}
+        uses: actions/setup-python@main
+        with:
+          python-version: ${{ matrix.py_version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Setup venv ${{ matrix.py_version }}
+        if: ${{ matrix.py_version != '3.x' }}
+        run: |
+          uv venv --python ${{ matrix.py_version }}
+      # `--python 3 --managed-python` makes uv to install the latest python version available
+      - name: Setup venv 3.x
+        if: ${{ matrix.py_version == '3.x' }}
+        run: |
+          uv venv --python 3 --managed-python
+
+      - name: Sync venv
+        run: |
+          uv sync
 
       - name: Get extra dependencies
         uses: actions/checkout@main
@@ -30,25 +59,54 @@ jobs:
           path: deps_repo
 
       - name: Run repo tests
-        run: python3 tests/check_recursive.py deps_repo
+        run: uv run tests/check_recursive.py deps_repo
 
   test_other_repo_py_cli:
-    name: Test other repo (Python cli)
-    runs-on: ubuntu-latest
-
+    name: Test other rep (Python ${{ matrix.py_version }})
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
+      matrix:
+        py_version:
+          - '3.7'
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+          - '3.13'
+          - '3.14'
+          - '3.14t'
+          - '3.x' # Explicit latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@main
 
-      - name: Install Dependencies
-        run: |
-          python3 -m pip install -U maturin
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Install local ipl3checksum
-        run: python3 -m pip install .
+      - name: Set up Python ${{ matrix.py_version }}
+        uses: actions/setup-python@main
+        with:
+          python-version: ${{ matrix.py_version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Setup venv ${{ matrix.py_version }}
+        if: ${{ matrix.py_version != '3.x' }}
+        run: |
+          uv venv --python ${{ matrix.py_version }}
+      # `--python 3 --managed-python` makes uv to install the latest python version available
+      - name: Setup venv 3.x
+        if: ${{ matrix.py_version == '3.x' }}
+        run: |
+          uv venv --python 3 --managed-python
+
+      - name: Sync venv
+        run: |
+          uv sync
 
       - name: Get extra dependencies
         uses: actions/checkout@main
@@ -58,4 +116,6 @@ jobs:
           path: deps_repo
 
       - name: Run repo tests
-        run: bindings/python/tests/test_check_other_repo.sh
+        run: |
+          . .venv/bin/activate
+          bindings/python/tests/test_check_other_repo.sh

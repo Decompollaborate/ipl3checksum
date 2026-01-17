@@ -4,10 +4,10 @@
 [project]
 name = "ipl3checksum"
 # Version should be synced with src/ipl3checksum/__init__.py, Cargo.toml and src/rs/version.rs
-version = "1.3.0"
+version = "1.3.1"
 description = "Library to calculate the IPL3 checksum for N64 ROMs"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.7"
 license = {file = "LICENSE"}
 keywords = ["IPL3", "CIC", "checksum", "N64", "Nintendo 64"]
 authors = [
@@ -44,12 +44,6 @@ build-backend = "maturin"
 
 [project.scripts]
 ipl3checksum = "ipl3checksum.__main__:ipl3checksumMain"
-
-[tool.cibuildwheel]
-skip = ["cp36-*"]
-
-[tool.setuptools.package-data]
-ipl3checksum = ["py.typed"]
 
 [tool.maturin]
 features = ["pyo3/extension-module", "python_bindings"]
