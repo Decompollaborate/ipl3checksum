@@ -24,7 +24,7 @@ mod python_bindings {
 
     use super::*;
 
-    #[pymodule]
+    #[pymodule(gil_uesd = false)]
     fn ipl3checksum(m: &Bound<'_, PyModule>) -> PyResult<()> {
         // Classes
         m.add_class::<cickinds::CICKind>()?;

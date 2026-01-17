@@ -79,7 +79,7 @@ If you use a `requirements.txt` file in your repository, then you can add
 this library with the following line:
 
 ```txt
-ipl3checksum>=1.3.0,<2.0.0
+ipl3checksum>=1.3.1,<2.0.0
 ```
 
 Now you can invoke the library from your script.
@@ -123,7 +123,7 @@ cargo add ipl3checksum
 Or add the following line manually to your `Cargo.toml` file:
 
 ```toml
-ipl3checksum = "1.3.0"
+ipl3checksum = "1.3.1"
 ```
 
 This crate is `no_std` compatible! Simply turn off the default features to use
