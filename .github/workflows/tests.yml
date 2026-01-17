@@ -5,22 +5,54 @@ on: [push, pull_request]
 
 jobs:
   tests_cases:
-    name: Tests cases
-    runs-on: ubuntu-latest
+    name: Tests cases (Python ${{ matrix.py_version }})
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        py_version:
+          - '3.7'
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+          - '3.13'
+          - '3.14'
+          - '3.14t'
+          - '3.x' # Explicit latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@main
 
-      - name: Install Dependencies
-        run: |
-          pip3 install -U maturin
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Install local ipl3checksum
-        run: pip install .
+      - name: Set up Python ${{ matrix.py_version }}
+        uses: actions/setup-python@main
+        with:
+          python-version: ${{ matrix.py_version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Setup venv ${{ matrix.py_version }}
+        if: ${{ matrix.py_version != '3.x' }}
+        run: |
+          uv venv --python ${{ matrix.py_version }}
+      # `--python 3 --managed-python` makes uv to install the latest python version available
+      - name: Setup venv 3.x
+        if: ${{ matrix.py_version == '3.x' }}
+        run: |
+          uv venv --python 3 --managed-python
+
+      - name: Sync venv
+        run: |
+          uv sync
 
       - name: Update tests outputs
-        run: python3 tests/check_correct_sum.py
+        run: uv run tests/check_correct_sum.py
 
       - name: Test exceptions
-        run: python3 tests/exception_test.py
+        run: uv run tests/exception_test.py
