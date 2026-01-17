@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-01-17
+
+### Added
+
+- Add support for Python 3.7 again.
+  - Figured out how to have CI to test compatibility with Python 3.7 again.
+- Wheels for free threaded Python (3.14t).
+  - Hopefully nothing will break when running without the GIL.
+- Wheels are now tested to be installable in CI.
+  - Specifically useful for abi3 wheels, so we can ensure the wheel is
+    installable in the oldest Python version we support for each OS/arch combo.
+- Integrate `uv` in CI for Python and dependencies management.
+
+### Changed
+
+- Wheels now use the stable abi3 abi instead of building a single wheel for
+  each version for GIL Python.
+- Python tests in CI are now run against all the Python versions we support
+  instead of relying on whatever Python version the Github runner has.
+
 ## [1.3.0] - 2025-10-11
 
 ### Added
@@ -112,7 +132,8 @@ version of the library.
 
 - Initial relase
 
-[unreleased]: https://github.com/Decompollaborate/ipl3checksum/compare/1.3.0...HEAD
+[unreleased]: https://github.com/Decompollaborate/ipl3checksum/compare/1.3.1...HEAD
+[1.3.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/Decompollaborate/ipl3checksum/compare/1.2.1...1.3.0
 [1.2.1]: https://github.com/Decompollaborate/ipl3checksum/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/Decompollaborate/ipl3checksum/compare/1.1.1...1.2.0

@@ -14,7 +14,7 @@ jobs:
           - '3.8'
 
     steps:
-      - name: Checkout reposistory
+      - name: Checkout repository
         uses: actions/checkout@main
 
       - name: Set up Python ${{ matrix.py_version }}
@@ -71,7 +71,7 @@ jobs:
           - '3.8'
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repositoryh
         uses: actions/checkout@main
 
       - name: Set up Python ${{ matrix.py_version }}
